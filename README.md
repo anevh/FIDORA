@@ -1,3 +1,3 @@
 # CoMet
-#list of functions we should include
+#list of functions we should include \n
 #calibration curve
