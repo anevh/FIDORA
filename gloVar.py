@@ -55,7 +55,6 @@ global correction127_red
 with open('output_red_127.txt', 'r') as f:
     correction127_red = [[float(num) for num in line.split(',')] for line in f]
 correction127_red = np.matrix(correction127_red)
-print(correction127_red)
 global correction127_green
 with open('output_green_127.txt', 'r') as f:
     correction127_green = [[float(num) for num in line.split(',')] for line in f]
