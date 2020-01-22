@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, INSERT, DISABLED, GROOVE
+from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton
 import Globals
 
 
@@ -23,9 +23,33 @@ upload_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.31)
 upload_box.insert(INSERT," ")
 upload_box.config(state=DISABLED, bd=0)
 upload_button = tk.Button(Globals.tab1, text='Browse',cursor='hand2',font=('calibri', '14'),\
-    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.nothingButton)
+    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
 upload_button.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.305)
 
+
+## Text and buttons for the user to choose DPI
+choose_CoMet_dpi = tk.Text(Globals.tab1, height=1, width=1)
+choose_CoMet_dpi.place(relwidth=0.35, relheight=0.5, relx=0.07, rely=0.41)
+choose_CoMet_dpi.insert(tk.CURRENT,"Dots per inch (dpi) used during scanning: ")
+choose_CoMet_dpi.config(state=DISABLED, bd=0, font=('calibri', '15'))
+Radiobutton(Globals.tab1, text='72 dpi',cursor='hand2',font=('calibri', '14'), \
+    variable=Globals.CoMet_dpi, value=72, command=CoMet_functions.nothingButton).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.46)
+Radiobutton(Globals.tab1, text='127 dpi',cursor='hand2',font=('calibri', '14'), \
+    variable=Globals.CoMet_dpi, value=127, command=CoMet_functions.nothingButton).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.46)
+
+
+## Text and buttons for the user to select upload folder
+#folder_tx = tk.Text(gloVar.root, height=1, width=1)
+#folder_tx.place(relwidth=0.4, relheight=0.05, relx=0.08, rely=0.57)
+#folder_tx.insert(INSERT,"Folder to save the corrected image:")
+#folder_tx.config(state=DISABLED, bd=0, font=('calibri', '15'), bg ='#D98880') 
+#folder_box = tk.Text(gloVar.root, height=1, width=1)
+#folder_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.57)
+#folder_box.insert(INSERT," ")
+#folder_box.config(state=DISABLED, bd=0, font=('calibri', '12'), bg ='#FDFEFE') 
+#toFolder = tk.Button(gloVar.root, text='Browse', cursor='hand2',font=('calibri', '14'),\
+#    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=Export_File)
+#toFolder.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.565)
 
 ##################################### TAB 2 - Dose respons ############################################
 
