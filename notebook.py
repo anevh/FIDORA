@@ -13,7 +13,7 @@ Globals.tab_parent.add(Globals.tab2, text='Dose-response')
 
 import CoMet_functions
 
-## Text and button for uploading image
+## Text and button for uploading image 
 upload_file = tk.Text(Globals.tab1, height=1, width=1)
 upload_file.place(relwidth=0.28, relheight=0.05, relx=0.1, rely=0.31)
 upload_file.insert(INSERT,"Upload file you want to correct:")
@@ -32,7 +32,7 @@ upload_button.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.305)
 ## Text and button for uploading image
 upload_file = tk.Text(Globals.tab2, height=1, width=1)
 upload_file.place(relwidth=0.28, relheight=0.05, relx=0.1, rely=0.31)
-upload_file.insert(INSERT,"Upload file you want to correct:")
+upload_file.insert(INSERT,"Upload image file for calibration:")
 upload_file.config(state=DISABLED, bd=0) 
 upload_box = tk.Text(Globals.tab2, height=1, width=1)
 upload_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.31)
