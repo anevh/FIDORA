@@ -63,9 +63,18 @@ upload_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.31)
 upload_box.insert(INSERT," ")
 upload_box.config(state=DISABLED, bd=0)
 upload_button = tk.Button(Globals.tab2, text='Browse',cursor='hand2',font=('calibri', '14'),\
-    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.nothingButton)
+    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
 upload_button.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.305)
 
+## Text and buttons for the user to choose DPI
+choose_doseResponse_dpi = tk.Text(Globals.tab2, height=1, width=1)
+choose_doseResponse_dpi.place(relwidth=0.35, relheight=0.5, relx=0.07, rely=0.41)
+choose_doseResponse_dpi.insert(tk.CURRENT,"Dots per inch (dpi) used during scanning: ")
+choose_doseResponse_dpi.config(state=DISABLED, bd=0, font=('calibri', '15'))
+Radiobutton(Globals.tab2, text='72 dpi',cursor='hand2',font=('calibri', '14'), \
+    variable=Globals.doseResponse_dpi, value=72, command=CoMet_functions.nothingButton).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.46)
+Radiobutton(Globals.tab2, text='127 dpi',cursor='hand2',font=('calibri', '14'), \
+    variable=Globals.doseResponse_dpi, value=127, command=CoMet_functions.nothingButton).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.46)
 
 
 
