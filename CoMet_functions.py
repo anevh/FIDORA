@@ -21,3 +21,16 @@ def UploadAction(event=None):
     else:
         messagebox.showerror("Error", "The file must be a .tif file")
         Globals.CoMet_uploaded_filename.set("Error!") 
+
+def setCoMet_dpi():
+    dpi = Globals.CoMet_dpi.get()
+    print(dpi)
+    return dpi
+
+def setCoMet_export_folder():
+    Globals.CoMet_export_folder.set(filedialog.askdirectory())
+    os.chdir(Globals.CoMet_export_folder.get())
+    save_to_folder=tk.Text(Globals.tab1, height=1, width=1)
+    save_to_folder.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.57)
+    save_to_folder.insert(INSERT, basename(normpath(Globals.CoMet_export_folder.get())))
+    save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'))
