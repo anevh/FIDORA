@@ -29,8 +29,13 @@ def setCoMet_dpi():
 
 def setCoMet_export_folder():
     Globals.CoMet_export_folder.set(filedialog.askdirectory())
-    os.chdir(Globals.CoMet_export_folder.get())
-    save_to_folder=tk.Text(Globals.tab1, height=1, width=1)
-    save_to_folder.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.57)
-    save_to_folder.insert(INSERT, basename(normpath(Globals.CoMet_export_folder.get())))
-    save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'))
+    if(Globals.CoMet_export_folder.get() == ""):
+        #If this: the dialogbox was closed and no folder selected.
+        Globals.CoMet_export_folder = "Error!"
+    else:
+        os.chdir(Globals.CoMet_export_folder.get())
+        save_to_folder=tk.Text(Globals.tab1, height=1, width=1)
+        save_to_folder.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.57)
+        save_to_folder.insert(INSERT, basename(normpath(Globals.CoMet_export_folder.get())))
+        save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'))
+
