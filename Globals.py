@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, StringVar
+import numpy as np
+
 
 global form 
 form = tk.Tk()
@@ -16,6 +18,13 @@ global CoMet_dpi
 CoMet_dpi = StringVar(tab1)
 CoMet_dpi.set("127")
 
+global doseResponse_dpi
+doseResponse_dpi="127"
+
+global CoMet_saveAs
+CoMet_saveAs = tk.StringVar(tab1)
+CoMet_saveAs.set(".dcm")
+
 global CoMet_uploaded_filename 
 CoMet_uploaded_filename=StringVar(tab1)
 CoMet_uploaded_filename.set("Error!")
@@ -23,3 +32,69 @@ CoMet_uploaded_filename.set("Error!")
 global CoMet_export_folder
 CoMet_export_folder=StringVar(tab1)
 CoMet_export_folder.set("Error!")
+
+global doseResponse_uploaded_filename 
+doseResponse_uploaded_filename=StringVar(tab2)
+doseResponse_uploaded_filename.set("Error!")
+
+global CoMet_correcte_image_filename_box
+
+global CoMet_corrected_image_filename          
+CoMet_corrected_image_filename=StringVar(tab1)
+CoMet_corrected_image_filename.set("Error!")
+
+global CoMet_patientName_box
+
+global CoMet_patientName
+CoMet_patientName=StringVar(tab1)
+CoMet_patientName.set("Error!")
+
+global CoMet_correctedImage
+CoMet_correctedImage=None
+
+
+
+############################### Correction matrix ######################################3
+
+global correction127_red
+with open('output_red_127.txt', 'r') as f:
+    correction127_red = [[float(num) for num in line.split(',')] for line in f]
+correction127_red = np.matrix(correction127_red)
+global correction127_green
+with open('output_green_127.txt', 'r') as f:
+    correction127_green = [[float(num) for num in line.split(',')] for line in f]
+correction127_green = np.matrix(correction127_green)
+
+global correction127_blue
+with open('output_blue_127.txt', 'r') as f:
+    correction127_blue = [[float(num) for num in line.split(',')] for line in f]
+correction127_blue = np.matrix(correction127_blue)
+
+global correction72_red
+with open('output_red_72.txt', 'r') as f:
+    correction72_red = [[float(num) for num in line.split(',')] for line in f]
+correction72_red = np.matrix(correction72_red)
+
+global correction72_green
+with open('output_green_72.txt', 'r') as f:
+    correction72_green = [[float(num) for num in line.split(',')] for line in f]
+correction72_green = np.matrix(correction72_green)
+
+global correction72_blue
+with open('output_blue_72.txt', 'r') as f:
+    correction72_blue = [[float(num) for num in line.split(',')] for line in f]
+correction72_blue = np.matrix(correction72_blue)
+
+
+global correctionMatrix127
+correctionMatrix127 = np.zeros((1270,1016,3))
+correctionMatrix127[:,:,0] = correction127_blue[:,:]
+correctionMatrix127[:,:,1] = correction127_green[:,:]
+correctionMatrix127[:,:,2] = correction127_red[:,:]
+
+global correctionMatrix72
+correctionMatrix72 = np.zeros((720,576,3))
+correctionMatrix72[:,:,0] = correction72_blue[:,:]
+correctionMatrix72[:,:,1] = correction72_green[:,:]
+correctionMatrix72[:,:,2] = correction72_red[:,:]
+
