@@ -27,6 +27,7 @@ upload_button = tk.Button(Globals.tab1, text='Browse',cursor='hand2',font=('cali
 upload_button.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.305)
 
 
+<<<<<<< HEAD
 ## Text and buttons for the user to choose DPI
 choose_CoMet_dpi = tk.Text(Globals.tab1, height=1, width=1)
 choose_CoMet_dpi.place(relwidth=0.35, relheight=0.5, relx=0.07, rely=0.41)
@@ -52,7 +53,22 @@ Radiobutton(Globals.tab1, text='127 dpi',cursor='hand2',font=('calibri', '14'), 
 #toFolder.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.565)
 
 ##################################### TAB 2 - Dose respons ############################################
+=======
+##################################### TAB 2 - Dose response ############################################
+>>>>>>> 59a03b98c8838d493c879f4720565a69e5cef74e
 
+## Text and button for uploading image
+upload_file = tk.Text(Globals.tab2, height=1, width=1)
+upload_file.place(relwidth=0.28, relheight=0.05, relx=0.1, rely=0.31)
+upload_file.insert(INSERT,"Upload file you want to correct:")
+upload_file.config(state=DISABLED, bd=0) 
+upload_box = tk.Text(Globals.tab2, height=1, width=1)
+upload_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.31)
+upload_box.insert(INSERT," ")
+upload_box.config(state=DISABLED, bd=0)
+upload_button = tk.Button(Globals.tab2, text='Browse',cursor='hand2',font=('calibri', '14'),\
+    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.nothingButton)
+upload_button.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.305)
 
 
 
