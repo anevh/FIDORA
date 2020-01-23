@@ -138,6 +138,8 @@ correct_button.place(relwidth=0.2, relheight=0.14, relx=.18, rely=0.83)
 
 
 ##################################### TAB 2 - Dose response ############################################
+#img_file_name="default.png"
+#path_img=db_config.photo_directory + img_file_name
 
 ## Text and button for uploading image
 upload_file = tk.Text(Globals.tab2, height=1, width=1)
@@ -162,7 +164,9 @@ Radiobutton(Globals.tab2, text='72 dpi',cursor='hand2',font=('calibri', '14'), \
 Radiobutton(Globals.tab2, text='127 dpi',cursor='hand2',font=('calibri', '14'), \
     variable=Globals.doseResponse_dpi, value=127, command=CoMet_functions.nothingButton).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.46)
 
-
+#openImageTabOne=Image.open(path_img)
+#imgTabOne=ImageTk.PhotoImage(openImageTabOne)
+#imgLabelTabOne=tk.Label(tab2,image=imgTabOne)
 
 
 Globals.tab_parent.pack(expand=1, fill='both')
