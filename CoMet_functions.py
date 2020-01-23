@@ -4,10 +4,11 @@ from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledial
 import os
 from os.path import normpath, basename
 import cv2
-from cv2 import imread, IMREAD_ANYCOLOR, IMREAD_ANYDEPTH
+from cv2 import imread, IMREAD_ANYCOLOR, IMREAD_ANYDEPTH, imwrite
 import numpy as np
 import SimpleITK as sitk
 import pydicom
+from PIL import Image, ImageTk
 
 ## Function to do nothing (temp)
 def nothingButton():
@@ -139,3 +140,6 @@ def Correct():
         
     mod_NameAndModality.save_as(Globals.CoMet_export_folder.get() + '/' + Globals.CoMet_corrected_image_filename.get().lstrip() + Globals.CoMet_saveAs.get())
 
+    ds = pydicom.dcmread(Globals.CoMet_export_folder.get() + '/' + Globals.CoMet_corrected_image_filename.get().lstrip() + Globals.CoMet_saveAs.get() ) # read dicom image
+    img = ds.pixel_array # get image array
+    cv2.imwrite(Globals.CoMet_export_folder.get() + '/' + Globals.CoMet_corrected_image_filename.get().lstrip() + '.png',img) # write png image

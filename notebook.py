@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, NORMAL, ACTIVE, messagebox, Menu
 import Globals
 import re
-
 import CoMet_functions
 
 
@@ -162,6 +161,7 @@ Radiobutton(Globals.tab2, text='72 dpi',cursor='hand2',font=('calibri', '14'), \
     variable=Globals.doseResponse_dpi, value=72, command=CoMet_functions.nothingButton).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.46)
 Radiobutton(Globals.tab2, text='127 dpi',cursor='hand2',font=('calibri', '14'), \
     variable=Globals.doseResponse_dpi, value=127, command=CoMet_functions.nothingButton).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.46)
+
 
 
 
