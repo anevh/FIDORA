@@ -19,7 +19,9 @@ CoMet_dpi = StringVar(tab1)
 CoMet_dpi.set("127")
 
 global doseResponse_dpi
-doseResponse_dpi="127"
+#doseResponse_dpi="127"
+doseResponse_dpi=StringVar(tab2)
+doseResponse_dpi.set("127")
 
 global CoMet_saveAs
 CoMet_saveAs = tk.StringVar(tab1)
