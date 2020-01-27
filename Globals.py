@@ -13,6 +13,8 @@ global tab1
 tab1 = ttk.Frame(tab_parent)
 global tab2
 tab2 = ttk.Frame(tab_parent)
+global tab3
+tab3 = ttk.Frame(tab_parent)
 
 global CoMet_dpi
 CoMet_dpi = StringVar(tab1)

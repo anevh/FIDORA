@@ -11,6 +11,7 @@ Globals.form.geometry("1100x600")
 
 Globals.tab_parent.add(Globals.tab1, text='CoMet')
 Globals.tab_parent.add(Globals.tab2, text='Dose-response')
+Globals.tab_parent.add(Globals.tab3, text='Map dose')
 
 menubar = Menu(Globals.form)
 filemenu = Menu(menubar, tearoff=0)
@@ -70,7 +71,7 @@ toFolder.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.565)
 def testFilename():   
     Globals.CoMet_corrected_image_filename.set(Globals.CoMet_corrected_image_filename_box.get("1.0",'end-1c'))
     if(Globals.CoMet_corrected_image_filename.get() == " "):
-        Globals.CoMet_saveTo.set("Error!")
+        Globals.CoMet_corrected_image_filename.set("Error!")
     elif(len(Globals.CoMet_corrected_image_filename.get()) >21):
         messagebox.showerror("Error", "The filename must be under 20 characters")
         Globals.CoMet_corrected_image_filename.set("Error!")
@@ -169,5 +170,17 @@ Radiobutton(Globals.tab2, text='127 dpi',cursor='hand2',font=('calibri', '14'), 
 #imgLabelTabOne=tk.Label(tab2,image=imgTabOne)
 
 
+
+
+
+##################################### TAB 3 - Map dose ############################################
+
+temp_text = tk.Text(Globals.tab3, height=1, width=1)
+temp_text.place(relwidth=0.8, relheight=0.1, relx=0.1, rely=0.31)
+temp_text.insert(INSERT,"lage en ny fane der en kan scanne en ukjent film og finne dose vha kalibreringskurva")
+temp_text.config(state=DISABLED, bd=0) 
+
+
+##################################### End statements ############################################
 Globals.tab_parent.pack(expand=1, fill='both')
 Globals.form.mainloop()

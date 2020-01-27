@@ -1,6 +1,6 @@
 import Globals
 import tkinter as tk
-from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, PhotoImage
+from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, PhotoImage, BOTH
 import os
 from os.path import normpath, basename
 import cv2
@@ -142,4 +142,23 @@ def Correct():
 
     ds = pydicom.dcmread(Globals.CoMet_export_folder.get() + '/' + Globals.CoMet_corrected_image_filename.get().lstrip() + Globals.CoMet_saveAs.get() ) # read dicom image
     img = ds.pixel_array # get image array
-    cv2.imwrite(Globals.CoMet_export_folder.get() + '/' + Globals.CoMet_corrected_image_filename.get().lstrip() + '.png',img) # write png image
+    RGB_image = np.zeros((img.shape[1], img.shape[2], 3))
+    for i in range(img.shape[0]):
+        RGB_image[:,:,2-i] = img[i, :,:]
+
+    img8 = (RGB_image/256).astype('uint8')
+
+    #image = Image.fromarray(img8)
+    image_to_canvas =  ImageTk.PhotoImage(image=Image.fromarray(img8))
+
+    height, width, channels = img8.shape
+
+    canvas = tk.Canvas(Globals.tab1, width=width, height=height)
+    canvas.pack()
+
+    canvas.create_image(0,0,image=image_to_canvas)
+
+    #canvas = tk.Canvas(Globals.tab1,width=300,height=300)
+    #canvas.pack()
+    #canvas.create_image(20,20, anchor="nw", image=image_to_canvas)
+    #canvas.pack(fill=BOTH, expand=1)
