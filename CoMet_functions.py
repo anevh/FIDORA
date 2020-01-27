@@ -148,15 +148,16 @@ def Correct():
 
     img8 = (RGB_image/256).astype('uint8')
 
-    #image = Image.fromarray(img8)
+    
     image_to_canvas =  ImageTk.PhotoImage(image=Image.fromarray(img8))
 
     height, width, channels = img8.shape
 
-    canvas = tk.Canvas(Globals.tab1, width=width, height=height)
-    canvas.pack()
-
+    canvas = tk.Canvas(Globals.tab1, width=width/2, height=height/2)
     canvas.create_image(0,0,image=image_to_canvas)
+    canvas.image = image_to_canvas
+    canvas.pack()
+    
 
     #canvas = tk.Canvas(Globals.tab1,width=300,height=300)
     #canvas.pack()
