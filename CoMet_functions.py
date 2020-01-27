@@ -143,20 +143,24 @@ def Correct():
     ds = pydicom.dcmread(Globals.CoMet_export_folder.get() + '/' + Globals.CoMet_corrected_image_filename.get().lstrip() + Globals.CoMet_saveAs.get() ) # read dicom image
     img = ds.pixel_array # get image array
     RGB_image = np.zeros((img.shape[1], img.shape[2], 3))
-    for i in range(img.shape[0]):
-        RGB_image[:,:,2-i] = img[i, :,:]
-
-    img8 = (RGB_image/256).astype('uint8')
-
     
-    image_to_canvas =  ImageTk.PhotoImage(image=Image.fromarray(img8))
+    for i in range(img.shape[0]):
+        RGB_image[:,:,i] = img[i, :,:]
 
-    height, width, channels = img8.shape
+ 
+    img8 = (RGB_image/256).astype('uint8')
+    height, width, channels = img8.shape 
+    img8 = Image.fromarray(img8, 'RGB')
+    
+    img8 = img8.resize((250, 300))   
+    
+    image_to_canvas =  ImageTk.PhotoImage(image=img8)
 
-    canvas = tk.Canvas(Globals.tab1, width=width/2, height=height/2)
-    canvas.create_image(0,0,image=image_to_canvas)
+    canvas = tk.Canvas(Globals.tab1, width=240, height=290)
+    canvas.place(relx=0.8, rely=0.05)
+    canvas.create_image(123,148,image=image_to_canvas)
     canvas.image = image_to_canvas
-    canvas.pack()
+    #canvas.pack()
     
 
     #canvas = tk.Canvas(Globals.tab1,width=300,height=300)

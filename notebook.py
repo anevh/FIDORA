@@ -31,16 +31,16 @@ Globals.form.config(menu=menubar)
 
 ## Text and button for uploading image 
 upload_file = tk.Text(Globals.tab1, height=1, width=1)
-upload_file.place(relwidth=0.28, relheight=0.05, relx=0.1, rely=0.31)
+upload_file.place(relwidth=0.28, relheight=0.05, relx=0.01, rely=0.31)
 upload_file.insert(INSERT,"Upload file you want to correct:")
 upload_file.config(state=DISABLED, bd=0) 
 upload_box = tk.Text(Globals.tab1, height=1, width=1)
-upload_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.31)
+upload_box.place(relwidth=0.3, relheight=0.05, relx=0.31, rely=0.31)
 upload_box.insert(INSERT," ")
 upload_box.config(state=DISABLED, bd=0)
 upload_button = tk.Button(Globals.tab1, text='Browse',cursor='hand2',font=('calibri', '14'),\
     highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
-upload_button.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.305)
+upload_button.place(relwidth=0.15, relheight=0.06, relx=0.55, rely=0.305)
 
 
 ## Text and buttons for the user to choose DPI
@@ -56,16 +56,16 @@ Radiobutton(Globals.tab1, text='127 dpi',cursor='hand2',font=('calibri', '14'), 
 
 ## Text and button for the user to select folder to save corrected image
 save_to_folder = tk.Text(Globals.tab1, height=1, width=1)
-save_to_folder.place(relwidth=0.4, relheight=0.05, relx=0.08, rely=0.57)
+save_to_folder.place(relwidth=0.4, relheight=0.05, relx=0.008, rely=0.57)
 save_to_folder.insert(INSERT,"Folder to save the corrected image:")
 save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '15')) 
 folder_box = tk.Text(Globals.tab1, height=1, width=1)
-folder_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.57)
+folder_box.place(relwidth=0.3, relheight=0.05, relx=0.31, rely=0.57)
 folder_box.insert(INSERT," ")
 folder_box.config(state=DISABLED, bd=0, font=('calibri', '12')) 
 toFolder = tk.Button(Globals.tab1, text='Browse', cursor='hand2',font=('calibri', '14'),\
    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.setCoMet_export_folder)
-toFolder.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.565)
+toFolder.place(relwidth=0.15, relheight=0.06, relx=0.55, rely=0.565)
 
 ## Function to test the filename the user chooses for the corrected image
 def testFilename():   
@@ -85,7 +85,7 @@ def testFilename():
 
 ## Text and box for the user to write in a filename for the corrected image, and lock it
 corrected_image_filename_text = tk.Text(Globals.tab1, height=1, width=1)
-corrected_image_filename_text.place(relwidt=0.4, relheight=0.05, relx=0.1, rely=0.66)
+corrected_image_filename_text.place(relwidt=0.4, relheight=0.05, relx=0.008, rely=0.66)
 corrected_image_filename_text.insert(INSERT, "Write filename of saved image:" )
 corrected_image_filename_text.config(state=DISABLED, bd=0, font=('calibri', '15'))
 Globals.CoMet_corrected_image_filename_box= tk.Text(Globals.tab1, height=1, width=1)
@@ -94,7 +94,7 @@ Globals.CoMet_corrected_image_filename_box.insert(INSERT, " " )
 Globals.CoMet_corrected_image_filename_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
 load_corrected_image_filename=tk.Button(Globals.tab1, text='Save filename', cursor='hand2', font=('calibri', '14'), highlightthickness=7, \
     overrelief=GROOVE, state=ACTIVE, width=15, command=testFilename)
-load_corrected_image_filename.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.65)
+load_corrected_image_filename.place(relwidth=0.15, relheight=0.06, relx=0.55, rely=0.65)
 
 #Tell filetype
 out_filetype_text = tk.Text(Globals.tab1, height=1, width=1)
