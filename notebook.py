@@ -3,6 +3,7 @@ from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, NORMAL,
 import Globals
 import re
 import CoMet_functions
+import Dose_response_functions
 
 
 
@@ -192,14 +193,40 @@ film piece in the center of the scanner and perfom three scans per dose.  " )
 how_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
 dose_text = tk.Text(Globals.tab2, height=1, width=1)
-dose_text.place(relwidth=0.1, relheight=0.05, relx=0.6, rely=0.5)
+dose_text.place(relwidth=0.12, relheight=0.05, relx=0.6, rely=0.5)
 dose_text.insert(INSERT, "Write dose (cGy): ")
 dose_text.config(state=NORMAL, bd=0, font=('calibri', '12'))
 
 dose1_box= tk.Text(Globals.tab2, height=1, width=1)
-dose1_box.place(relwidth=0.08, relheight=0.05, relx=0.62, rely=0.55)
+dose1_box.place(relwidth=0.08, relheight=0.04, relx=0.62, rely=0.56)
 dose1_box.insert(INSERT, " " )
 dose1_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
+
+dose2_box = tk.Text(Globals.tab2, height=1, width=1)
+dose2_box.place(relwidt=0.08, relheight=0.04, relx=0.62, rely=0.61)
+dose2_box.insert(INSERT, " ")
+dose2_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
+
+dose3_box = tk.Text(Globals.tab2, height=1, width=1)
+dose3_box.place(relwidt=0.08, relheight=0.04, relx = 0.62, rely=0.66)
+dose3_box.insert(INSERT, " ")
+dose3_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
+
+dose4_box = tk.Text(Globals.tab2, height=1, width=1)
+dose4_box.place(relwidt=0.08, relheight=0.04, relx = 0.62, rely = 0.71)
+dose4_box.insert(INSERT, " ")
+dose4_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
+
+dose5_box = tk.Text(Globals.tab2, height=1, width=1)
+dose5_box.place(relwidt=0.08, relheight=0.04, relx=0.62, rely=0.76)
+dose5_box.insert(INSERT, " ")
+dose5_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
+
+
+upload_button1 = tk.Button(Globals.tab2, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
+    overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.nothingButton)
+upload_button1.place(relwidth=0.12, relheight=0.06, relx=0.72, rely=0.555)
+
 ##################################### TAB 3 - Map dose ############################################
 
 temp_text = tk.Text(Globals.tab3, height=1, width=1)
