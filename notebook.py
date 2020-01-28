@@ -144,16 +144,16 @@ correct_button.place(relwidth=0.2, relheight=0.14, relx=.18, rely=0.75)
 
 ## Text and button for uploading image
 upload_file = tk.Text(Globals.tab2, height=1, width=1)
-upload_file.place(relwidth=0.28, relheight=0.05, relx=0.1, rely=0.51)
-upload_file.insert(INSERT,"Upload image file for calibration:")
+upload_file.place(relwidth=0.21, relheight=0.05, relx=0.007, rely=0.51)
+upload_file.insert(INSERT,"Upload image for calibration:")
 upload_file.config(state=DISABLED, bd=0) 
 upload_box = tk.Text(Globals.tab2, height=1, width=1)
-upload_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.51)
+upload_box.place(relwidth=0.18, relheight=0.05, relx=0.23, rely=0.51)
 upload_box.insert(INSERT," ")
 upload_box.config(state=DISABLED, bd=0)
 upload_button = tk.Button(Globals.tab2, text='Browse',cursor='hand2',font=('calibri', '14'),\
     highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
-upload_button.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.505)
+upload_button.place(relwidth=0.12, relheight=0.06, relx=0.4, rely=0.505)
 
 ## Text and buttons for the user to choose DPI
 choose_doseResponse_dpi = tk.Text(Globals.tab2, height=1, width=1)
@@ -190,6 +190,16 @@ how_dose_response_text.insert(INSERT,\
 "Irradiate film piece of size (Bestemt med maske?) with known doses. Place one and one\n\
 film piece in the center of the scanner and perfom three scans per dose.  " )
 how_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
+
+dose_text = tk.Text(Globals.tab2, height=1, width=1)
+dose_text.place(relwidth=0.1, relheight=0.05, relx=0.6, rely=0.5)
+dose_text.insert(INSERT, "Write dose (cGy): ")
+dose_text.config(state=NORMAL, bd=0, font=('calibri', '12'))
+
+dose1_box= tk.Text(Globals.tab2, height=1, width=1)
+dose1_box.place(relwidth=0.08, relheight=0.05, relx=0.62, rely=0.55)
+dose1_box.insert(INSERT, " " )
+dose1_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
 ##################################### TAB 3 - Map dose ############################################
 
 temp_text = tk.Text(Globals.tab3, height=1, width=1)
