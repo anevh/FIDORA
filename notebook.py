@@ -144,38 +144,52 @@ correct_button.place(relwidth=0.2, relheight=0.14, relx=.18, rely=0.75)
 
 ## Text and button for uploading image
 upload_file = tk.Text(Globals.tab2, height=1, width=1)
-upload_file.place(relwidth=0.28, relheight=0.05, relx=0.1, rely=0.31)
+upload_file.place(relwidth=0.28, relheight=0.05, relx=0.1, rely=0.51)
 upload_file.insert(INSERT,"Upload image file for calibration:")
 upload_file.config(state=DISABLED, bd=0) 
 upload_box = tk.Text(Globals.tab2, height=1, width=1)
-upload_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.31)
+upload_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.51)
 upload_box.insert(INSERT," ")
 upload_box.config(state=DISABLED, bd=0)
 upload_button = tk.Button(Globals.tab2, text='Browse',cursor='hand2',font=('calibri', '14'),\
     highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
-upload_button.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.305)
+upload_button.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.505)
 
 ## Text and buttons for the user to choose DPI
 choose_doseResponse_dpi = tk.Text(Globals.tab2, height=1, width=1)
-choose_doseResponse_dpi.place(relwidth=0.35, relheight=0.5, relx=0.07, rely=0.41)
+choose_doseResponse_dpi.place(relwidth=0.35, relheight=0.5, relx=0.07, rely=0.61)
 choose_doseResponse_dpi.insert(tk.CURRENT,"Dots per inch (dpi) used during scanning: ")
 choose_doseResponse_dpi.config(state=DISABLED, bd=0, font=('calibri', '15'))
 Radiobutton(Globals.tab2, text='72 dpi',cursor='hand2',font=('calibri', '14'), \
-    variable=Globals.doseResponse_dpi, value=72, command=CoMet_functions.nothingButton).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.46)
+    variable=Globals.doseResponse_dpi, value=72, command=CoMet_functions.nothingButton).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.66)
 Radiobutton(Globals.tab2, text='127 dpi',cursor='hand2',font=('calibri', '14'), \
-    variable=Globals.doseResponse_dpi, value=127, command=CoMet_functions.nothingButton).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.46)
+    variable=Globals.doseResponse_dpi, value=127, command=CoMet_functions.nothingButton).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.66)
 
 #openImageTabOne=Image.open(path_img)
 #imgTabOne=ImageTk.PhotoImage(openImageTabOne)
 #imgLabelTabOne=tk.Label(tab2,image=imgTabOne)
 
 
-how_dose_response_text = tk.Text(Globals.tab1, height=1, width=1)
-how_dose_response_text.place(relwidt=0.24, relheight=0.05, relx=0.004, rely=0.5)
-how_dose_response_text.insert(INSERT, "Scan each dose at least three times at the center of the scanner" )
-how_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '15'))
+why_dose_response_text = tk.Text(Globals.tab2, height=1, width=1)
+why_dose_response_text.place(relwidt=0.48, relheight=0.4, relx=0.004, rely=0.005)
+why_dose_response_text.insert(INSERT,\
+"To be able to perform an accurate dose caluclations using GafChromic film EBT3 \n\
+it is necessary to create a dose-respons curve for each batch of film, in addition\n\
+to a calibration scan before/along every use. The respons of GafChromic film \n\
+EBT3 is modelled using a rational function, X(D,n) = a + b/(D-c), as this has \n\
+proven to fit well with the film behavior. In the model X(D,n) is the scanner \n\
+respons in color channel n and a, b and c are constants. Because of the nature \n\
+of asymptotic fitting functions a good fit will be achieved by using doses in \n\
+geomteric progression, D, nD, nnD, etc.. Also, to avoid scanner uncertainties\n\
+each dose should be scannet three times and uploaded here where an average will be used." )
+why_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-
+how_dose_response_text = tk.Text(Globals.tab2, height=1, width=1)
+how_dose_response_text.place(relwidt=0.48, relheight=0.4, relx=0.51, rely=0.005)
+how_dose_response_text.insert(INSERT,\
+"Irradiate film piece of size (Bestemt med maske?) with known doses. Place one and one\n\
+film piece in the center of the scanner and perfom three scans per dose.  " )
+how_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
 ##################################### TAB 3 - Map dose ############################################
 
 temp_text = tk.Text(Globals.tab3, height=1, width=1)
