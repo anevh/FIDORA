@@ -170,7 +170,10 @@ Radiobutton(Globals.tab2, text='127 dpi',cursor='hand2',font=('calibri', '14'), 
 #imgLabelTabOne=tk.Label(tab2,image=imgTabOne)
 
 
-
+how_dose_response_text = tk.Text(Globals.tab1, height=1, width=1)
+how_dose_response_text.place(relwidt=0.24, relheight=0.05, relx=0.004, rely=0.5)
+how_dose_response_text.insert(INSERT, "Scan each dose at least three times at the center of the scanner" )
+how_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '15'))
 
 
 ##################################### TAB 3 - Map dose ############################################
@@ -179,6 +182,8 @@ temp_text = tk.Text(Globals.tab3, height=1, width=1)
 temp_text.place(relwidth=0.8, relheight=0.1, relx=0.1, rely=0.31)
 temp_text.insert(INSERT,"lage en ny fane der en kan scanne en ukjent film og finne dose vha kalibreringskurva")
 temp_text.config(state=DISABLED, bd=0) 
+
+
 
 
 ##################################### End statements ############################################
