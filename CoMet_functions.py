@@ -20,7 +20,7 @@ def UploadAction(event=None):
     ext = os.path.splitext(Globals.CoMet_uploaded_filename.get())[-1].lower()
     if(ext==".tif"):
         uploaded_filename = tk.Text(Globals.tab1, height=1, width=1)
-        uploaded_filename.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.31)
+        uploaded_filename.place(relwidth=0.2, relheight=0.05, relx=0.28, rely=0.11)
         uploaded_filename.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get()))) 
         uploaded_filename.config(state=DISABLED, bd=0, font=('calibri', '12'))
     elif(ext==""):
@@ -44,7 +44,7 @@ def setCoMet_export_folder():
     else:
         os.chdir(Globals.CoMet_export_folder.get())
         save_to_folder=tk.Text(Globals.tab1, height=1, width=1)
-        save_to_folder.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.57)
+        save_to_folder.place(relwidth=0.2, relheight=0.05, relx=0.29, rely=0.4)
         save_to_folder.insert(INSERT, basename(normpath(Globals.CoMet_export_folder.get())))
         save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
@@ -108,8 +108,8 @@ def Correct():
         Error_message.config(state=DISABLED, bd=0, font=('calibri', '13'), bg ='#D98880', fg='#FBFCFC')
     else:
         conf_text=tk.Text(Globals.tab1, height=1, width=1)
-        conf_text.place(relwidth=0.4, relheight=0.14, relx=.5, rely=0.89)
-        conf_text.insert(INSERT, "File " + Globals.CoMet_corrected_image_filename.get() + " is saved in folder " +  basename(normpath(Globals.CoMet_export_folder.get())))
+        conf_text.place(relwidth=0.2, relheight=0.14, relx=.78, rely=0.65)
+        conf_text.insert(INSERT, "File " + Globals.CoMet_corrected_image_filename.get() + " is saved\n in folder " +  basename(normpath(Globals.CoMet_export_folder.get())))
         conf_text.config(state=DISABLED, bd=0, font=('calibri', '13'), bg ='#D98880', fg='#FBFCFC')
 
     R=Globals.CoMet_correctedImage[:,:,2];G=Globals.CoMet_correctedImage[:,:,1];B=Globals.CoMet_correctedImage[:,:,0]
@@ -157,13 +157,7 @@ def Correct():
     image_to_canvas =  ImageTk.PhotoImage(image=img8)
 
     canvas = tk.Canvas(Globals.tab1, width=240, height=290)
-    canvas.place(relx=0.8, rely=0.05)
+    canvas.place(relx=0.75, rely=0.05)
     canvas.create_image(123,148,image=image_to_canvas)
     canvas.image = image_to_canvas
-    #canvas.pack()
-    
-
-    #canvas = tk.Canvas(Globals.tab1,width=300,height=300)
-    #canvas.pack()
-    #canvas.create_image(20,20, anchor="nw", image=image_to_canvas)
-    #canvas.pack(fill=BOTH, expand=1)
+   

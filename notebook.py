@@ -31,41 +31,41 @@ Globals.form.config(menu=menubar)
 
 ## Text and button for uploading image 
 upload_file = tk.Text(Globals.tab1, height=1, width=1)
-upload_file.place(relwidth=0.28, relheight=0.05, relx=0.01, rely=0.31)
+upload_file.place(relwidth=0.25, relheight=0.05, relx=0.007, rely=0.11)
 upload_file.insert(INSERT,"Upload file you want to correct:")
-upload_file.config(state=DISABLED, bd=0) 
+upload_file.config(state=DISABLED, bd=0, font=('calibri', '15')) 
 upload_box = tk.Text(Globals.tab1, height=1, width=1)
-upload_box.place(relwidth=0.3, relheight=0.05, relx=0.31, rely=0.31)
+upload_box.place(relwidth=0.2, relheight=0.05, relx=0.28, rely=0.11)
 upload_box.insert(INSERT," ")
 upload_box.config(state=DISABLED, bd=0)
 upload_button = tk.Button(Globals.tab1, text='Browse',cursor='hand2',font=('calibri', '14'),\
     highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
-upload_button.place(relwidth=0.15, relheight=0.06, relx=0.55, rely=0.305)
+upload_button.place(relwidth=0.15, relheight=0.06, relx=0.5, rely=0.105)
 
 
 ## Text and buttons for the user to choose DPI
 choose_CoMet_dpi = tk.Text(Globals.tab1, height=1, width=1)
-choose_CoMet_dpi.place(relwidth=0.35, relheight=0.1, relx=0.07, rely=0.41)
+choose_CoMet_dpi.place(relwidth=0.35, relheight=0.05, relx=0.07, rely=0.23)
 choose_CoMet_dpi.insert(tk.CURRENT,"Dots per inch (dpi) used during scanning: ")
 choose_CoMet_dpi.config(state=DISABLED, bd=0, font=('calibri', '15'))
 Radiobutton(Globals.tab1, text='72 dpi',cursor='hand2',font=('calibri', '14'), \
-    variable=Globals.CoMet_dpi, value=72, command=CoMet_functions.setCoMet_dpi).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.46)
+    variable=Globals.CoMet_dpi, value=72, command=CoMet_functions.setCoMet_dpi).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.3)
 Radiobutton(Globals.tab1, text='127 dpi',cursor='hand2',font=('calibri', '14'), \
-    variable=Globals.CoMet_dpi, value=127, command=CoMet_functions.setCoMet_dpi).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.46)
+    variable=Globals.CoMet_dpi, value=127, command=CoMet_functions.setCoMet_dpi).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.3)
 
 
 ## Text and button for the user to select folder to save corrected image
 save_to_folder = tk.Text(Globals.tab1, height=1, width=1)
-save_to_folder.place(relwidth=0.4, relheight=0.05, relx=0.008, rely=0.57)
+save_to_folder.place(relwidth=0.28, relheight=0.05, relx=0.003, rely=0.4)
 save_to_folder.insert(INSERT,"Folder to save the corrected image:")
 save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '15')) 
 folder_box = tk.Text(Globals.tab1, height=1, width=1)
-folder_box.place(relwidth=0.3, relheight=0.05, relx=0.31, rely=0.57)
+folder_box.place(relwidth=0.2, relheight=0.05, relx=0.29, rely=0.4)
 folder_box.insert(INSERT," ")
 folder_box.config(state=DISABLED, bd=0, font=('calibri', '12')) 
 toFolder = tk.Button(Globals.tab1, text='Browse', cursor='hand2',font=('calibri', '14'),\
    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.setCoMet_export_folder)
-toFolder.place(relwidth=0.15, relheight=0.06, relx=0.55, rely=0.565)
+toFolder.place(relwidth=0.15, relheight=0.06, relx=0.5, rely=0.395)
 
 ## Function to test the filename the user chooses for the corrected image
 def testFilename():   
@@ -81,24 +81,24 @@ def testFilename():
     else:
         load_corrected_image_filename.config(state=DISABLED)
         Globals.CoMet_corrected_image_filename_box.config(state=DISABLED)
-
+    
 
 ## Text and box for the user to write in a filename for the corrected image, and lock it
 corrected_image_filename_text = tk.Text(Globals.tab1, height=1, width=1)
-corrected_image_filename_text.place(relwidt=0.4, relheight=0.05, relx=0.008, rely=0.66)
+corrected_image_filename_text.place(relwidt=0.24, relheight=0.05, relx=0.004, rely=0.5)
 corrected_image_filename_text.insert(INSERT, "Write filename of saved image:" )
 corrected_image_filename_text.config(state=DISABLED, bd=0, font=('calibri', '15'))
 Globals.CoMet_corrected_image_filename_box= tk.Text(Globals.tab1, height=1, width=1)
-Globals.CoMet_corrected_image_filename_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.66)
+Globals.CoMet_corrected_image_filename_box.place(relwidth=0.24, relheight=0.05, relx=0.25, rely=0.5)
 Globals.CoMet_corrected_image_filename_box.insert(INSERT, " " )
 Globals.CoMet_corrected_image_filename_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
 load_corrected_image_filename=tk.Button(Globals.tab1, text='Save filename', cursor='hand2', font=('calibri', '14'), highlightthickness=7, \
     overrelief=GROOVE, state=ACTIVE, width=15, command=testFilename)
-load_corrected_image_filename.place(relwidth=0.15, relheight=0.06, relx=0.55, rely=0.65)
+load_corrected_image_filename.place(relwidth=0.15, relheight=0.06, relx=0.5, rely=0.495)
 
 #Tell filetype
 out_filetype_text = tk.Text(Globals.tab1, height=1, width=1)
-out_filetype_text.place(relwidth=0.2, relheight=0.05, relx=0.41, rely=0.795)
+out_filetype_text.place(relwidth=0.2, relheight=0.05, relx=0.21, rely=0.57)
 out_filetype_text.insert(tk.CURRENT,"Will be saved as *.dcm")
 out_filetype_text.config(state=DISABLED, bd=0, font=('calibri', '13'))
 
@@ -120,22 +120,22 @@ def testName():
 
 ## Text and box for the user to write patient name
 patientName_text = tk.Text(Globals.tab1, height=1, width=1)
-patientName_text.place(relwidt=0.4, relheight=0.05, relx=0.12, rely=0.74)
+patientName_text.place(relwidt=0.23, relheight=0.05, relx=0.007, rely=0.65)
 patientName_text.insert(INSERT, "Write name of patient:" )
 patientName_text.config(state=DISABLED, bd=0, font=('calibri', '15'))
 Globals.CoMet_patientName_box= tk.Text(Globals.tab1, height=1, width=1)
-Globals.CoMet_patientName_box.place(relwidth=0.3, relheight=0.05, relx=0.41, rely=0.74)
+Globals.CoMet_patientName_box.place(relwidth=0.23, relheight=0.05, relx=0.25, rely=0.65)
 Globals.CoMet_patientName_box.insert(INSERT, " " )
 Globals.CoMet_patientName_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
 loadName=tk.Button(Globals.tab1, text='Save name', cursor='hand2', font=('calibri', '14'), highlightthickness=7, \
     overrelief=GROOVE, state=ACTIVE, width=15, command=testName)
-loadName.place(relwidth=0.15, relheight=0.06, relx=0.75, rely=0.725)
+loadName.place(relwidth=0.15, relheight=0.06, relx=0.49, rely=0.6495)
 
 
 ## Creating a button-widget to perform the correction
 correct_button = tk.Button(Globals.tab1, text='Correct', cursor='hand2',font=('calibri', '18'),highlightthickness= 7,\
     overrelief=GROOVE, state=ACTIVE, width = 15, command=CoMet_functions.Correct)
-correct_button.place(relwidth=0.2, relheight=0.14, relx=.18, rely=0.83)
+correct_button.place(relwidth=0.2, relheight=0.14, relx=.18, rely=0.75)
 
 
 ##################################### TAB 2 - Dose response ############################################
