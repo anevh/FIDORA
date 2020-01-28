@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, StringVar
+from tkinter import ttk, StringVar, IntVar
 import numpy as np
 
 
@@ -55,6 +55,21 @@ CoMet_patientName.set("Error!")
 
 global CoMet_correctedImage
 CoMet_correctedImage=None
+
+global dose_response_var1 
+dose_response_var1= IntVar()
+
+global dose_response_var2
+dose_response_var2 = IntVar()
+
+global dose_response_var3
+dose_response_var3 = IntVar()
+
+global dose_response_var4
+dose_response_var4 = IntVar()
+
+global dose_response_var5
+dose_response_var5 = IntVar()
 
 
 
