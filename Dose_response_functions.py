@@ -86,7 +86,24 @@ def readImage(filename):
         return False
 
 
-def avgAllFiles():
+## Function to find mean of uploaded images with same dose.
+def avgAllFiles(write_dose_box, new_window):
+
+    #First block is to test that everythin is filled in and as expected.
+    dose_input = write_dose_box.get("1.0",'end-1c')
+    if (dose_input == " "):
+        messagebox.showerror("Error", "Input dose")
+        return
+    try:
+        dose_input = float(dose_input)
+    except:
+        messagebox.showerror("Error","The dose must be a number")
+        return
+    if(len(Globals.dose_response_uploaded_filenames) == 0):
+        messagebox.showerror("Error", "No files uploaded")
+        return
+
+    #Calculates the mean in each color channel
     avg_red=0;avg_green=0;avg_blue=0
     for i in range(0, len(Globals.dose_response_uploaded_filenames)):
         if(readImage(Globals.dose_response_uploaded_filenames[i])==False):
@@ -101,13 +118,28 @@ def avgAllFiles():
     avg_green = avg_green/len(Globals.dose_response_uploaded_filenames)
     avg_blue = avg_blue/len(Globals.dose_response_uploaded_filenames)
 
-    Globals.avg_red_vector.append(avg_red)
-    Globals.avg_green_vector.append(avg_green)
-    Globals.avg_blue_vector.append(avg_blue)
+    Globals.avg_red_vector.append([dose_input, avg_red])
+    Globals.avg_green_vector.append([dose_input, avg_green])
+    Globals.avg_blue_vector.append([dose_input, avg_blue])
 
-    print(Globals.avg_red_vector)
+    result_red = tk.Text(Globals.tab2, height=1, width=1)
+    result_red.place(relwidt=0.08, relheight=0.04, relx=0.6, rely=Globals.dose_response_results_coordY)
+    result_red.insert(INSERT, avg_red)
+    result_red.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
+    result_green = tk.Text(Globals.tab2, height=1, width=1)
+    result_green.place(relwidt=0.08, relheight=0.04, relx=0.73, rely=Globals.dose_response_results_coordY)
+    result_green.insert(INSERT, avg_green)
+    result_green.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
+    result_blue = tk.Text(Globals.tab2, height=1, width=1)
+    result_blue.place(relwidt=0.08, relheight=0.04, relx=0.86, rely=Globals.dose_response_results_coordY)
+    result_blue.insert(INSERT, avg_blue)
+    result_blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
+
+    Globals.dose_response_results_coordY += 0.07
+
+    new_window.destroy()
 
 def create_window():
     new_window = tk.Toplevel(Globals.tab2)
@@ -115,12 +147,14 @@ def create_window():
     new_window.grab_set()
     
     Globals.dose_response_uploaded_filenames = []
-    Globals.dose_response_new_window_countY = 0.2
+    Globals.dose_response_new_window_countY = 0.3
 
     write_dose_text = tk.Text(new_window, width=1, height=1)
     write_dose_text.place(relwidth=0.07, relheight=0.075, relx=0.4, rely=0.15)
     write_dose_text.insert(INSERT, "Dose: ")
     write_dose_text.config(state=DISABLED, bd=0, font=('calibri', '14'))
+
+   
 
     write_dose_box = tk.Text(new_window, width=1, height=1)
     write_dose_box.place(relwidt=0.05, relheight=0.075, relx=0.5, rely=0.15)
@@ -132,6 +166,6 @@ def create_window():
     upload_button.place(relwidth=0.2, relheight=0.23, relx=0.23, rely=0.26)
 
     done_button = tk.Button(new_window, text='Done', cursor='hand2', font=('calibri', '20'), highlightthickness=7, \
-        overrelief=GROOVE, state=ACTIVE, width=12, command=avgAllFiles)
+        overrelief=GROOVE, state=ACTIVE, width=12, command=lambda: avgAllFiles(write_dose_box, new_window))
     done_button.place(relwidth=0.2, relheight=0.23, relx=0.23, rely=0.6)
 

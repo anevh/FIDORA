@@ -192,82 +192,33 @@ how_dose_response_text.insert(INSERT,\
 film piece in the center of the scanner and perfom three scans per dose.  " )
 how_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-dose_text = tk.Text(Globals.tab2, height=1, width=1)
-dose_text.place(relwidth=0.12, relheight=0.05, relx=0.6, rely=0.5)
-dose_text.insert(INSERT, "Write dose (cGy): ")
-dose_text.config(state=NORMAL, bd=0, font=('calibri', '12'))
-
-dose1_box= tk.Text(Globals.tab2, height=1, width=1)
-dose1_box.place(relwidth=0.08, relheight=0.04, relx=0.62, rely=0.56)
-dose1_box.insert(INSERT, " " )
-dose1_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
-
-dose2_box = tk.Text(Globals.tab2, height=1, width=1)
-dose2_box.place(relwidt=0.08, relheight=0.04, relx=0.62, rely=0.61)
-dose2_box.insert(INSERT, " ")
-dose2_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
-
-dose3_box = tk.Text(Globals.tab2, height=1, width=1)
-dose3_box.place(relwidt=0.08, relheight=0.04, relx = 0.62, rely=0.66)
-dose3_box.insert(INSERT, " ")
-dose3_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
-
-dose4_box = tk.Text(Globals.tab2, height=1, width=1)
-dose4_box.place(relwidt=0.08, relheight=0.04, relx = 0.62, rely = 0.71)
-dose4_box.insert(INSERT, " ")
-dose4_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
-
-dose5_box = tk.Text(Globals.tab2, height=1, width=1)
-dose5_box.place(relwidt=0.08, relheight=0.04, relx=0.62, rely=0.76)
-dose5_box.insert(INSERT, " ")
-dose5_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
-
-
 upload_button1 = tk.Button(Globals.tab2, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
     overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.create_window)
-upload_button1.place(relwidth=0.1, relheight=0.04, relx=0.72, rely=0.56)
+upload_button1.place(relwidth=0.1, relheight=0.04, relx=0.72, rely=0.5)
 
-upload_button2 = tk.Button(Globals.tab2, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
-    overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.nothingButton)
-upload_button2.place(relwidth=0.1, relheight=0.04, relx=0.72, rely=0.61)
+red = tk.Text(Globals.tab2, height=1, width=1)
+red.place(relwidt=0.08, relheight=0.04, relx=0.6, rely=0.55)
+red.insert(INSERT, "Red")
+red.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-upload_button3 = tk.Button(Globals.tab2, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
-    overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.nothingButton)
-upload_button3.place(relwidth=0.1, relheight=0.04, relx=0.72, rely=0.66)
+green = tk.Text(Globals.tab2, height=1, width=1)
+green.place(relwidt=0.08, relheight=0.04, relx=0.73, rely=0.55)
+green.insert(INSERT, "Green")
+green.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-upload_button4 = tk.Button(Globals.tab2, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
-    overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.nothingButton)
-upload_button4.place(relwidth=0.1, relheight=0.04, relx=0.72, rely=0.71)
+blue = tk.Text(Globals.tab2, height=1, width=1)
+blue.place(relwidt=0.08, relheight=0.04, relx=0.86, rely=0.55)
+blue.insert(INSERT, "Blue")
+blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-upload_button5 = tk.Button(Globals.tab2, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
-    overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.nothingButton)
-upload_button5.place(relwidth=0.1, relheight=0.04, relx=0.72, rely=0.76)
 
-uploaded_file_print1 = tk.Text(Globals.tab2, height=1, width=1)
-uploaded_file_print1.place(relwidt=0.08, relheight=0.04, relx=0.84, rely=0.56)
-uploaded_file_print1.insert(INSERT, " ")
-uploaded_file_print1.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-uploaded_file_print2 = tk.Text(Globals.tab2, height=1, width=1)
-uploaded_file_print2.place(relwidt=0.08, relheight=0.04, relx=0.84, rely=0.61)
-uploaded_file_print2.insert(INSERT, " ")
-uploaded_file_print2.config(state=DISABLED, bd=0, font=('calibri', '12'))
+empty_result_blue = tk.Text(Globals.tab2, height=1, width=1)
+empty_result_blue.place(relwidt=0.08, relheight=0.04, relx=0.86, rely=0.6)
+empty_result_blue.insert(INSERT, " ")
+empty_result_blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-uploaded_file_print3 = tk.Text(Globals.tab2, height=1, width=1)
-uploaded_file_print3.place(relwidt=0.08, relheight=0.04, relx=0.84, rely=0.66)
-uploaded_file_print3.insert(INSERT, " ")
-uploaded_file_print3.config(state=DISABLED, bd=0, font=('calibri', '12'))
-
-uploaded_file_print4 = tk.Text(Globals.tab2, height=1, width=1)
-uploaded_file_print4.place(relwidt=0.08, relheight=0.04, relx=0.84, rely=0.71)
-uploaded_file_print4.insert(INSERT, " ")
-uploaded_file_print4.config(state=DISABLED, bd=0, font=('calibri', '12'))
-
-uploaded_file_print5 = tk.Text(Globals.tab2, height=1, width=1)
-uploaded_file_print5.place(relwidt=0.08, relheight=0.04, relx=0.84, rely=0.76)
-uploaded_file_print5.insert(INSERT, " ")
-uploaded_file_print5.config(state=DISABLED, bd=0, font=('calibri', '12'))
-
+"""
 checkbox_text = tk.Text(Globals.tab2, height=1, width=1)
 checkbox_text.place(relwidt=0.08, relheight=0.05, relx = 0.90, rely = 0.51)
 checkbox_text.insert(INSERT, "Include?")
@@ -287,6 +238,9 @@ check4.place(relx=0.94, rely=0.71)
 
 check5 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var5)
 check5.place(relx=0.94, rely=0.76)
+"""
+
+
 ##################################### TAB 3 - Map dose ############################################
 
 temp_text = tk.Text(Globals.tab3, height=1, width=1)

@@ -87,6 +87,9 @@ avg_green_vector = []
 global avg_blue_vector
 avg_blue_vector = []
 
+global dose_response_results_coordY
+dose_response_results_coordY = 0.6
+
 ############################### Correction matrix ######################################3
 
 global correction127_red
