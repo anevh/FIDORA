@@ -224,7 +224,7 @@ dose5_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
 
 
 upload_button1 = tk.Button(Globals.tab2, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
-    overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.nothingButton)
+    overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.create_window)
 upload_button1.place(relwidth=0.1, relheight=0.04, relx=0.72, rely=0.56)
 
 upload_button2 = tk.Button(Globals.tab2, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
@@ -268,6 +268,10 @@ uploaded_file_print5.place(relwidt=0.08, relheight=0.04, relx=0.84, rely=0.76)
 uploaded_file_print5.insert(INSERT, " ")
 uploaded_file_print5.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
+checkbox_text = tk.Text(Globals.tab2, height=1, width=1)
+checkbox_text.place(relwidt=0.08, relheight=0.05, relx = 0.90, rely = 0.51)
+checkbox_text.insert(INSERT, "Include?")
+checkbox_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
 check1 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var1)
 check1.place(relx=0.94, rely=0.56)

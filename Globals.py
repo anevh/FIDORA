@@ -3,6 +3,7 @@ from tkinter import ttk, StringVar, IntVar
 import numpy as np
 
 
+
 global form 
 form = tk.Tk()
 
@@ -71,7 +72,20 @@ dose_response_var4 = IntVar()
 global dose_response_var5
 dose_response_var5 = IntVar()
 
+global dose_response_uploaded_filenames
+dose_response_uploaded_filenames = np.array([])
 
+global dose_response_new_window_countY
+dose_response_new_window_countY = 0.2
+
+global avg_red_vector
+avg_red_vector = []
+
+global avg_green_vector
+avg_green_vector = []
+
+global avg_blue_vector
+avg_blue_vector = []
 
 ############################### Correction matrix ######################################3
 
