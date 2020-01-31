@@ -16,8 +16,10 @@ except:
 
 """
 
-A = []
+A = [[2, 6], [3, 3], [1,9]]
+A = sorted(A,key=lambda l:l[0])
+print(A[0])
 
-print(len(A))
+
 
 

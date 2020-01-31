@@ -143,28 +143,16 @@ correct_button.place(relwidth=0.2, relheight=0.14, relx=.18, rely=0.75)
 #img_file_name="default.png"
 #path_img=db_config.photo_directory + img_file_name
 
-## Text and button for uploading image
-upload_file = tk.Text(Globals.tab2, height=1, width=1)
-upload_file.place(relwidth=0.21, relheight=0.05, relx=0.007, rely=0.51)
-upload_file.insert(INSERT,"Upload image for calibration:")
-upload_file.config(state=DISABLED, bd=0) 
-upload_box = tk.Text(Globals.tab2, height=1, width=1)
-upload_box.place(relwidth=0.18, relheight=0.05, relx=0.23, rely=0.51)
-upload_box.insert(INSERT," ")
-upload_box.config(state=DISABLED, bd=0)
-upload_button = tk.Button(Globals.tab2, text='Browse',cursor='hand2',font=('calibri', '14'),\
-    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
-upload_button.place(relwidth=0.12, relheight=0.06, relx=0.4, rely=0.505)
 
 ## Text and buttons for the user to choose DPI
-choose_doseResponse_dpi = tk.Text(Globals.tab2, height=1, width=1)
-choose_doseResponse_dpi.place(relwidth=0.35, relheight=0.5, relx=0.07, rely=0.61)
-choose_doseResponse_dpi.insert(tk.CURRENT,"Dots per inch (dpi) used during scanning: ")
-choose_doseResponse_dpi.config(state=DISABLED, bd=0, font=('calibri', '15'))
-Radiobutton(Globals.tab2, text='72 dpi',cursor='hand2',font=('calibri', '14'), \
-    variable=Globals.doseResponse_dpi, value=72, command=CoMet_functions.nothingButton).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.66)
-Radiobutton(Globals.tab2, text='127 dpi',cursor='hand2',font=('calibri', '14'), \
-    variable=Globals.doseResponse_dpi, value=127, command=CoMet_functions.nothingButton).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.66)
+#choose_doseResponse_dpi = tk.Text(Globals.tab2, height=1, width=1)
+#choose_doseResponse_dpi.place(relwidth=0.35, relheight=0.5, relx=0.07, rely=0.61)
+#choose_doseResponse_dpi.insert(tk.CURRENT,"Dots per inch (dpi) used during scanning: ")
+#choose_doseResponse_dpi.config(state=DISABLED, bd=0, font=('calibri', '15'))
+#Radiobutton(Globals.tab2, text='72 dpi',cursor='hand2',font=('calibri', '14'), \
+#    variable=Globals.doseResponse_dpi, value=72, command=CoMet_functions.nothingButton).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.66)
+#Radiobutton(Globals.tab2, text='127 dpi',cursor='hand2',font=('calibri', '14'), \
+#    variable=Globals.doseResponse_dpi, value=127, command=CoMet_functions.nothingButton).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.66)
 
 #openImageTabOne=Image.open(path_img)
 #imgTabOne=ImageTk.PhotoImage(openImageTabOne)
@@ -211,12 +199,6 @@ blue.place(relwidt=0.08, relheight=0.04, relx=0.86, rely=0.55)
 blue.insert(INSERT, "Blue")
 blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-
-
-empty_result_blue = tk.Text(Globals.tab2, height=1, width=1)
-empty_result_blue.place(relwidt=0.08, relheight=0.04, relx=0.86, rely=0.6)
-empty_result_blue.insert(INSERT, " ")
-empty_result_blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
 """
 checkbox_text = tk.Text(Globals.tab2, height=1, width=1)

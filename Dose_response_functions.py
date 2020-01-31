@@ -42,9 +42,11 @@ def readImage(filename):
          return
     
     if(image.shape[2] == 3):
-        if(Globals.doseResponse_dpi.get()=="127" and image.shape[0]==1270 and image.shape[1]==1016):
+        #if(Globals.doseResponse_dpi.get()=="127" and image.shape[0]==1270 and image.shape[1]==1016):
+        if(image.shape[0]==1270 and image.shape[1]==1016):
             image = abs(image-Globals.correctionMatrix127)
-        elif(Globals.doseResponse_dpi.get()=="72" and image.shape[0]==720 and image.shape[1]==576):
+        #elif(Globals.doseResponse_dpi.get()=="72" and image.shape[0]==720 and image.shape[1]==576):
+        elif(image.shape[0]==720 and image.shape[1]==576):
             image = abs(image - Globals.correctionMatrix72)
         else:
             messagebox.showerror("Error","The resolution of the image is not consistent with dpi:" + Globals.doseResponse_dpi.get())
@@ -137,7 +139,27 @@ def avgAllFiles(write_dose_box, new_window):
     result_blue.insert(INSERT, avg_blue)
     result_blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
+    dose_print = tk.Text(Globals.tab2, height=1, width=1)
+    dose_print.place(relwidth=0.04, relheight=0.04, relx = 0.53, rely=Globals.dose_response_results_coordY)
+    dose_print.insert(INSERT, dose_input)
+    dose_print.config(state=DISABLED, bd=0, font=('calibri', '12'))
+
     Globals.dose_response_results_coordY += 0.07
+
+    Globals.avg_red_vector = sorted(Globals.avg_red_vector,key=lambda l:l[0])
+    Globals.avg_green_vector = sorted(Globals.avg_green_vector,key=lambda l:l[0])
+    Globals.avg_blue_vector = sorted(Globals.avg_blue_vector,key=lambda l:l[0])
+    """
+    temp_red = [];temp_green=[], temp_blue=[]
+    i = 0
+    while(i < len(Globals.avg_red_vector)):
+        temp_red = Globals.avg_red_vector[i] #appen
+        temp_green= Globals.avg_green_vector[i]
+        temp_blue = Globals.avg_blue_vector[i]
+
+        if(avg_red_vector[i][0] == avg_red_vector[i+1][0])
+        
+    """
 
     new_window.destroy()
 
