@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton
+from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
+    NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton
 import Globals
 import re
 import CoMet_functions
@@ -185,19 +186,24 @@ upload_button1 = tk.Button(Globals.tab2, text='Upload file', cursor='hand2', fon
 upload_button1.place(relwidth=0.1, relheight=0.04, relx=0.72, rely=0.5)
 
 red = tk.Text(Globals.tab2, height=1, width=1)
-red.place(relwidt=0.08, relheight=0.04, relx=0.6, rely=0.55)
+red.place(relwidth=0.08, relheight=0.04, relx=0.6, rely=0.55)
 red.insert(INSERT, "Red")
 red.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
 green = tk.Text(Globals.tab2, height=1, width=1)
-green.place(relwidt=0.08, relheight=0.04, relx=0.73, rely=0.55)
+green.place(relwidth=0.08, relheight=0.04, relx=0.73, rely=0.55)
 green.insert(INSERT, "Green")
 green.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
 blue = tk.Text(Globals.tab2, height=1, width=1)
-blue.place(relwidt=0.08, relheight=0.04, relx=0.86, rely=0.55)
+blue.place(relwidth=0.08, relheight=0.04, relx=0.86, rely=0.55)
 blue.insert(INSERT, "Blue")
 blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
+
+dose_title = tk.Text(Globals.tab2, height=1, width=1)
+dose_title.place(relheight=0.04, relwidth=0.04, relx= 0.53, rely=0.55)
+dose_title.insert(INSERT, "Dose")
+dose_title.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
 
 """

@@ -6,6 +6,11 @@ import cv2
 import numpy as np
 import os
 from os.path import normpath, basename
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from scipy.optimize import curve_fit
 
 ## Function to do nothing (temp)
 def nothingButton():
@@ -88,6 +93,10 @@ def readImage(filename):
         return False
 
 
+def fitted_dose_response(temp_dose, a, b, c):
+    return a + b/(temp_dose-c)
+
+
 ## Function to find mean of uploaded images with same dose.
 def avgAllFiles(write_dose_box, new_window):
 
@@ -120,9 +129,19 @@ def avgAllFiles(write_dose_box, new_window):
     avg_green = avg_green/len(Globals.dose_response_uploaded_filenames)
     avg_blue = avg_blue/len(Globals.dose_response_uploaded_filenames)
 
-    Globals.avg_red_vector.append([dose_input, avg_red])
-    Globals.avg_green_vector.append([dose_input, avg_green])
-    Globals.avg_blue_vector.append([dose_input, avg_blue])
+    temp_dose = [item[0] for item in Globals.avg_red_vector]
+    try:
+        indx = temp_dose.index(dose_input)
+        Globals.avg_red_vector[indx][1] = (avg_red + Globals.avg_red_vector[indx][1])/2
+        Globals.avg_green_vector[indx][1] = (avg_green + Globals.avg_green_vector[indx][1])/2
+        Globals.avg_blue_vector[indx][1] = (avg_blue + Globals.avg_blue_vector[indx][1])/2
+        
+    except:
+        Globals.avg_red_vector.append([dose_input, avg_red])
+        Globals.avg_green_vector.append([dose_input, avg_green])
+        Globals.avg_blue_vector.append([dose_input, avg_blue])
+
+    temp_dose = [item[0] for item in Globals.avg_red_vector]
 
     result_red = tk.Text(Globals.tab2, height=1, width=1)
     result_red.place(relwidt=0.08, relheight=0.04, relx=0.6, rely=Globals.dose_response_results_coordY)
@@ -145,21 +164,29 @@ def avgAllFiles(write_dose_box, new_window):
     dose_print.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
     Globals.dose_response_results_coordY += 0.07
+      
+    
+    #plot
+    temp_avg_red = [item[1] for item in Globals.avg_red_vector]
+    temp_avg_green = [item[1] for item in Globals.avg_green_vector]
+    temp_avg_blue = [item[1] for item in Globals.avg_blue_vector]
+    
+    
 
-    Globals.avg_red_vector = sorted(Globals.avg_red_vector,key=lambda l:l[0])
-    Globals.avg_green_vector = sorted(Globals.avg_green_vector,key=lambda l:l[0])
-    Globals.avg_blue_vector = sorted(Globals.avg_blue_vector,key=lambda l:l[0])
-    """
-    temp_red = [];temp_green=[], temp_blue=[]
-    i = 0
-    while(i < len(Globals.avg_red_vector)):
-        temp_red = Globals.avg_red_vector[i] #appen
-        temp_green= Globals.avg_green_vector[i]
-        temp_blue = Globals.avg_blue_vector[i]
+    fig = Figure(figsize=(3,3))
+    a = fig.add_subplot(111)
+    a.scatter(temp_dose,temp_avg_red,color='red')
+    #a.plot(xdata, ydata, color='red')
+    #a.plot(p, range(2 +max(x)),color='blue')
+    a.invert_yaxis()
 
-        if(avg_red_vector[i][0] == avg_red_vector[i+1][0])
-        
-    """
+    a.set_title ("Title", fontsize=12)
+    a.set_ylabel("Pixel value", fontsize=12)
+    a.set_xlabel("Dose", fontsize=12)
+
+    canvas = FigureCanvasTkAgg(fig, master=Globals.tab2)
+    canvas.get_tk_widget().place(relwidth=0.4, relheight=0.45, relx = 0, rely=0.44)
+    canvas.draw()
 
     new_window.destroy()
 
