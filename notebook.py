@@ -231,12 +231,73 @@ check5.place(relx=0.94, rely=0.76)
 
 ##################################### TAB 3 - Map dose ############################################
 
-temp_text = tk.Text(Globals.tab3, height=1, width=1)
-temp_text.place(relwidth=0.8, relheight=0.1, relx=0.1, rely=0.31)
-temp_text.insert(INSERT,"lage en ny fane der en kan scanne en ukjent film og finne dose vha kalibreringskurva")
-temp_text.config(state=DISABLED, bd=0) 
+#temp_text = tk.Text(Globals.tab3, height=1, width=1)
+#temp_text.place(relwidth=0.8, relheight=0.1, relx=0.1, rely=0.31)
+#temp_text.insert(INSERT,"lage en ny fane der en kan scanne en ukjent film og finne dose vha kalibreringskurva")
+#temp_text.config(state=DISABLED, bd=0) 
+
+## Text and button for uploading image 
+upload_file = tk.Text(Globals.tab3, height=1, width=1)
+upload_file.place(relwidth=0.25, relheight=0.05, relx=0.007, rely=0.11)
+upload_file.insert(INSERT,"Upload image you want to map to dose values:")
+upload_file.config(state=DISABLED, bd=0, font=('calibri', '15')) 
+upload_box = tk.Text(Globals.tab3, height=1, width=1)
+upload_box.place(relwidth=0.2, relheight=0.05, relx=0.28, rely=0.11)
+upload_box.insert(INSERT," ")
+upload_box.config(state=DISABLED, bd=0)
+upload_button = tk.Button(Globals.tab3, text='Browse',cursor='hand2',font=('calibri', '14'),\
+    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
+upload_button.place(relwidth=0.15, relheight=0.06, relx=0.5, rely=0.105)
+
+## Text and button for the user to select folder to save the dose map
+save_to_folder = tk.Text(Globals.tab3, height=1, width=1)
+save_to_folder.place(relwidth=0.28, relheight=0.05, relx=0.003, rely=0.21) #endre rely
+save_to_folder.insert(INSERT,"Folder to save the dose map:")
+save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '15')) 
+folder_box = tk.Text(Globals.tab3, height=1, width=1)
+folder_box.place(relwidth=0.2, relheight=0.05, relx=0.29, rely=0.21)
+folder_box.insert(INSERT," ")
+folder_box.config(state=DISABLED, bd=0, font=('calibri', '12')) 
+toFolder = tk.Button(Globals.tab3, text='Browse', cursor='hand2',font=('calibri', '14'),\
+   highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.setCoMet_export_folder)
+toFolder.place(relwidth=0.15, relheight=0.06, relx=0.5, rely=0.205)#rely=0.395
+
+## Text and box for the user to write in a filename for the corrected image, and lock it
+corrected_image_filename_text = tk.Text(Globals.tab1, height=1, width=1)
+corrected_image_filename_text.place(relwidt=0.24, relheight=0.05, relx=0.004, rely=0.5)
+corrected_image_filename_text.insert(INSERT, "Write filename of saved image:" )
+corrected_image_filename_text.config(state=DISABLED, bd=0, font=('calibri', '15'))
+Globals.CoMet_corrected_image_filename_box= tk.Text(Globals.tab1, height=1, width=1)
+Globals.CoMet_corrected_image_filename_box.place(relwidth=0.24, relheight=0.05, relx=0.25, rely=0.5)
+Globals.CoMet_corrected_image_filename_box.insert(INSERT, " " )
+Globals.CoMet_corrected_image_filename_box.config(state=NORMAL, bd=0, font=('calibri', '12'))
+load_corrected_image_filename=tk.Button(Globals.tab1, text='Save filename', cursor='hand2', font=('calibri', '14'), highlightthickness=7, \
+    overrelief=GROOVE, state=ACTIVE, width=15, command=testFilename)
+load_corrected_image_filename.place(relwidth=0.15, relheight=0.06, relx=0.5, rely=0.495)
+
+## Creating a button-widget to perform the mapping
+correct_button = tk.Button(Globals.tab3, text='Map dose', cursor='hand2',font=('calibri', '18'),highlightthickness= 7,\
+    overrelief=GROOVE, state=ACTIVE, width = 15, command="") ##command=Map_Dose.mapDose(img_path) må implementeres riktig
+correct_button.place(relwidth=0.2, relheight=0.14, relx=.75, rely=0.10)
 
 
+## Text and button for uploading dicom image from doseplan system 
+upload_file = tk.Text(Globals.tab3, height=1, width=1)
+upload_file.place(relwidth=0.25, relheight=0.05, relx=0.007, rely=0.31)
+upload_file.insert(INSERT,"Upload dose map from doseplan system:")
+upload_file.config(state=DISABLED, bd=0, font=('calibri', '15')) 
+upload_box = tk.Text(Globals.tab3, height=1, width=1)
+upload_box.place(relwidth=0.2, relheight=0.05, relx=0.28, rely=0.31)
+upload_box.insert(INSERT," ")
+upload_box.config(state=DISABLED, bd=0)
+upload_button = tk.Button(Globals.tab3, text='Browse',cursor='hand2',font=('calibri', '14'),\
+    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
+upload_button.place(relwidth=0.15, relheight=0.06, relx=0.5, rely=0.305)
+
+## Creating a button-widget to compare dose map from film measurement and dose map from doseplan system
+correct_button = tk.Button(Globals.tab3, text='Compare dose maps', cursor='hand2',font=('calibri', '18'),highlightthickness= 7,\
+    overrelief=GROOVE, state=ACTIVE, width = 15, command="") ##command=Map_Dose.Compare(img_path) må implementeres riktig
+correct_button.place(relwidth=0.2, relheight=0.14, relx=.75, rely=0.27)
 
 
 ##################################### End statements ############################################
