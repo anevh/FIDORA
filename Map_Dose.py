@@ -19,15 +19,13 @@ def pixelValueToDose(pixelValue):
 
 def mapDose(img_path):
     dataset = pydicom.dcmread(img_path)
-    if "PixelData" in dataset:
-        rows= int(dataset.Rows)
-        cols = int(dataset.Columns)
-        ds= np.pixel_array(ds.PixelData)
-        dose_value = np.zeros((rows,cols))
-        for i in range(rows):
-            for j in range(cols):
-                dose_value[i,j]=pixelValueToDose(ds[i,j])
-        return dose_value #er et bilde med dose-nivåer, med samme dimensjoner som PV-bildet
-    else:
-        print("Error. No image stored in dicom file.")
-        return 
+    ds=dataset.pixel_array
+    rows, cols = np.shape(ds)
+    #rows= int(dataset.Rows)
+    #cols = int(dataset.Columns)
+    #ds= np.pixel_array(ds.PixelData)
+    dose_value = np.zeros((rows,cols))
+    for i in range(rows):
+        for j in range(cols):
+            dose_value[i,j]=pixelValueToDose(ds[i,j])
+    return dose_value #er et bilde med dose-nivåer, med samme dimensjoner som PV-bildet
