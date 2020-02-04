@@ -93,8 +93,8 @@ def readImage(filename):
         return False
 
 
-def fitted_dose_response(temp_dose, a, b, c):
-    return a + b/(temp_dose-c)
+def fitted_dose_response(D, a, b, c):
+    return a + b/(D-c)
 
 
 ## Function to find mean of uploaded images with same dose.
@@ -178,8 +178,20 @@ def avgAllFiles(write_dose_box, new_window):
     a.scatter(temp_dose,temp_avg_red,color='red')
     #a.plot(xdata, ydata, color='red')
     #a.plot(p, range(2 +max(x)),color='blue')
+    
     a.invert_yaxis()
+    ### Denne fungerer ikke ! TAllENE MÅ SORTERES ! Får ofte optimaliseringsproblemer..
+    if(len(temp_avg_red) > 2):
+        print(len(temp_avg_red), len(temp_dose))
+        popt, pcov = curve_fit(fitted_dose_response, temp_dose, temp_avg_red, p0=[41000, 0.05, 0.05])
+        print(popt[0], " + ", popt[1], "/(D - ", popt[2], ")")
+        xdata = np.linspace(0,800,1001)
+        ydata = np.zeros(len(xdata))
+        for i in range(len(ydata)):
+            ydata[i] = fitted_dose_response(xdata[i], popt[0], popt[1], popt[2])
+        a.plot(xdata, ydata, color='red')
 
+    ####
     a.set_title ("Title", fontsize=12)
     a.set_ylabel("Pixel value", fontsize=12)
     a.set_xlabel("Dose", fontsize=12)

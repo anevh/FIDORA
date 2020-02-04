@@ -32,8 +32,3 @@ if not [3,4] in A:
 
 list1 = [item[0] for item in A]
 print(list1)
-
-if(list1.index(9)):
-    print("Ok")
-else:
-    print("nei")
