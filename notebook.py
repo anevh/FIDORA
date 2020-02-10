@@ -9,11 +9,40 @@ import Dose_response_functions
 
 
 Globals.form.title("Master")
-Globals.form.geometry("1100x600")
+Globals.form.geometry("1250x600")
+Globals.form.configure(bg='#F8F9F9')
 
-Globals.tab_parent.add(Globals.tab1, text='CoMet')
-Globals.tab_parent.add(Globals.tab2, text='Dose-response')
-Globals.tab_parent.add(Globals.tab3, text='Map dose')
+Globals.tab_parent.add(Globals.tab1, text='\n              CoMet              \n')
+Globals.tab_parent.add(Globals.tab2, text='\n          Dose-response          \n')
+Globals.tab_parent.add(Globals.tab3, text='\n            Map dose             \n')
+
+style = ttk.Style()
+style.theme_create('MyStyle', settings={
+    ".": {
+        "configure": {
+            "background": '#EBF5FB', # All colors except for active tab-button
+            "font": 'red'
+        }
+    },
+    "TNotebook": {
+        "configure": {
+            "background":'#A9CCE3', # color behind the notebook
+            "tabmargins": [5, 5, 0, 0], # [left margin, upper margin, right margin, margin beetwen tab and frames]
+        }
+    },
+    "TNotebook.Tab": {
+        "configure": {
+            "background": '#5DADE2', # Color of non selected tab-button
+            "padding": [5, 2], # [space beetwen text and horizontal tab-button border, space between text and vertical tab_button border]
+            "font":"white"
+        },
+        "map": {
+            "background": [("selected", '#EBF5FB')], # Color of active tab
+            "expand": [("selected", [1, 1, 1, 0])] # [expanse of text]
+        }
+    }
+})
+style.theme_use('MyStyle')
 
 menubar = Menu(Globals.form)
 filemenu = Menu(menubar, tearoff=0)
@@ -201,32 +230,18 @@ blue.insert(INSERT, "Blue")
 blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
 dose_title = tk.Text(Globals.tab2, height=1, width=1)
-dose_title.place(relheight=0.04, relwidth=0.04, relx= 0.53, rely=0.55)
-dose_title.insert(INSERT, "Dose")
+dose_title.place(relheight=0.04, relwidth=0.06, relx= 0.53, rely=0.55)
+dose_title.insert(INSERT, "Dose (cGy)")
 dose_title.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
+check1 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var1, command=Dose_response_functions.plot_dose_response)
+check1.place(relx=0.65, rely=0.55)
 
-"""
-checkbox_text = tk.Text(Globals.tab2, height=1, width=1)
-checkbox_text.place(relwidt=0.08, relheight=0.05, relx = 0.90, rely = 0.51)
-checkbox_text.insert(INSERT, "Include?")
-checkbox_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
+check2 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var2, command=Dose_response_functions.plot_dose_response)
+check2.place(relx=0.78, rely=0.55)
 
-check1 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var1)
-check1.place(relx=0.94, rely=0.56)
-
-check2 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var2)
-check2.place(relx=0.94, rely=0.61)
-
-check3 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var3)
-check3.place(relx=0.94, rely=0.66)
-
-check4 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var4)
-check4.place(relx=0.94, rely=0.71)
-
-check5 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var5)
-check5.place(relx=0.94, rely=0.76)
-"""
+check3 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var3, command=Dose_response_functions.plot_dose_response)
+check3.place(relx=0.91, rely=0.55)
 
 
 ##################################### TAB 3 - Map dose ############################################
