@@ -30,18 +30,20 @@ def mapDose(img_path):
             dose_value[i,j]=pixelValueToDose(ds[i,j])
     return dose_value #er et bilde med dose-nivåer, med samme dimensjoner som PV-bildet
 
-def compare(img_path2):
+def compare(img_path2,img_path):
     film=mapDose(img_path)
     dosePlanSys=pydicom.dcmread(img_path2)
     ds=dosePlanSys.pixel_array
     rows, cols = np.shape(ds)
     compare_gamma=np.zeros((rows,cols))
     tolerance=5 #ingen ide hva som er akseptabelt avvik her?
-    
+    count=0
     for i in range(rows):
         for j in range(cols):
             if (abs(film-dosePlanSys)<tolerance):
                 compare_gamma[i,j]=2^16-1 #sett til hvit
+                count+=1
             else:
                 compare_gamma[i,j]=0 #sett til svart
-    return compare_gamma
+    pass_rate=count/(rows*cols)*100
+    return compare_gamma, pass_rate
