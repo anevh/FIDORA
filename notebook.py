@@ -16,6 +16,7 @@ Globals.tab_parent.add(Globals.tab1, text='\n              CoMet              \n
 Globals.tab_parent.add(Globals.tab2, text='\n          Dose-response          \n')
 Globals.tab_parent.add(Globals.tab3, text='\n            Map dose             \n')
 
+
 style = ttk.Style()
 style.theme_create('MyStyle', settings={
     ".": {
@@ -210,12 +211,16 @@ how_dose_response_text.insert(INSERT,\
 film piece in the center of the scanner and perfom three scans per dose.  " )
 how_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-upload_button1 = tk.Button(Globals.tab2, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
-    overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.create_window)
-upload_button1.place(relwidth=0.1, relheight=0.04, relx=0.72, rely=0.5)
 
-red = tk.Text(Globals.tab2, height=1, width=1)
-red.place(relwidth=0.08, relheight=0.04, relx=0.6, rely=0.55)
+scroll_window = tk.Canvas(Globals.tab2, width=200, height=100)
+scroll_window.place(relwidth=0.48, relheight=0.55, relx = 0.5, rely = 0.42)
+
+upload_button1 = tk.Button(scroll_window, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
+    overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.create_window)
+upload_button1.place(relwidth=0.5, relheight=0.1, relx=0.3, rely=0.03)
+
+red = tk.Text(scroll_window, height=1, width=1)
+red.place(relwidth=0.08, relheight=0.04, relx=0.3, rely=0.24)
 red.insert(INSERT, "Red")
 red.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
@@ -229,13 +234,13 @@ blue.place(relwidth=0.08, relheight=0.04, relx=0.86, rely=0.55)
 blue.insert(INSERT, "Blue")
 blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-dose_title = tk.Text(Globals.tab2, height=1, width=1)
-dose_title.place(relheight=0.04, relwidth=0.06, relx= 0.53, rely=0.55)
+dose_title = tk.Text(scroll_window, height=1, width=1)
+dose_title.place(relheight=0.08, relwidth=0.15, relx= 0.05, rely=0.2)
 dose_title.insert(INSERT, "Dose (cGy)")
 dose_title.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-check1 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var1, command=Dose_response_functions.plot_dose_response)
-check1.place(relx=0.65, rely=0.55)
+check1 = Checkbutton(scroll_window, variable=Globals.dose_response_var1, command=Dose_response_functions.plot_dose_response)
+check1.place(relx=0.4, rely=0.2)
 
 check2 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var2, command=Dose_response_functions.plot_dose_response)
 check2.place(relx=0.78, rely=0.55)

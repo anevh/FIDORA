@@ -45,3 +45,16 @@ def compare(img_path2):
             else:
                 compare_gamma[i,j]=0 #sett til svart
     return compare_gamma
+
+
+"""
+def gamma_test(dose_plan, film_data, lim_pix, lim_dist):
+    #sjekke dimensjoner
+
+    #Lage en tom array av lik dimensjon
+    def distToAgreement():
+        
+    #
+"""
+
+
