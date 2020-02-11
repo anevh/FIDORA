@@ -59,12 +59,15 @@ CoMet_correctedImage=None
 
 global dose_response_var1 
 dose_response_var1= IntVar()
+dose_response_var1.set(1)
 
 global dose_response_var2
 dose_response_var2 = IntVar()
+dose_response_var2.set(1)
 
 global dose_response_var3
 dose_response_var3 = IntVar()
+dose_response_var3.set(1)
 
 global dose_response_var4
 dose_response_var4 = IntVar()
@@ -89,6 +92,24 @@ avg_blue_vector = []
 
 global dose_response_results_coordY
 dose_response_results_coordY = 0.6
+
+global dose_response_inOrOut
+dose_response_inOrOut = True
+
+global dose_response_delete_buttons
+dose_response_delete_buttons = []
+
+global dose_response_red_list
+dose_response_red_list = []
+
+global dose_response_green_list
+dose_response_green_list = []
+
+global dose_response_blue_list
+dose_response_blue_list = []
+
+global dose_response_dose_list
+dose_response_dose_list = []
 
 ############################### Correction matrix ######################################3
 

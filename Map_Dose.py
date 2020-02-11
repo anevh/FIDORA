@@ -47,3 +47,17 @@ def compare(img_path2,img_path):
                 compare_gamma[i,j]=0 #sett til svart
     pass_rate=count/(rows*cols)*100
     return compare_gamma, pass_rate
+    return compare_gamma
+
+
+"""
+def gamma_test(dose_plan, film_data, lim_pix, lim_dist):
+    #sjekke dimensjoner
+
+    #Lage en tom array av lik dimensjon
+    def distToAgreement():
+        
+    #
+"""
+
+
