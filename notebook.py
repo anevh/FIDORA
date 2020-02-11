@@ -1,44 +1,60 @@
 import tkinter as tk
 from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
-    NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton
+    NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton, FLAT, PhotoImage, Label
 import Globals
 import re
 import CoMet_functions
 import Dose_response_functions
+from PIL import Image, ImageTk
 
 
 
-Globals.form.title("Master")
-Globals.form.geometry("1250x600")
+Globals.form.title("FIDORA")
+#lobals.form.geometry("1250x600")
 Globals.form.configure(bg='#F8F9F9')
+Globals.form.state('zoomed')
 
-Globals.tab_parent.add(Globals.tab1, text='\n              CoMet              \n')
-Globals.tab_parent.add(Globals.tab2, text='\n          Dose-response          \n')
-Globals.tab_parent.add(Globals.tab3, text='\n            Map dose             \n')
+Globals.form.tk.call('wm', 'iconphoto', Globals.form._w, PhotoImage(file='logo_fidora.png'))
+Globals.form.iconbitmap(default='ntnu_logo.png')
 
+load = Image.open("fidora_logo.png")
+render = ImageTk.PhotoImage(load)
+label = Label(image=render)
+label.image = render
+label.place(relwidt=0.61,relheight=0.15, relx=0.02, rely=0.0)
+label.config(bg='#FFFFFF') 
+
+Globals.tab_parent.add(Globals.intro_tab, text='\n\n\tFIDORA\t\t\n\n')
+Globals.tab_parent.add(Globals.tab1, text='\n\n\tCoMet\t\t\n\n')
+Globals.tab_parent.add(Globals.tab2, text='\n\n\tDose-response\t\n\n')
+Globals.tab_parent.add(Globals.tab3, text='\n\n\tMap dose\t\t\n\n')
+Globals.tab_parent.add(Globals.tab4, text='\n\n\tProfiles\t\t\n\n')
 
 style = ttk.Style()
 style.theme_create('MyStyle', settings={
     ".": {
         "configure": {
-            "background": '#EBF5FB', # All colors except for active tab-button
+            "background": '#FFFFFF', # All colors except for active tab-button
             "font": 'red'
         }
     },
     "TNotebook": {
         "configure": {
-            "background":'#A9CCE3', # color behind the notebook
+            "background":'#EAF2EF', # color behind the notebook
             "tabmargins": [5, 5, 0, 0], # [left margin, upper margin, right margin, margin beetwen tab and frames]
+            "tabposition": 'wn'
         }
     },
     "TNotebook.Tab": {
         "configure": {
-            "background": '#5DADE2', # Color of non selected tab-button
+            "background": '#0A7D76', # Color of non selected tab-button
+            "foreground": '#ffffff',
             "padding": [5, 2], # [space beetwen text and horizontal tab-button border, space between text and vertical tab_button border]
-            "font":"white"
+            "font": '#FFFFFF'
+            
         },
         "map": {
-            "background": [("selected", '#EBF5FB')], # Color of active tab
+            "background": [("selected", '#02B9A5')], # Color of active tab
             "expand": [("selected", [1, 1, 1, 0])] # [expanse of text]
         }
     }
@@ -57,6 +73,60 @@ helpmenu.add_command(label="Help", command=CoMet_functions.nothingButton)
 helpmenu.add_command(label="About", command=CoMet_functions.nothingButton)
 menubar.add_cascade(label="Help", menu=helpmenu)
 Globals.form.config(menu=menubar)
+
+###################################### INTRO TAB #################################################
+
+
+tab1_text_box = tk.Text(Globals.intro_tab, height=1, width=1)
+tab1_text_box.place(relwidth=0.4, relheight=0.4, relx=0.05, rely=0.05)
+tab1_text_box.insert(INSERT, " ")
+tab1_text_box.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '13'))
+
+tab1_text = tk.Text(tab1_text_box, height=1, width=1)
+tab1_text.place(relwidth=1, relheight=1, relx=0, rely=0)
+tab1_text.insert(INSERT,"Correct your scanned images using CoMet. A method \ndeveloped to correct for non-uniformity introduced\n\
+by the scanner. The correction is based on absolute \nsubtraction.")
+tab1_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '13'), pady=60, padx=20) 
+
+tab1_title_text = tk.Text(tab1_text_box, height=1, width=1)
+tab1_title_text.place(relwidth=0.3, relheight=0.17, relx=0.385, rely=0.05)
+tab1_title_text.insert(INSERT, "CoMet")
+tab1_title_text.config(state=DISABLED, bd=0, bg = '#e5f9ff', fg='#130e07', font=('calibri', '25', 'bold'))
+
+tab1_readmore_text = tk.Text(tab1_text_box, height=1, width=1)
+tab1_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.27, rely=0.55)
+tab1_readmore_text.insert(INSERT,"Read more...")
+tab1_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold')) 
+
+
+tab2_text_box = tk.Text(Globals.intro_tab, height=1, width=1)
+tab2_text_box.place(relwidth=0.4, relheight=0.4, relx=0.5, rely=0.05)
+tab2_text_box.insert(INSERT, " ")
+tab2_text_box.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '15'))
+
+tab2_title = tk.Text(tab2_text_box, height=1, width=1)
+tab2_title.place(relwidth=0.3, relheight=0.17, relx=0.385, rely=0.05)
+tab2_title.insert(INSERT, "Dose response")
+tab2_title.config(state=DISABLED, bd=0, bg = '#e5f9ff', fg='#130e07', font=('calibri', '25', 'bold'))
+
+tab2_text = tk.Text(tab2_text_box, height=1, width=1)
+tab2_text.place(relwidth=1, relheight=1, relx=0, rely=0)
+tab2_text.insert(INSERT,"Make a calibration curve and read out the dose response function. For every new batch of GafChromic film\
+    there is a need to update the dose response. All three channels (RGB) are read and calculated.")
+tab2_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '15'), pady = 60, padx = 20) 
+
+
+
+tab3_text = tk.Text(Globals.intro_tab, height=1, width=1)
+tab3_text.place(relwidth=0.4, relheight=0.4, relx=0.05, rely=0.5)
+tab3_text.insert(INSERT,"Upload file you want to correct:")
+tab3_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '15'), highlightbackground='#066') 
+
+tab4_text = tk.Text(Globals.intro_tab, height=1, width=1)
+tab4_text.place(relwidth=0.4, relheight=0.4, relx=0.5, rely=0.5)
+tab4_text.insert(INSERT,"Upload file you want to correct:")
+tab4_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '15'), highlightbackground='#066') 
+
 
 ##################################### TAB 1 - CoMet ############################################
 
@@ -212,41 +282,38 @@ film piece in the center of the scanner and perfom three scans per dose.  " )
 how_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
 
-scroll_window = tk.Canvas(Globals.tab2, width=200, height=100)
-scroll_window.place(relwidth=0.48, relheight=0.55, relx = 0.5, rely = 0.42)
-
-upload_button1 = tk.Button(scroll_window, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
+upload_button1 = tk.Button(Globals.dose_response_scroll_window_1, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
     overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.create_window)
 upload_button1.place(relwidth=0.5, relheight=0.1, relx=0.3, rely=0.03)
 
-red = tk.Text(scroll_window, height=1, width=1)
-red.place(relwidth=0.08, relheight=0.04, relx=0.3, rely=0.24)
+red = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
+red.place(relwidth=0.1, relheight=0.08, relx=0.3, rely=0.2)
 red.insert(INSERT, "Red")
 red.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-green = tk.Text(Globals.tab2, height=1, width=1)
-green.place(relwidth=0.08, relheight=0.04, relx=0.73, rely=0.55)
+green = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
+green.place(relwidth=0.1, relheight=0.08, relx=0.5, rely=0.2)
 green.insert(INSERT, "Green")
 green.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-blue = tk.Text(Globals.tab2, height=1, width=1)
-blue.place(relwidth=0.08, relheight=0.04, relx=0.86, rely=0.55)
+blue = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
+blue.place(relwidth=0.1, relheight=0.08, relx=0.75, rely=0.2)
 blue.insert(INSERT, "Blue")
 blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-dose_title = tk.Text(scroll_window, height=1, width=1)
+dose_title = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
 dose_title.place(relheight=0.08, relwidth=0.15, relx= 0.05, rely=0.2)
 dose_title.insert(INSERT, "Dose (cGy)")
 dose_title.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-check1 = Checkbutton(scroll_window, variable=Globals.dose_response_var1, command=Dose_response_functions.plot_dose_response)
-check1.place(relx=0.4, rely=0.2)
+check1 = Checkbutton(Globals.dose_response_scroll_window_1, variable=Globals.dose_response_var1, command=Dose_response_functions.plot_dose_response)
+check1.place(relx=0.4, rely=0.19)
 
-check2 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var2, command=Dose_response_functions.plot_dose_response)
-check2.place(relx=0.78, rely=0.55)
+check2 = Checkbutton(Globals.dose_response_scroll_window_1, variable=Globals.dose_response_var2, command=Dose_response_functions.plot_dose_response)
+check2.place(relx=0.6, rely=0.19)
 
-check3 = Checkbutton(Globals.tab2, variable=Globals.dose_response_var3, command=Dose_response_functions.plot_dose_response)
-check3.place(relx=0.91, rely=0.55)
+check3 = Checkbutton(Globals.dose_response_scroll_window_1, variable=Globals.dose_response_var3, command=Dose_response_functions.plot_dose_response)
+check3.place(relx=0.85, rely=0.19)
 
 
 ##################################### TAB 3 - Map dose ############################################
@@ -321,5 +388,5 @@ correct_button.place(relwidth=0.2, relheight=0.14, relx=.75, rely=0.27)
 
 
 ##################################### End statements ############################################
-Globals.tab_parent.pack(expand=1, fill='both')
+Globals.tab_parent.place(relwidth=1, relheight=0.9, relx=0, rely=0.15)
 Globals.form.mainloop()

@@ -1,8 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, StringVar, IntVar
+from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y
 import numpy as np
-
-
 
 global form 
 form = tk.Tk()
@@ -10,19 +8,32 @@ form = tk.Tk()
 global tab_parent
 tab_parent = ttk.Notebook(form)
 
+global intro_tab
+intro_tab = ttk.Frame(tab_parent)
 global tab1
 tab1 = ttk.Frame(tab_parent)
 global tab2
 tab2 = ttk.Frame(tab_parent)
 global tab3
 tab3 = ttk.Frame(tab_parent)
+global tab4
+tab4 = ttk.Frame(tab_parent)
+
+sb = Scrollbar(tab2)
+sb.pack(side = RIGHT, fill = Y)
+
+global dose_response_scroll_window_1
+dose_response_scroll_window_1 = tk.Canvas(tab2,  yscrollcommand = sb.set, width=200, height=100)
+dose_response_scroll_window_1.place(relwidth=0.48, relheight=0.55, relx = 0.5, rely = 0.42)
+
+sb.config(command = dose_response_scroll_window_1.yview )  
+
 
 global CoMet_dpi
 CoMet_dpi = StringVar(tab1)
 CoMet_dpi.set("127")
 
 global doseResponse_dpi
-#doseResponse_dpi="127"
 doseResponse_dpi=StringVar(tab2)
 doseResponse_dpi.set("127")
 
@@ -91,7 +102,7 @@ global avg_blue_vector
 avg_blue_vector = []
 
 global dose_response_results_coordY
-dose_response_results_coordY = 0.6
+dose_response_results_coordY = 0.35
 
 global dose_response_inOrOut
 dose_response_inOrOut = True

@@ -178,9 +178,9 @@ def delete_line(delete_button):
         Globals.avg_green_vector = []
         Globals.avg_blue_vector = []
         Globals.dose_response_delete_buttons = []
+    
 
     plot_dose_response()
-    return
 
 def fitted_dose_response(D, a, b, c):
     return a + b/(D-c)
@@ -234,26 +234,26 @@ def avgAllFiles(write_dose_box, new_window):
     
     temp_dose = [item[0] for item in Globals.avg_red_vector]
 
-    result_red = tk.Text(Globals.tab2, height=1, width=1)
-    result_red.place(relwidt=0.08, relheight=0.04, relx=0.6, rely=Globals.dose_response_results_coordY)
+    result_red = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
+    result_red.place(relwidth=0.1, relheight=0.08, relx=0.3, rely=Globals.dose_response_results_coordY)
     result_red.insert(INSERT, round(avg_red))
     result_red.config(state=DISABLED, bd=0, font=('calibri', '12'))
     Globals.dose_response_red_list.append(result_red)
 
-    result_green = tk.Text(Globals.tab2, height=1, width=1)
-    result_green.place(relwidt=0.08, relheight=0.04, relx=0.73, rely=Globals.dose_response_results_coordY)
+    result_green = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
+    result_green.place(relwidth=0.1, relheight=0.08, relx=0.5, rely=Globals.dose_response_results_coordY)
     result_green.insert(INSERT, round(avg_green))
     result_green.config(state=DISABLED, bd=0, font=('calibri', '12'))
     Globals.dose_response_green_list.append(result_green)
 
-    result_blue = tk.Text(Globals.tab2, height=1, width=1)
-    result_blue.place(relwidt=0.08, relheight=0.04, relx=0.86, rely=Globals.dose_response_results_coordY)
+    result_blue = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
+    result_blue.place(relwidth=0.1, relheight=0.08, relx=0.75, rely=Globals.dose_response_results_coordY)
     result_blue.insert(INSERT, round(avg_blue))
     result_blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
     Globals.dose_response_blue_list.append(result_blue)
 
-    dose_print = tk.Text(Globals.tab2, height=1, width=1)
-    dose_print.place(relwidth=0.04, relheight=0.04, relx = 0.53, rely=Globals.dose_response_results_coordY)
+    dose_print = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
+    dose_print.place(relwidth=0.15, relheight=0.08, relx = 0.05, rely=Globals.dose_response_results_coordY)
     dose_print.insert(INSERT, dose_input)
     dose_print.config(state=DISABLED, bd=0, font=('calibri', '12'))
     Globals.dose_response_dose_list.append(dose_print)
@@ -262,12 +262,12 @@ def avgAllFiles(write_dose_box, new_window):
     path = path + "\delete.png"
     img = ImageTk.PhotoImage(file=path)
 
-    delete_button = tk.Button(Globals.tab2, text='Remove', image=img, cursor='hand2',font=('calibri', '18'),highlightthickness= 0,\
+    delete_button = tk.Button(Globals.dose_response_scroll_window_1, text='Remove', image=img, cursor='hand2',font=('calibri', '18'),highlightthickness= 0,\
         relief=FLAT, state=ACTIVE, width = 15, command=lambda: delete_line(delete_button)) 
     delete_button.image = img
     Globals.dose_response_delete_buttons.append(delete_button)
-    delete_button.place(relwidth=0.018, relheight=0.032, relx=0.95, rely=Globals.dose_response_results_coordY)
-    Globals.dose_response_results_coordY += 0.05
+    delete_button.place(relwidth=0.06, relheight=0.06, relx=0.9, rely=Globals.dose_response_results_coordY)
+    Globals.dose_response_results_coordY += 0.5
 
     plot_dose_response()
     new_window.destroy()
