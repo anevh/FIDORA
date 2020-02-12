@@ -3,7 +3,7 @@ from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
     NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton, FLAT, PhotoImage, Label
 import Globals
 import re
-import CoMet_functions
+import CoMet_functions, intro_tab_functions
 import Dose_response_functions
 from PIL import Image, ImageTk
 
@@ -94,39 +94,78 @@ tab1_title_text.insert(INSERT, "CoMet")
 tab1_title_text.config(state=DISABLED, bd=0, bg = '#e5f9ff', fg='#130e07', font=('calibri', '25', 'bold'))
 
 tab1_readmore_text = tk.Text(tab1_text_box, height=1, width=1)
-tab1_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.27, rely=0.55)
+tab1_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.27, rely=0.54)
 tab1_readmore_text.insert(INSERT,"Read more...")
 tab1_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold')) 
 
-
+"""
+tab1_readmore = tk.Button(tab1_text_box, text='Read more',cursor='hand2',font=('calibri', '12', 'bold'),\
+    relief=FLAT, state=tk.ACTIVE, width = 15, command=intro_tab_functions.readMore)
+tab1_readmore.place(relwidth=0.25, relheight=0.13, relx=0.27, rely=0.054)
+"""
 tab2_text_box = tk.Text(Globals.intro_tab, height=1, width=1)
 tab2_text_box.place(relwidth=0.4, relheight=0.4, relx=0.5, rely=0.05)
 tab2_text_box.insert(INSERT, " ")
 tab2_text_box.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '15'))
 
+tab2_text = tk.Text(tab2_text_box, height=1, width=1)
+tab2_text.place(relwidth=1, relheight=1, relx=0, rely=0)
+tab2_text.insert(INSERT,"Make a calibration curve and read the dose response function. For every new batch of GafChromic film\
+    \nthere is a need to update the dose response. All three channels (RGB) are read and calculated.")
+tab2_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '13'), pady = 60, padx = 20) 
+
 tab2_title = tk.Text(tab2_text_box, height=1, width=1)
-tab2_title.place(relwidth=0.3, relheight=0.17, relx=0.385, rely=0.05)
+tab2_title.place(relwidth=0.7, relheight=0.17, relx=0.25, rely=0.05)
 tab2_title.insert(INSERT, "Dose response")
 tab2_title.config(state=DISABLED, bd=0, bg = '#e5f9ff', fg='#130e07', font=('calibri', '25', 'bold'))
 
-tab2_text = tk.Text(tab2_text_box, height=1, width=1)
-tab2_text.place(relwidth=1, relheight=1, relx=0, rely=0)
-tab2_text.insert(INSERT,"Make a calibration curve and read out the dose response function. For every new batch of GafChromic film\
-    there is a need to update the dose response. All three channels (RGB) are read and calculated.")
-tab2_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '15'), pady = 60, padx = 20) 
+tab2_readmore_text = tk.Text(tab2_text_box, height=1, width=1)
+tab2_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.73, rely=0.54)
+tab2_readmore_text.insert(INSERT,"Read more...")
+tab2_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold'))
+
+tab3_text_box = tk.Text(Globals.intro_tab, height=1, width=1)
+tab3_text_box.place(relwidth=0.4, relheight=0.4, relx=0.05, rely=0.5)
+tab3_text_box.insert(INSERT, " ")
+tab3_text_box.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '15'))
+
+tab3_text = tk.Text(tab3_text_box, height=1, width=1)
+tab3_text.place(relwidth=1, relheight=1, relx=0.0, rely=0)
+tab3_text.insert(INSERT,"Compare dose distribution in your treatment plan \nwith the measures distribution by the Gafchromic \nfilm.\
+ Using the gamma evaluation index a map of \npass/fail and variations is visualised.")
+tab3_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '13'), pady = 60, padx = 20)
+
+tab3_title = tk.Text(tab3_text_box, height=1, width=1)
+tab3_title.place(relwidth=0.7, relheight=0.17, relx=0.27, rely=0.05)
+tab3_title.insert(INSERT, "Map dose")
+tab3_title.config(state=DISABLED, bd=0, bg = '#e5f9ff', fg='#130e07', font=('calibri', '25', 'bold'))
+
+tab3_readmore_text = tk.Text(tab3_text_box, height=1, width=1)
+tab3_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.69, rely=0.54)
+tab3_readmore_text.insert(INSERT,"Read more...")
+tab3_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold'))
 
 
+tab4_text_box = tk.Text(Globals.intro_tab, height=1, width=1)
+tab4_text_box.place(relwidth=0.4, relheight=0.4, relx=0.5, rely=0.5)
+tab4_text_box.insert(INSERT, " ")
+tab4_text_box.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '15'))
 
-tab3_text = tk.Text(Globals.intro_tab, height=1, width=1)
-tab3_text.place(relwidth=0.4, relheight=0.4, relx=0.05, rely=0.5)
-tab3_text.insert(INSERT,"Upload file you want to correct:")
-tab3_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '15'), highlightbackground='#066') 
+tab4_text = tk.Text(tab4_text_box, height=1, width=1)
+tab4_text.place(relwidth=1, relheight=1, relx=0.0, rely=0)
+tab4_text.insert(INSERT,"Investigate the profiles measured using GafChromic \nfilm and compare with the profiles in your treatment \nplan.\
+ Using gamma evaluation an acceptance tube \ncan be places over the profile.")
+tab4_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '13'), pady = 60, padx = 20) 
 
-tab4_text = tk.Text(Globals.intro_tab, height=1, width=1)
-tab4_text.place(relwidth=0.4, relheight=0.4, relx=0.5, rely=0.5)
-tab4_text.insert(INSERT,"Upload file you want to correct:")
-tab4_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '15'), highlightbackground='#066') 
+tab4_title = tk.Text(tab4_text_box, height=1, width=1)
+tab4_title.place(relwidth=0.7, relheight=0.17, relx=0.27, rely=0.05)
+tab4_title.insert(INSERT, "Profiles")
+tab4_title.config(state=DISABLED, bd=0, bg = '#e5f9ff', fg='#130e07', font=('calibri', '25', 'bold'))
 
+tab4_readmore_text = tk.Text(tab4_text_box, height=1, width=1)
+tab4_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.59, rely=0.54)
+tab4_readmore_text.insert(INSERT,"Read more...")
+tab4_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold'))
 
 ##################################### TAB 1 - CoMet ############################################
 
