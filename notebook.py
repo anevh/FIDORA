@@ -27,7 +27,7 @@ label.config(bg='#FFFFFF')
 Globals.tab_parent.add(Globals.intro_tab, text='\n\n\tFIDORA\t\t\n\n')
 Globals.tab_parent.add(Globals.tab1, text='\n\n\tCoMet\t\t\n\n')
 Globals.tab_parent.add(Globals.tab2, text='\n\n\tDose-response\t\n\n')
-Globals.tab_parent.add(Globals.tab3, text='\n\n\tMap dose\t\t\n\n')
+Globals.tab_parent.add(Globals.tab3, text='\n\n\tMap dose\t\n\n')
 Globals.tab_parent.add(Globals.tab4, text='\n\n\tProfiles\t\t\n\n')
 
 style = ttk.Style()
