@@ -11,53 +11,20 @@ import SimpleITK as sitk
 import pydicom
 from PIL import Image, ImageTk
 
-def pixelValueToDose(pixelValue):
-    a=1
-    b=1
-    c=1 #må finne disse konstantene 
-    return b/(pixelValue - a) + c
-
-def mapDose(img_path):
-    dataset = pydicom.dcmread(img_path)
-    ds=dataset.pixel_array
-    rows, cols = np.shape(ds) #må kanskje ve
-    #rows= int(dataset.Rows)
-    #cols = int(dataset.Columns)
-    #ds= np.pixel_array(ds.PixelData)
-    dose_value = np.zeros((rows,cols))
-    for i in range(rows):
-        for j in range(cols):
-            dose_value[i,j]=pixelValueToDose(ds[i,j])
-    return dose_value #er et bilde med dose-nivåer, med samme dimensjoner som PV-bildet
-
-def compare(img_path2,img_path):
-    film=mapDose(img_path)
-    dosePlanSys=pydicom.dcmread(img_path2)
-    ds=dosePlanSys.pixel_array
-    rows, cols = np.shape(ds)
-    compare_gamma=np.zeros((rows,cols))
-    tolerance=5 #ingen ide hva som er akseptabelt avvik her?
-    count=0
-    for i in range(rows):
-        for j in range(cols):
-            if (abs(film-dosePlanSys)<tolerance):
-                compare_gamma[i,j]=2^16-1 #sett til hvit
-                count+=1
-            else:
-                compare_gamma[i,j]=0 #sett til svart
-    pass_rate=count/(rows*cols)*100
-    return compare_gamma, pass_rate
-    return compare_gamma
 
 
-"""
-def gamma_test(dose_plan, film_data, lim_pix, lim_dist):
-    #sjekke dimensjoner
-
-    #Lage en tom array av lik dimensjon
-    def distToAgreement():
-        
-    #
-"""
+#laste opp bilde og markere i bildene, egen funksjon
+#gammatest, lese opp på det og implementere
+#Eksportere figurer og dataset ut av programmet
+#må lagre siste kalibrering (spørre hvilken kalibrering bruker vil bruke)
+# hvordan er doseplanene lagret.
 
 
+# Laste opp doseplan (for nå er det en enkel matrise, selvkonstruert.)
+# laste opp skannet film, korriger automatisk.
+# brukeren spesifiserse posisjon på film
+# gjøre film om til dose map (bruke dose response)
+# tegne dose plan og dose map fra film
+# regne gamma
+# tegne gamma pass/fail og variasjoner
+# skriv ut all info vi får fra gammatest
