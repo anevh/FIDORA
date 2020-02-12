@@ -3,9 +3,11 @@ from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
     NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton, FLAT, PhotoImage, Label
 import Globals
 import re
-import CoMet_functions, intro_tab_functions
+import CoMet_functions, intro_tab_functions, Map_Dose
 import Dose_response_functions
 from PIL import Image, ImageTk
+import os
+import sys
 
 
 
@@ -357,7 +359,15 @@ check3.place(relx=0.85, rely=0.19)
 
 ##################################### TAB 3 - Map dose ############################################
 
+#path = os.path.dirname(sys.argv[0])
+path= "upload.png"
+upload_button_image = ImageTk.PhotoImage(file=path)
 
+
+
+upload_film_data = tk.Button(Globals.tab3, text='Upload',image=upload_button_image, cursor='hand2', font=('calibri', '12'), \
+    relief=FLAT, state=ACTIVE, width=12, command=lambda: Map_Dose.UploadAction("FILM"))
+upload_film_data.place(relwidth=0.17, relheight=0.11, relx=0.3, rely=0.03)
 
 ##################################### TAB 4 - Profiles ###########################################
 

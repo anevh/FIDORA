@@ -1,7 +1,8 @@
 ########################### Map dose ###################
 import Globals
 import tkinter as tk
-from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, PhotoImage, BOTH
+from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog,\
+     PhotoImage, BOTH, Canvas, N, S, W, E
 import os
 from os.path import normpath, basename
 import cv2
@@ -13,7 +14,7 @@ from PIL import Image, ImageTk
 
 def upload_film_data():
     mark_isocenter_window = tk.Toplevel(Globals.tab3)
-    new_window.grab_set()
+    mark_isocenter_window.grab_set()
 
     canvas = Canvas(mark_isocenter_window, bd=0)
     canvas.grid(row=0, column=0, sticky=N+S+E+W)
