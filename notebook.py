@@ -24,11 +24,11 @@ label.image = render
 label.place(relwidt=0.61,relheight=0.15, relx=0.02, rely=0.0)
 label.config(bg='#FFFFFF') 
 
-Globals.tab_parent.add(Globals.intro_tab, text='\n\n\tFIDORA\t\t\n\n')
-Globals.tab_parent.add(Globals.tab1, text='\n\n\tCoMet\t\t\n\n')
-Globals.tab_parent.add(Globals.tab2, text='\n\n\tDose-response\t\n\n')
-Globals.tab_parent.add(Globals.tab3, text='\n\n\tMap dose\t\n\n')
-Globals.tab_parent.add(Globals.tab4, text='\n\n\tProfiles\t\t\n\n')
+Globals.tab_parent.add(Globals.intro_tab, text='\n\n               FIDORA              \n\n')
+Globals.tab_parent.add(Globals.tab1, text='\n\n                 CoMet               \n\n')
+Globals.tab_parent.add(Globals.tab2, text='\n\n         Dose-response        \n\n')
+Globals.tab_parent.add(Globals.tab3, text='\n\n             Map dose              \n\n')
+Globals.tab_parent.add(Globals.tab4, text='\n\n              Profiles                 \n\n')
 
 style = ttk.Style()
 style.theme_create('MyStyle', settings={

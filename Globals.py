@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y
+from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, HORIZONTAL, E, W, N, S
 import numpy as np
 
 global form 
@@ -19,14 +19,11 @@ tab3 = ttk.Frame(tab_parent)
 global tab4
 tab4 = ttk.Frame(tab_parent)
 
-sb = Scrollbar(tab2)
-sb.pack(side = RIGHT, fill = Y)
 
 global dose_response_scroll_window_1
-dose_response_scroll_window_1 = tk.Canvas(tab2,  yscrollcommand = sb.set, width=200, height=100)
+dose_response_scroll_window_1 = tk.Canvas(tab2, width=200, height=100)
 dose_response_scroll_window_1.place(relwidth=0.48, relheight=0.55, relx = 0.5, rely = 0.42)
 
-sb.config(command = dose_response_scroll_window_1.yview )  
 
 
 global CoMet_dpi
@@ -121,6 +118,10 @@ dose_response_blue_list = []
 
 global dose_response_dose_list
 dose_response_dose_list = []
+
+global map_dose_film_dataset
+map_dose_film_dataset=StringVar(tab3)
+map_dose_film_dataset.set("Error!")
 
 ############################### Correction matrix ######################################3
 
