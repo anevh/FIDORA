@@ -70,7 +70,7 @@ tk.Button(root, text='Some Text!').pack(fill=tk.X)
 
 root.mainloop()
 """
-
+"""
 from tkinter import *
 #from tkFileDialog import askopenfilename
 from PIL import Image, ImageTk
@@ -132,3 +132,48 @@ def printcoords(event):
 canvas.bind("<Button 1>",printcoords)
 
 root.mainloop()
+"""
+"""
+a = 5
+b = 4
+
+if(not (a==2 or b==1)):
+    print("Hei")
+
+"""
+"""
+import cv2
+cv2Img = cv2.imread("050_100_200_000_025_002.tif", cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+print(cv2Img.shape[2])
+f = open('calibration.txt', 'r')
+lines = f.readlines()
+print(len(lines))
+for x in lines:
+    words = x.split()
+    print(words)
+
+"""
+"""
+f = open("test_fil.txt", 'a')
+f.write("teste her!\n")
+f.close()
+f = open("test_fil.txt", 'a')
+f.write("teste her!\n")
+f.close()
+f = open("test_fil.txt", 'a')
+f.write("teste her!\n")
+f.close()
+f = open("test_fil.txt", 'w')
+f.write("hei\n")
+f.write("på deg")
+f.close()
+
+"""
+"""
+import numpy as np
+A = np.zeros((4,3))
+print(A)
+
+"""
+import pymedphys
+import pydicom

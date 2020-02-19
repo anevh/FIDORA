@@ -7,6 +7,8 @@ form = tk.Tk()
 
 global tab_parent
 tab_parent = ttk.Notebook(form)
+tab_parent.borderWidth=0
+
 
 global intro_tab
 intro_tab = ttk.Frame(tab_parent)
@@ -19,11 +21,27 @@ tab3 = ttk.Frame(tab_parent)
 global tab4
 tab4 = ttk.Frame(tab_parent)
 
+global CoMet_progressbar
+CoMet_progressbar = ttk.Progressbar(tab1,orient ="horizontal",length = 200, mode ="determinate")
+CoMet_progressbar.place(relwidth=0.2, relheight=0.07, rely = 0.8, relx = 0.7)
+CoMet_progressbar["maximum"] = 100
+CoMet_progressbar["value"] = 0
+
+global CoMet_progressbar_counter
+CoMet_progressbar_counter = 0
+
+global CoMet_progressbar_check_file
+CoMet_progressbar_check_file = True
+
+global CoMet_progressbar_check_folder
+CoMet_progressbar_check_folder = True
+
 
 global dose_response_scroll_window_1
 dose_response_scroll_window_1 = tk.Canvas(tab2, width=200, height=100)
 dose_response_scroll_window_1.place(relwidth=0.48, relheight=0.55, relx = 0.5, rely = 0.42)
 
+global dose_response_save_calibration_button
 
 
 global CoMet_dpi
@@ -64,6 +82,9 @@ CoMet_patientName.set("Error!")
 
 global CoMet_correctedImage
 CoMet_correctedImage=None
+
+global CoMet_upload_file_box
+CoMet_upload_file_box = tk.Text(tab1, height=1, width=1)
 
 global dose_response_var1 
 dose_response_var1= IntVar()
@@ -119,9 +140,50 @@ dose_response_blue_list = []
 global dose_response_dose_list
 dose_response_dose_list = []
 
+global popt_red
+popt_red = np.zeros(3)
+
+global dose_response_batch_number
+dose_response_batch_number = "-"
+
 global map_dose_film_dataset
 map_dose_film_dataset=StringVar(tab3)
 map_dose_film_dataset.set("Error!")
+
+global map_dose_isocenter_map_x_coord_scaled
+map_dose_isocenter_map_x_coord_scaled = []
+
+global map_dose_isocenter_map_x_coord_unscaled
+map_dose_isocenter_map_x_coord_unscaled = []
+
+global map_dose_isocenter_map_y_coord_scaled
+map_dose_isocenter_map_y_coord_scaled = []
+
+global map_dose_isocenter_map_y_coord_unscaled
+map_dose_isocenter_map_y_coord_unscaled = []
+
+global map_dose_icocenter_film   #Oppgitt ved [<,v] = [bortover, nedover]
+
+global map_dose_film_batch
+map_dose_film_batch = IntVar()
+map_dose_film_batch.set(0)
+
+global map_dose_ROI_x_start
+map_dose_ROI_x_start = IntVar()
+map_dose_ROI_x_start.set(0)
+
+global map_dose_ROI_y_start
+map_dose_ROI_y_start = IntVar()
+map_dose_ROI_y_start.set(0)
+
+global map_dose_ROI_x_end
+map_dose_ROI_x_end = IntVar()
+map_dose_ROI_x_end.set(0)
+
+global map_dose_ROI_y_end
+map_dose_ROI_y_end = IntVar()
+map_dose_ROI_y_end.set(0)
+
 
 ############################### Correction matrix ######################################3
 

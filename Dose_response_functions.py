@@ -13,10 +13,67 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from scipy.optimize import curve_fit
 from PIL import Image, ImageTk
 import sys
+from datetime import datetime
+import re
 
 ## Function to do nothing (temp)
 def nothingButton():
     return
+
+def saveCalibration():
+    ask_batch_window = tk.Toplevel(Globals.tab2)
+    ask_batch_window.geometry("800x400")
+    ask_batch_window.grab_set()
+
+    batch_info = tk.Text(ask_batch_window, width=1, height=1)
+    batch_info.place(relwidth = 0.8, relheight = 0.5, relx = 0.1, rely =0.1)
+    batch_info.insert(INSERT, 'Write the batch number of current GafChromic film:\n\
+        (Defaults to -)')
+    batch_info.config(state=DISABLED, bd = 0, font=('calibri', '13'))
+
+    batch = tk.Text(ask_batch_window, width=1, height=1)
+    batch.place(relwidth = 0.4, relheight = 0.07, relx = 0.2, rely = 0.6)
+    batch.insert(INSERT, " ")
+    batch.config(state=NORMAL, bd = 3, font=('calibri', '12'))
+
+    def save_batch():
+        Globals.dose_response_batch_number= batch.get("1.0",'end-1c')
+        if(Globals.dose_response_batch_number == " "):
+            Globals.dose_response_batch_number = "-"
+            save_batch_button.config(state=DISABLED)
+            ask_batch_window.destroy()
+        elif(re.match("^[A-Za-z0-9_]*$", (Globals.dose_response_batch_number).lstrip())==None):
+            messagebox.showerror("Error","Batch number can only contain letters and/or numbers")
+            ask_batch_window.destroy()
+            saveCalibration()
+            return
+        else:
+            save_batch_button.config(state=DISABLED)
+            ask_batch_window.destroy()
+
+        f = open('calibration.txt', 'r')
+        lines = f.readlines()
+        f.close()
+        string_to_file = str(datetime.now()) + " " + str(Globals.dose_response_batch_number) + " " + \
+            str(Globals.popt_red[0]) + " " + str(Globals.popt_red[1]) + " " + str(Globals.popt_red[2]) + "\n"
+        if(len(lines) < 5):
+            f = open('calibration.txt', 'a')
+            f.write(string_to_file)
+            f.close()
+        else:
+            new_lines = [lines[1], lines[2], lines[3], lines[4], string_to_file]
+            f = open('calibration.txt', 'w')
+            for i in range(len(new_lines)):
+                f.write(new_lines[i])
+            f.close()
+
+    save_batch_button = tk.Button(ask_batch_window, text='Save', cursor='hand2',font=('calibri', '13'),\
+        highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=save_batch)
+    save_batch_button.place(relwidth=0.2, relheight=0.1, relx=0.5, rely=0.55)
+
+    
+    Globals.dose_response_save_calibration_button.config(state=DISABLED)
+
 
 def UploadAction(new_window, event=None):
     file = filedialog.askopenfilename()
@@ -116,7 +173,7 @@ def plot_dose_response():
     #a.invert_yaxis()
     ### Får ofte optimaliseringsproblemer..
     if(len(temp_avg_red) > 3):
-
+        Globals.dose_response_save_calibration_button.config(state=ACTIVE)
         sorted_temp_red = sorted(Globals.avg_red_vector,key=lambda l:l[0])
         sorted_temp_avg_red = [item[1] for item in sorted_temp_red]
         sorted_temp_dose = [item[0] for item in sorted_temp_red]
@@ -127,13 +184,13 @@ def plot_dose_response():
         sorted_temp_blue = sorted(Globals.avg_blue_vector, key=lambda l:l[0])
         sorted_temp_avg_blue = [item[1] for item in sorted_temp_blue]
 
-        popt_red, pcov_red = curve_fit(fitted_dose_response, sorted_temp_dose, sorted_temp_avg_red, p0=[1700, 15172069, -390], maxfev=10000)
+        Globals.popt_red, pcov_red = curve_fit(fitted_dose_response, sorted_temp_dose, sorted_temp_avg_red, p0=[1700, 15172069, -390], maxfev=10000)
         popt_green, pcov_green = curve_fit(fitted_dose_response, sorted_temp_dose, sorted_temp_avg_green, p0=[1700, 15172069, -390], maxfev=10000)
         #popt_blue, pcov_blue = curve_fit(fitted_dose_response, sorted_temp_dose, sorted_temp_avg_blue, p0=[1700, 15172069, -390], maxfev=10000)
         xdata = np.linspace(0,600,1001)
         ydata_red = np.zeros(len(xdata));ydata_green=np.zeros(len(xdata))#;ydata_blue=np.zeros(len(xdata))
         for i in range(len(xdata)):
-            ydata_red[i] = fitted_dose_response(xdata[i], popt_red[0], popt_red[1], popt_red[2])
+            ydata_red[i] = fitted_dose_response(xdata[i], Globals.popt_red[0], Globals.popt_red[1], Globals.popt_red[2])
             ydata_green[i] = fitted_dose_response(xdata[i], popt_green[0], popt_green[1], popt_green[2])
             #ydata_blue[i] = fitted_dose_response(xdata[i], popt_blue[0], popt_blue[1], popt_blue[2])
         if(Globals.dose_response_var1.get()):
@@ -143,7 +200,7 @@ def plot_dose_response():
         if(Globals.dose_response_var3.get()):
             a.plot(sorted_temp_dose, sorted_temp_avg_blue , color='blue')
 
-        out_text_function = "Pixel value = " + str(round(popt_red[0])) + " + " + str(round(popt_red[1])) + "/(dose - (" + str(round(popt_red[2])) + "))"
+        out_text_function = "Pixel value = " + str(round(Globals.popt_red[0])) + " + " + str(round(Globals.popt_red[1])) + "/(dose - (" + str(round(Globals.popt_red[2])) + "))"
         write_out_respons_function = tk.Text(Globals.tab2, height=1, width=1)
         write_out_respons_function.place(relwidt=0.48, relheight=0.06, relx=0, rely=0.46)
         write_out_respons_function.insert(INSERT, out_text_function )
@@ -267,7 +324,7 @@ def avgAllFiles(write_dose_box, new_window):
     delete_button.image = img
     Globals.dose_response_delete_buttons.append(delete_button)
     delete_button.place(relwidth=0.06, relheight=0.06, relx=0.9, rely=Globals.dose_response_results_coordY)
-    Globals.dose_response_results_coordY += 0.5
+    Globals.dose_response_results_coordY += 0.1
 
     plot_dose_response()
     new_window.destroy()

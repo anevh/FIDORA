@@ -19,10 +19,19 @@ def UploadAction(event=None):
     Globals.CoMet_uploaded_filename.set(filedialog.askopenfilename())
     ext = os.path.splitext(Globals.CoMet_uploaded_filename.get())[-1].lower()
     if(ext==".tif"):
-        uploaded_filename = tk.Text(Globals.tab1, height=1, width=1)
-        uploaded_filename.place(relwidth=0.2, relheight=0.05, relx=0.28, rely=0.11)
-        uploaded_filename.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get()))) 
-        uploaded_filename.config(state=DISABLED, bd=0, font=('calibri', '12'))
+        #uploaded_filename = tk.Text(Globals.tab1, height=1, width=1)
+        #uploaded_filename.place(relwidth=0.2, relheight=0.05, relx=0.28, rely=0.11)
+        #uploaded_filename.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get()))) 
+        #uploaded_filename.config(state=DISABLED, bd=0, font=('calibri', '12'))
+        CoMet_upload_box = tk.Text(Globals.CoMet_upload_file_box, height=1, width=1)
+        CoMet_upload_box.place(relwidth=0.8, relheight=0.15, relx=0.12, rely=0.81)
+        CoMet_upload_box.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
+        CoMet_upload_box.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#E5f9ff')
+        if (Globals.CoMet_progressbar_check_file):
+            Globals.CoMet_progressbar_counter +=1
+            Globals.CoMet_progressbar_check_file = False
+        Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
+
     elif(ext==""):
         Globals.CoMet_uploaded_filename.set("Error!") 
     else:
@@ -47,6 +56,11 @@ def setCoMet_export_folder():
         save_to_folder.place(relwidth=0.2, relheight=0.05, relx=0.29, rely=0.4)
         save_to_folder.insert(INSERT, basename(normpath(Globals.CoMet_export_folder.get())))
         save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'))
+        if(Globals.CoMet_progressbar_check_folder):
+            Globals.CoMet_progressbar_counter +=1
+            Globals.CoMet_progressbar_check_folder = False
+        Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
+        
 
 ## Function to check that user has filled inn everything
 def checkAllWidgets(*args):
@@ -111,6 +125,8 @@ def Correct():
         conf_text.place(relwidth=0.2, relheight=0.14, relx=.78, rely=0.65)
         conf_text.insert(INSERT, "File " + Globals.CoMet_corrected_image_filename.get() + " is saved\n in folder " +  basename(normpath(Globals.CoMet_export_folder.get())))
         conf_text.config(state=DISABLED, bd=0, font=('calibri', '13'), bg ='#D98880', fg='#FBFCFC')
+        Globals.CoMet_progressbar_counter +=1
+        Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
 
     R=Globals.CoMet_correctedImage[:,:,2];G=Globals.CoMet_correctedImage[:,:,1];B=Globals.CoMet_correctedImage[:,:,0]
     if(Globals.CoMet_dpi.get()=="127"):

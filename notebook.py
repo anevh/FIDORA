@@ -13,11 +13,11 @@ import sys
 
 Globals.form.title("FIDORA")
 #lobals.form.geometry("1250x600")
-Globals.form.configure(bg='#F8F9F9')
+Globals.form.configure(bg='#ffffff')
 Globals.form.state('zoomed')
 
 Globals.form.tk.call('wm', 'iconphoto', Globals.form._w, PhotoImage(file='logo_fidora.png'))
-Globals.form.iconbitmap(default='ntnu_logo.png')
+Globals.form.iconbitmap(default='logo_fidora.png')
 
 load = Image.open("fidora_logo.png")
 render = ImageTk.PhotoImage(load)
@@ -40,9 +40,16 @@ style.theme_create('MyStyle', settings={
             "font": 'red'
         }
     },
+    "Horizontal.TProgressbar":{
+        "configure": {
+            "background": '#2C8EAD',
+            "bordercolor": '#32A9CE',
+            "troughcolor": "#ffffff"
+        }
+    },
     "TNotebook": {
         "configure": {
-            "background":'#EAF2EF', # color behind the notebook
+            "background":'#ffffff', # color behind the notebook
             "tabmargins": [5, 5, 0, 0], # [left margin, upper margin, right margin, margin beetwen tab and frames]
             "tabposition": 'wn'
         }
@@ -61,6 +68,7 @@ style.theme_create('MyStyle', settings={
         }
     }
 })
+
 style.theme_use('MyStyle')
 
 menubar = Menu(Globals.form)
@@ -75,6 +83,9 @@ helpmenu.add_command(label="Help", command=CoMet_functions.nothingButton)
 helpmenu.add_command(label="About", command=CoMet_functions.nothingButton)
 menubar.add_cascade(label="Help", menu=helpmenu)
 Globals.form.config(menu=menubar)
+
+file = "upload.png"
+upload_button_image = ImageTk.PhotoImage(file=file)
 
 ###################################### INTRO TAB #################################################
 
@@ -99,6 +110,12 @@ tab1_readmore_text = tk.Text(tab1_text_box, height=1, width=1)
 tab1_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.27, rely=0.54)
 tab1_readmore_text.insert(INSERT,"Read more...")
 tab1_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold')) 
+
+tab1_box_figure = Image.open("CoMet_ikon.PNG")
+tab1_figure = ImageTk.PhotoImage(tab1_box_figure)
+tab1_figure_label = Label(tab1_text_box, image=tab1_figure)
+tab1_figure_label.image = tab1_figure
+tab1_figure_label.place(relwidt=0.27,relheight=0.3, relx=0.35, rely=0.65)
 
 """
 tab1_readmore = tk.Button(tab1_text_box, text='Read more',cursor='hand2',font=('calibri', '12', 'bold'),\
@@ -126,6 +143,12 @@ tab2_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.73, rely=0.54)
 tab2_readmore_text.insert(INSERT,"Read more...")
 tab2_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold'))
 
+tab2_box_figure = Image.open("kalibrering_ikon.PNG")
+tab2_figure = ImageTk.PhotoImage(tab2_box_figure)
+tab2_figure_label = Label(tab2_text_box, image=tab2_figure)
+tab2_figure_label.image = tab2_figure
+tab2_figure_label.place(relwidt=0.18,relheight=0.3, relx=0.38, rely=0.65)
+
 tab3_text_box = tk.Text(Globals.intro_tab, height=1, width=1)
 tab3_text_box.place(relwidth=0.4, relheight=0.4, relx=0.05, rely=0.5)
 tab3_text_box.insert(INSERT, " ")
@@ -147,6 +170,11 @@ tab3_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.69, rely=0.54)
 tab3_readmore_text.insert(INSERT,"Read more...")
 tab3_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold'))
 
+tab3_box_figure = Image.open("gammaTest_ikon.PNG")
+tab3_figure = ImageTk.PhotoImage(tab3_box_figure)
+tab3_figure_label = Label(tab3_text_box, image=tab3_figure)
+tab3_figure_label.image = tab3_figure
+tab3_figure_label.place(relwidt=0.16,relheight=0.3, relx=0.38, rely=0.65)
 
 tab4_text_box = tk.Text(Globals.intro_tab, height=1, width=1)
 tab4_text_box.place(relwidth=0.4, relheight=0.4, relx=0.5, rely=0.5)
@@ -169,32 +197,45 @@ tab4_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.59, rely=0.54)
 tab4_readmore_text.insert(INSERT,"Read more...")
 tab4_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold'))
 
+tab4_box_figure = Image.open("profil_ikon.PNG")
+tab4_figure = ImageTk.PhotoImage(tab4_box_figure)
+tab4_figure_label = Label(tab4_text_box, image=tab4_figure)
+tab4_figure_label.image = tab4_figure
+tab4_figure_label.place(relwidt=0.16,relheight=0.3, relx=0.4, rely=0.65)
+
 ##################################### TAB 1 - CoMet ############################################
 
 
 ## Text and button for uploading image 
-upload_file = tk.Text(Globals.tab1, height=1, width=1)
-upload_file.place(relwidth=0.25, relheight=0.05, relx=0.007, rely=0.11)
-upload_file.insert(INSERT,"Upload file you want to correct:")
-upload_file.config(state=DISABLED, bd=0, font=('calibri', '15')) 
-upload_box = tk.Text(Globals.tab1, height=1, width=1)
-upload_box.place(relwidth=0.2, relheight=0.05, relx=0.28, rely=0.11)
-upload_box.insert(INSERT," ")
-upload_box.config(state=DISABLED, bd=0)
-upload_button = tk.Button(Globals.tab1, text='Browse',cursor='hand2',font=('calibri', '14'),\
-    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
-upload_button.place(relwidth=0.15, relheight=0.06, relx=0.5, rely=0.105)
 
+Globals.CoMet_upload_file_box.place(relwidth=0.3, relheight=0.3, relx = 0.05, rely = 0.05)
+Globals.CoMet_upload_file_box.insert(INSERT, " ")
+Globals.CoMet_upload_file_box.config(state=DISABLED, bd= 0, bg= '#E5f9ff')
+
+CoMet_upload_file = tk.Text(Globals.CoMet_upload_file_box, height=1, width=1)
+CoMet_upload_file.place(relwidth=0.8, relheight=0.2, relx=0.1, rely=0.6)
+CoMet_upload_file.insert(INSERT,"Upload image you want to correct")
+CoMet_upload_file.config(state=DISABLED, bd=0, font=('calibri', '13'), bg = '#E5f9ff') 
+
+#CoMet_upload_box = tk.Text(Globals.CoMet_upload_file_box, height=1, width=1)
+#CoMet_upload_box.place(relwidth=0.8, relheight=0.15, relx=0.1, rely=0.81)
+#CoMet_upload_box.insert(INSERT," ")
+#CoMet_upload_box.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray')
+
+CoMet_upload_button = tk.Button(Globals.CoMet_upload_file_box, text='Browse', image = upload_button_image ,cursor='hand2',font=('calibri', '14'),\
+    relief=FLAT, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
+CoMet_upload_button.place(relwidth=0.57, relheight=0.39, relx=0.2, rely=0.13)
+CoMet_upload_button.image = upload_button_image
 
 ## Text and buttons for the user to choose DPI
 choose_CoMet_dpi = tk.Text(Globals.tab1, height=1, width=1)
-choose_CoMet_dpi.place(relwidth=0.35, relheight=0.05, relx=0.07, rely=0.23)
+choose_CoMet_dpi.place(relwidth=0.35, relheight=0.05, relx=0.77, rely=0.23)
 choose_CoMet_dpi.insert(tk.CURRENT,"Dots per inch (dpi) used during scanning: ")
 choose_CoMet_dpi.config(state=DISABLED, bd=0, font=('calibri', '15'))
 Radiobutton(Globals.tab1, text='72 dpi',cursor='hand2',font=('calibri', '14'), \
-    variable=Globals.CoMet_dpi, value=72, command=CoMet_functions.setCoMet_dpi).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.3)
+    variable=Globals.CoMet_dpi, value=72, command=CoMet_functions.setCoMet_dpi).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.73)
 Radiobutton(Globals.tab1, text='127 dpi',cursor='hand2',font=('calibri', '14'), \
-    variable=Globals.CoMet_dpi, value=127, command=CoMet_functions.setCoMet_dpi).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.3)
+    variable=Globals.CoMet_dpi, value=127, command=CoMet_functions.setCoMet_dpi).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.73)
 
 
 ## Text and button for the user to select folder to save corrected image
@@ -202,10 +243,10 @@ save_to_folder = tk.Text(Globals.tab1, height=1, width=1)
 save_to_folder.place(relwidth=0.28, relheight=0.05, relx=0.003, rely=0.4)
 save_to_folder.insert(INSERT,"Folder to save the corrected image:")
 save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '15')) 
-folder_box = tk.Text(Globals.tab1, height=1, width=1)
-folder_box.place(relwidth=0.2, relheight=0.05, relx=0.29, rely=0.4)
-folder_box.insert(INSERT," ")
-folder_box.config(state=DISABLED, bd=0, font=('calibri', '12')) 
+#folder_box = tk.Text(Globals.tab1, height=1, width=1)
+#folder_box.place(relwidth=0.2, relheight=0.05, relx=0.29, rely=0.4)
+#folder_box.insert(INSERT," ")
+#folder_box.config(state=DISABLED, bd=0, font=('calibri', '12')) 
 toFolder = tk.Button(Globals.tab1, text='Browse', cursor='hand2',font=('calibri', '14'),\
    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.setCoMet_export_folder)
 toFolder.place(relwidth=0.15, relheight=0.06, relx=0.5, rely=0.395)
@@ -224,6 +265,8 @@ def testFilename():
     else:
         load_corrected_image_filename.config(state=DISABLED)
         Globals.CoMet_corrected_image_filename_box.config(state=DISABLED)
+        Globals.CoMet_progressbar_counter += 1
+        Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
     
 
 ## Text and box for the user to write in a filename for the corrected image, and lock it
@@ -356,19 +399,22 @@ check2.place(relx=0.6, rely=0.19)
 check3 = Checkbutton(Globals.dose_response_scroll_window_1, variable=Globals.dose_response_var3, command=Dose_response_functions.plot_dose_response)
 check3.place(relx=0.85, rely=0.19)
 
+Globals.dose_response_save_calibration_button = tk.Button(Globals.tab2, text='Save calibration', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
+    overrelief=GROOVE, state=DISABLED, width=12, command=Dose_response_functions.saveCalibration)
+Globals.dose_response_save_calibration_button.place(relwidth=0.1, relheight=0.05, relx=0.4, rely=0.4)
 
 ##################################### TAB 3 - Map dose ############################################
 
 #path = os.path.dirname(sys.argv[0])
-path= "upload.png"
-upload_button_image = ImageTk.PhotoImage(file=path)
+#path= "upload.png"
+#upload_button_image = ImageTk.PhotoImage(file=path)
 
 
 
 upload_film_data = tk.Button(Globals.tab3, text='Upload',image=upload_button_image, cursor='hand2', font=('calibri', '12'), \
     relief=FLAT, state=ACTIVE, width=12, command=lambda: Map_Dose.UploadAction("FILM"))
 upload_film_data.place(relwidth=0.17, relheight=0.11, relx=0.3, rely=0.03)
-
+upload_film_data.image = upload_button_image
 ##################################### TAB 4 - Profiles ###########################################
 
 
