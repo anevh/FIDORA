@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
-    NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton, FLAT, PhotoImage, Label
+    NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton, FLAT, PhotoImage, Label,\
+        SOLID, N, S, W, E, END
 import Globals
 import re
 import CoMet_functions, intro_tab_functions, Map_Dose
@@ -84,9 +85,17 @@ helpmenu.add_command(label="About", command=CoMet_functions.nothingButton)
 menubar.add_cascade(label="Help", menu=helpmenu)
 Globals.form.config(menu=menubar)
 
-file = "upload.png"
-upload_button_image = ImageTk.PhotoImage(file=file)
+upload_button_file = "uploadbutton2.png"
+upload_button_image = ImageTk.PhotoImage(file=upload_button_file)
 
+select_folder_button_file = "select_folder.png"
+select_folder_image = ImageTk.PhotoImage(file=select_folder_button_file)
+
+CoMet_border_dark_file = "border.png"
+CoMet_border_dark = ImageTk.PhotoImage(file=CoMet_border_dark_file)
+
+CoMet_border_light_file = "border_light.png"
+CoMet_border_light = ImageTk.PhotoImage(file=CoMet_border_light_file)
 ###################################### INTRO TAB #################################################
 
 
@@ -94,28 +103,31 @@ tab1_text_box = tk.Text(Globals.intro_tab, height=1, width=1)
 tab1_text_box.place(relwidth=0.4, relheight=0.4, relx=0.05, rely=0.05)
 tab1_text_box.insert(INSERT, " ")
 tab1_text_box.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '13'))
-
-tab1_text = tk.Text(tab1_text_box, height=1, width=1)
-tab1_text.place(relwidth=1, relheight=1, relx=0, rely=0)
-tab1_text.insert(INSERT,"Correct your scanned images using CoMet. A method \ndeveloped to correct for non-uniformity introduced\n\
-by the scanner. The correction is based on absolute \nsubtraction.")
-tab1_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '13'), pady=60, padx=20) 
+tab1_text_box.grid_columnconfigure(0, weight=1)
+tab1_text_box.grid_rowconfigure(0, weight=1)
 
 tab1_title_text = tk.Text(tab1_text_box, height=1, width=1)
-tab1_title_text.place(relwidth=0.3, relheight=0.17, relx=0.385, rely=0.05)
-tab1_title_text.insert(INSERT, "CoMet")
-tab1_title_text.config(state=DISABLED, bd=0, bg = '#e5f9ff', fg='#130e07', font=('calibri', '25', 'bold'))
+tab1_title_text.grid(row=0, column = 0, padx = 10, pady=5)
+tab1_title_text.insert(END, "CoMet")
+tab1_title_text.config(state=DISABLED, bd=0, bg = '#ffffff', fg='#130e07', font=('calibri', '25', 'bold'))
 
-tab1_readmore_text = tk.Text(tab1_text_box, height=1, width=1)
-tab1_readmore_text.place(relwidth=0.25, relheight=0.13, relx=0.27, rely=0.54)
-tab1_readmore_text.insert(INSERT,"Read more...")
-tab1_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold')) 
+#tab1_text = tk.Text(tab1_text_box, height=1, width=1)
+#tab1_text.grid(row=1, sticky=N+S+W+E, ipadx = 20, ipady=10)
+#tab1_text.insert(INSERT,"Correct your scanned images using CoMet. A method \ndeveloped to correct for non-uniformity introduced\n\
+#by the scanner. The correction is based on absolute \nsubtraction.")
+#tab1_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '13'), pady=60, padx=20) 
 
-tab1_box_figure = Image.open("CoMet_ikon.PNG")
-tab1_figure = ImageTk.PhotoImage(tab1_box_figure)
-tab1_figure_label = Label(tab1_text_box, image=tab1_figure)
-tab1_figure_label.image = tab1_figure
-tab1_figure_label.place(relwidt=0.27,relheight=0.3, relx=0.35, rely=0.65)
+#tab1_readmore_text = tk.Text(tab1_text_box, height=1, width=1)
+#tab1_readmore_text.grid(row=2, sticky = N+S+W+E)
+#tab1_readmore_text.insert(INSERT,"Read more...")
+#tab1_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font=('calibri', '12', 'bold')) 
+
+#tab1_box_figure = Image.open("CoMet_ikon.PNG")
+#tab1_figure = ImageTk.PhotoImage(tab1_box_figure)
+#tab1_figure_label = Label(tab1_text_box, image=tab1_figure)
+#tab1_figure_label.image = tab1_figure
+#tab1_figure_label.grid(row=3, sticky=N+S+W+E)
+#tab1_figure_label.config(bg='#E5f9ff')
 
 """
 tab1_readmore = tk.Button(tab1_text_box, text='Read more',cursor='hand2',font=('calibri', '12', 'bold'),\
@@ -148,6 +160,7 @@ tab2_figure = ImageTk.PhotoImage(tab2_box_figure)
 tab2_figure_label = Label(tab2_text_box, image=tab2_figure)
 tab2_figure_label.image = tab2_figure
 tab2_figure_label.place(relwidt=0.18,relheight=0.3, relx=0.38, rely=0.65)
+tab2_figure_label.config(bg='#E5f9ff')
 
 tab3_text_box = tk.Text(Globals.intro_tab, height=1, width=1)
 tab3_text_box.place(relwidth=0.4, relheight=0.4, relx=0.05, rely=0.5)
@@ -175,6 +188,7 @@ tab3_figure = ImageTk.PhotoImage(tab3_box_figure)
 tab3_figure_label = Label(tab3_text_box, image=tab3_figure)
 tab3_figure_label.image = tab3_figure
 tab3_figure_label.place(relwidt=0.16,relheight=0.3, relx=0.38, rely=0.65)
+tab3_figure_label.config(bg='#E5f9ff')
 
 tab4_text_box = tk.Text(Globals.intro_tab, height=1, width=1)
 tab4_text_box.place(relwidth=0.4, relheight=0.4, relx=0.5, rely=0.5)
@@ -202,30 +216,41 @@ tab4_figure = ImageTk.PhotoImage(tab4_box_figure)
 tab4_figure_label = Label(tab4_text_box, image=tab4_figure)
 tab4_figure_label.image = tab4_figure
 tab4_figure_label.place(relwidt=0.16,relheight=0.3, relx=0.4, rely=0.65)
+tab4_figure_label.config(bg='#E5f9ff')
 
 ##################################### TAB 1 - CoMet ############################################
 
 
 ## Text and button for uploading image 
 
-Globals.CoMet_upload_file_box.place(relwidth=0.3, relheight=0.3, relx = 0.05, rely = 0.05)
-Globals.CoMet_upload_file_box.insert(INSERT, " ")
-Globals.CoMet_upload_file_box.config(state=DISABLED, bd= 0, bg= '#E5f9ff')
+#Globals.CoMet_upload_file_box.place(relwidth=0.5, relheight=0.13, relx = 0.05, rely = 0.05)
+#Globals.CoMet_upload_file_box.insert(INSERT, " ")
+#Globals.CoMet_upload_file_box.config(state=DISABLED, bd= 0, bg= '#34fdf2')
 
-CoMet_upload_file = tk.Text(Globals.CoMet_upload_file_box, height=1, width=1)
-CoMet_upload_file.place(relwidth=0.8, relheight=0.2, relx=0.1, rely=0.6)
-CoMet_upload_file.insert(INSERT,"Upload image you want to correct")
-CoMet_upload_file.config(state=DISABLED, bd=0, font=('calibri', '13'), bg = '#E5f9ff') 
+#CoMet_upload_file = tk.Text(Globals.CoMet_upload_file_box, height=1, width=1)
+#CoMet_upload_file.place(relwidth=0.8, relheight=0.2, relx=0.1, rely=0.6)
+#CoMet_upload_file.insert(INSERT,"Upload image you want to correct")
+#CoMet_upload_file.config(state=DISABLED, bd=0, font=('calibri', '13'), bg = '#E5f9ff') 
 
-#CoMet_upload_box = tk.Text(Globals.CoMet_upload_file_box, height=1, width=1)
-#CoMet_upload_box.place(relwidth=0.8, relheight=0.15, relx=0.1, rely=0.81)
-#CoMet_upload_box.insert(INSERT," ")
-#CoMet_upload_box.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray')
+Globals.CoMet_border_1_label = Label(Globals.tab1, image = CoMet_border_dark)
+Globals.CoMet_border_1_label.image=CoMet_border_dark
+Globals.CoMet_border_1_label.place(relwidth=0.55, relheight=0.13, relx = 0., rely = 0.1)
+Globals.CoMet_border_1_label.config(bg='#ffffff')
 
-CoMet_upload_button = tk.Button(Globals.CoMet_upload_file_box, text='Browse', image = upload_button_image ,cursor='hand2',font=('calibri', '14'),\
+
+CoMet_upload_button = tk.Button(Globals.CoMet_border_1_label, text='Browse', image = upload_button_image ,cursor='hand2',font=('calibri', '14'),\
     relief=FLAT, state=tk.ACTIVE, width = 15, command=CoMet_functions.UploadAction)
-CoMet_upload_button.place(relwidth=0.57, relheight=0.39, relx=0.2, rely=0.13)
+CoMet_upload_button.place(relwidth=0.355, relheight=0.92, relx=0.63, rely=0.02)
+CoMet_upload_button.config(bg='#ffffff')
 CoMet_upload_button.image = upload_button_image
+
+
+CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label)
+CoMet_uploaded_file_text.place(relwidth=0.5, relheight=0.7, relx = 0.1, rely=0.13)
+CoMet_uploaded_file_text.insert(INSERT, "Upload the image you want to correct")
+CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
+
+
 
 ## Text and buttons for the user to choose DPI
 choose_CoMet_dpi = tk.Text(Globals.tab1, height=1, width=1)
@@ -247,10 +272,10 @@ save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '15'))
 #folder_box.place(relwidth=0.2, relheight=0.05, relx=0.29, rely=0.4)
 #folder_box.insert(INSERT," ")
 #folder_box.config(state=DISABLED, bd=0, font=('calibri', '12')) 
-toFolder = tk.Button(Globals.tab1, text='Browse', cursor='hand2',font=('calibri', '14'),\
+CoMet_toFolder = tk.Button(Globals.tab1, text='Browse', image = select_folder_image, cursor='hand2',font=('calibri', '14'),\
    highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=CoMet_functions.setCoMet_export_folder)
-toFolder.place(relwidth=0.15, relheight=0.06, relx=0.5, rely=0.395)
-
+CoMet_toFolder.place(relwidth=0.57, relheight=0.39, relx=0.5, rely=0.395)
+CoMet_toFolder.image=select_folder_image
 ## Function to test the filename the user chooses for the corrected image
 def testFilename():   
     Globals.CoMet_corrected_image_filename.set(Globals.CoMet_corrected_image_filename_box.get("1.0",'end-1c'))

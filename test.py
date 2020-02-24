@@ -177,3 +177,94 @@ print(A)
 """
 import pymedphys
 import pydicom
+import matplotlib.pyplot as plt
+import numpy as np
+
+gamma_options = {
+    'dose_percent_threshold': 3,
+    'distance_mm_threshold': 3,
+    'lower_percent_dose_cutoff': 20,
+    'interp_fraction': 10,  # Should be 10 or more for more accurate results
+    'max_gamma': 2,
+    'random_subset': None,
+    'local_gamma': True,
+    'ram_available': 2**29,  # 1/2 GB
+    'quiet': True
+}
+
+grid = 0.5
+scale_factor = 1.035
+noise = 0.01
+
+xmin = -28
+xmax = 28
+ymin = -25
+ymax = 25
+
+extent = [xmin-grid/2, xmax+grid/2, ymin-grid/2, ymax+grid/2]
+
+x = np.arange(xmin, xmax + grid, grid)
+y = np.arange(ymin, ymax + grid, grid)
+
+coords = (y, x)
+
+xx, yy = np.meshgrid(x, y)
+dose_ref = np.exp(-((xx/15)**20 + (yy/15)**20))
+
+plt.figure()
+plt.title('Reference dose')
+
+plt.imshow(
+    dose_ref, clim=(0, 1.04), extent=extent)
+plt.colorbar();
+
+
+dimensions_of_dose_ref = np.shape(dose_ref)
+assert dimensions_of_dose_ref[0] == len(coords[0])
+assert dimensions_of_dose_ref[1] == len(coords[1])
+
+
+dose_eval = dose_ref * scale_factor
+
+plt.figure()
+plt.title('Evaluation dose')
+
+plt.imshow(
+    dose_eval, clim=(0, 1.04), extent=extent)
+plt.colorbar();
+
+dose_diff = dose_eval - dose_ref
+
+plt.figure()
+plt.title('Dose Difference')
+
+plt.imshow(
+    dose_diff,
+    clim=(-0.1, 0.1), extent=extent,
+    cmap='seismic'
+)
+plt.colorbar();
+
+gamma_no_noise = pymedphys.gamma(
+    coords, dose_ref,
+    coords, dose_eval,
+    **gamma_options)
+
+plt.figure()
+plt.title('Gamma Distribution')
+
+plt.imshow(
+    gamma_no_noise, clim=(0, 2), extent=extent,
+    cmap='coolwarm')
+plt.colorbar()
+
+plt.show()
+valid_gamma_no_noise = gamma_no_noise[~np.isnan(gamma_no_noise)]
+no_noise_passing = 100 * np.round(np.sum(valid_gamma_no_noise <= 1) / len(valid_gamma_no_noise), 4)
+
+plt.figure()
+plt.title(f'Gamma Histogram | Passing rate = {no_noise_passing}%')
+plt.xlabel('Gamma')
+plt.ylabel('Number of pixels')
+
+plt.hist(valid_gamma_no_noise, 20);
