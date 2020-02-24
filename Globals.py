@@ -83,8 +83,12 @@ CoMet_patientName.set("Error!")
 global CoMet_correctedImage
 CoMet_correctedImage=None
 
-global CoMet_upload_file_box
-CoMet_upload_file_box = tk.Text(tab1, height=1, width=1)
+global CoMet_border_1_label
+CoMet_border_1_label = tk.Label(tab1)
+
+global CoMet_uploaded_file_text 
+CoMet_uploaded_file_text = tk.Text(CoMet_border_1_label)
+CoMet_uploaded_file_text.place(relwidth=0.5, relheight=0.7, relx = 0.1, rely=0.13)
 
 global dose_response_var1 
 dose_response_var1= IntVar()

@@ -23,10 +23,19 @@ def UploadAction(event=None):
         #uploaded_filename.place(relwidth=0.2, relheight=0.05, relx=0.28, rely=0.11)
         #uploaded_filename.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get()))) 
         #uploaded_filename.config(state=DISABLED, bd=0, font=('calibri', '12'))
-        CoMet_upload_box = tk.Text(Globals.CoMet_upload_file_box, height=1, width=1)
-        CoMet_upload_box.place(relwidth=0.8, relheight=0.15, relx=0.12, rely=0.81)
-        CoMet_upload_box.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
-        CoMet_upload_box.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#E5f9ff')
+        #CoMet_upload_box = tk.Text(Globals.CoMet_upload_file_box, height=1, width=1)
+        #CoMet_upload_box.place(relwidth=0.8, relheight=0.15, relx=0.12, rely=0.81)
+        #CoMet_upload_box.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
+        #CoMet_upload_box.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#E5f9ff')
+        #CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label)
+        #CoMet_uploaded_file_text.place(relwidth=0.5, relheight=0.7, relx = 0.1, rely=0.13)
+        #CoMet_uploaded_file_text.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
+        #CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#e5f9ff')
+        CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label)
+        CoMet_uploaded_file_text.place(relwidth=0.4, relheight=0.5, relx = 0.12, rely=0.32)
+        CoMet_uploaded_file_text.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
+        CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='black', bg='#ffffff')
+
         if (Globals.CoMet_progressbar_check_file):
             Globals.CoMet_progressbar_counter +=1
             Globals.CoMet_progressbar_check_file = False
