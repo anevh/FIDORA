@@ -1,6 +1,7 @@
 import Globals
 import tkinter as tk
-from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, PhotoImage, BOTH
+from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, PhotoImage, BOTH, \
+    E, S, N, W
 import os
 from os.path import normpath, basename
 import cv2
@@ -19,22 +20,10 @@ def UploadAction(event=None):
     Globals.CoMet_uploaded_filename.set(filedialog.askopenfilename())
     ext = os.path.splitext(Globals.CoMet_uploaded_filename.get())[-1].lower()
     if(ext==".tif"):
-        #uploaded_filename = tk.Text(Globals.tab1, height=1, width=1)
-        #uploaded_filename.place(relwidth=0.2, relheight=0.05, relx=0.28, rely=0.11)
-        #uploaded_filename.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get()))) 
-        #uploaded_filename.config(state=DISABLED, bd=0, font=('calibri', '12'))
-        #CoMet_upload_box = tk.Text(Globals.CoMet_upload_file_box, height=1, width=1)
-        #CoMet_upload_box.place(relwidth=0.8, relheight=0.15, relx=0.12, rely=0.81)
-        #CoMet_upload_box.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
-        #CoMet_upload_box.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#E5f9ff')
-        #CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label)
-        #CoMet_uploaded_file_text.place(relwidth=0.5, relheight=0.7, relx = 0.1, rely=0.13)
-        #CoMet_uploaded_file_text.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
-        #CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#e5f9ff')
-        CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label)
-        CoMet_uploaded_file_text.place(relwidth=0.4, relheight=0.5, relx = 0.12, rely=0.32)
+        CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label,  height=1, width=32)
+        CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
         CoMet_uploaded_file_text.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
-        CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='black', bg='#ffffff')
+        CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
 
         if (Globals.CoMet_progressbar_check_file):
             Globals.CoMet_progressbar_counter +=1
@@ -60,11 +49,13 @@ def setCoMet_export_folder():
         #If this: the dialogbox was closed and no folder selected.
         Globals.CoMet_export_folder = "Error!"
     else:
+        current_folder = os.getcwd()
         os.chdir(Globals.CoMet_export_folder.get())
-        save_to_folder=tk.Text(Globals.tab1, height=1, width=1)
-        save_to_folder.place(relwidth=0.2, relheight=0.05, relx=0.29, rely=0.4)
+        save_to_folder=tk.Text(Globals.CoMet_border_2_label, height=1, width=32)
+        save_to_folder.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
         save_to_folder.insert(INSERT, basename(normpath(Globals.CoMet_export_folder.get())))
-        save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'))
+        save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
+        os.chdir(current_folder)
         if(Globals.CoMet_progressbar_check_folder):
             Globals.CoMet_progressbar_counter +=1
             Globals.CoMet_progressbar_check_folder = False
@@ -94,12 +85,12 @@ def correctionMatrix():
          return
     
     if(dataset.shape[2] == 3):
-        if(Globals.CoMet_dpi.get()=="127" and dataset.shape[0]==1270 and dataset.shape[1]==1016):
+        if(dataset.shape[0]==1270 and dataset.shape[1]==1016):
             Globals.CoMet_correctedImage = abs(dataset-Globals.correctionMatrix127)
-        elif(Globals.CoMet_dpi.get()=="72" and dataset.shape[0]==720 and dataset.shape[1]==576):
+        elif(dataset.shape[0]==720 and dataset.shape[1]==576):
             Globals.CoMet_correctedImage = abs(dataset - Globals.correctionMatrix72)
         else:
-            messagebox.showerror("Error","The resolution of the image is not consistent with dpi:" + Globals.CoMet_dpi.get())
+            messagebox.showerror("Error","The resolution of the image is not consistent with dpi. Must be either 72 or 127")
 
     else:
         messagebox.showerror("Error","The uploaded image need to be in RGB-format")
@@ -125,15 +116,15 @@ def Correct():
     correctionMatrix()
     
     if (Globals.CoMet_correctedImage is None):
-        Error_message=tk.Text(Globals.tab1, height=1, width=1)
-        Error_message.place(relwidth=0.4, relheight=0.14, relx=.5, rely=0.89)
-        Error_message.insert(INSERT, "Error! Image not corrected")
-        Error_message.config(state=DISABLED, bd=0, font=('calibri', '13'), bg ='#D98880', fg='#FBFCFC')
+        messagebox.showerror("Error", "The image could not be corrected. Please check all the specifications and try again.")
+        Globals.CoMet_progressbar["value"]=0
     else:
-        conf_text=tk.Text(Globals.tab1, height=1, width=1)
-        conf_text.place(relwidth=0.2, relheight=0.14, relx=.78, rely=0.65)
-        conf_text.insert(INSERT, "File " + Globals.CoMet_corrected_image_filename.get() + " is saved\n in folder " +  basename(normpath(Globals.CoMet_export_folder.get())))
-        conf_text.config(state=DISABLED, bd=0, font=('calibri', '13'), bg ='#D98880', fg='#FBFCFC')
+        #conf_text=tk.Text(Globals.tab1_canvas)
+        #conf_text.grid(row=4, column=3)
+        #conf_text.insert(INSERT, "File " + Globals.CoMet_corrected_image_filename.get() + " is saved\n in folder " +  basename(normpath(Globals.CoMet_export_folder.get())))
+        #conf_text.config(state=DISABLED, bd=0, font=('calibri', '13'), bg ='#D98880', fg='#FBFCFC')
+        #Globals.tab1_canvas.grid_columnconfigure(10, weight=0)
+        #Globals.tab1_canvas.grid_rowconfigure(10, weight=0)
         Globals.CoMet_progressbar_counter +=1
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
 
@@ -147,7 +138,7 @@ def Correct():
         corrImg_dicom = corrImg_dicom.astype('uint16')
         corrImg_dicom[:,:,0]=R; corrImg_dicom[:,:,1]=G;corrImg_dicom[:,:,2]=B
     else:
-        messagebox.showerror("Error", "Wrong DPI in image. No correction")
+        messagebox.showerror("Error", "Wrong DPI in image. No correction.\n Please check all specifications and try again.")
         
     corrImg_dicom = np.moveaxis(corrImg_dicom,-2,1)
     corrImg_dicom = np.rollaxis(corrImg_dicom,2,0)
@@ -181,8 +172,6 @@ def Correct():
     
     image_to_canvas =  ImageTk.PhotoImage(image=img8)
 
-    canvas = tk.Canvas(Globals.tab1, width=240, height=290)
-    canvas.place(relx=0.75, rely=0.05)
-    canvas.create_image(123,148,image=image_to_canvas)
-    canvas.image = image_to_canvas
+    Globals.CoMet_print_corrected_image.create_image(123,148,image=image_to_canvas)
+    Globals.CoMet_print_corrected_image.image = image_to_canvas
    
