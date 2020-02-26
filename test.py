@@ -175,6 +175,8 @@ A = np.zeros((4,3))
 print(A)
 
 """
+
+"""
 import pymedphys
 import pydicom
 import matplotlib.pyplot as plt
@@ -268,3 +270,27 @@ plt.xlabel('Gamma')
 plt.ylabel('Number of pixels')
 
 plt.hist(valid_gamma_no_noise, 20);
+"""
+
+from tkinter import *
+from tkinter import ttk
+
+root = Tk()
+root.resizable(0,0)
+notebook = ttk.Notebook(root)
+notebook.pack(fill=BOTH, expand=True)
+notebook.pressed_index = None
+container = Frame(notebook)
+container.pack(fill=BOTH, expand=True)
+notebook.add(container, text='Mode A')
+
+canvas = Canvas(container, width=200, height=400)
+scroll = Scrollbar(container, command=canvas.yview)
+canvas.config(yscrollcommand=scroll.set, scrollregion=(0,0,100,1000))
+canvas.pack(side=LEFT, fill=BOTH, expand=True)
+scroll.pack(side=RIGHT, fill=Y)
+
+frame = Frame(canvas, bg='white', width=200, height=1000)
+canvas.create_window(100, 500, window=frame)
+
+root.mainloop()

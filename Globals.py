@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, HORIZONTAL, E, W, N, S
+from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, HORIZONTAL, E, W, N, S, BOTH, Frame, Canvas, LEFT, FLAT
 import numpy as np
 
 global form 
@@ -8,10 +8,11 @@ form = tk.Tk()
 global tab_parent
 tab_parent = ttk.Notebook(form)
 tab_parent.borderWidth=0
-
+tab_parent.grid(row=1, column=0, sticky=E+W+N+S, pady=(0,0), padx =(0,0)) #pack(fill=BOTH, expand=True)
 
 global intro_tab
 intro_tab = ttk.Frame(tab_parent)
+intro_tab.config(relief=FLAT)
 global tab1
 tab1 = ttk.Frame(tab_parent)
 global tab2
@@ -21,9 +22,14 @@ tab3 = ttk.Frame(tab_parent)
 global tab4
 tab4 = ttk.Frame(tab_parent)
 
+global tab1_canvas
+tab1_canvas = tk.Canvas(tab1)
+
 global CoMet_progressbar
-CoMet_progressbar = ttk.Progressbar(tab1,orient ="horizontal",length = 200, mode ="determinate")
-CoMet_progressbar.place(relwidth=0.2, relheight=0.07, rely = 0.8, relx = 0.7)
+CoMet_progressbar = ttk.Progressbar(tab1_canvas,orient ="horizontal",length = 200, mode ="determinate")
+CoMet_progressbar.grid(row=5, column=1, columnspan=2, sticky=E+W)
+tab1_canvas.grid_columnconfigure(12, weight=0)
+tab1_canvas.grid_rowconfigure(12, weight=0)
 CoMet_progressbar["maximum"] = 100
 CoMet_progressbar["value"] = 0
 
@@ -74,8 +80,6 @@ global CoMet_corrected_image_filename
 CoMet_corrected_image_filename=StringVar(tab1)
 CoMet_corrected_image_filename.set("Error!")
 
-global CoMet_patientName_box
-
 global CoMet_patientName
 CoMet_patientName=StringVar(tab1)
 CoMet_patientName.set("Error!")
@@ -84,11 +88,21 @@ global CoMet_correctedImage
 CoMet_correctedImage=None
 
 global CoMet_border_1_label
-CoMet_border_1_label = tk.Label(tab1)
+CoMet_border_1_label = tk.Label(tab1_canvas)
 
-global CoMet_uploaded_file_text 
-CoMet_uploaded_file_text = tk.Text(CoMet_border_1_label)
-CoMet_uploaded_file_text.place(relwidth=0.5, relheight=0.7, relx = 0.1, rely=0.13)
+global CoMet_border_2_label
+CoMet_border_2_label = tk.Label(tab1_canvas)
+
+global CoMet_boder_3_label
+CoMet_boder_3_label = tk.Label(tab1_canvas)
+
+global CoMet_border_4_label
+CoMet_border_4_label = tk.Label(tab1_canvas)
+
+global CoMet_print_corrected_image
+CoMet_print_corrected_image = tk.Canvas(tab1_canvas)
+
+global CoMet_uploaded_file_text
 
 global dose_response_var1 
 dose_response_var1= IntVar()
