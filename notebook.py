@@ -22,7 +22,7 @@ Globals.form.iconbitmap(default='logo_fidora.png')
 
 load = Image.open("fidora_logo.png")
 render = ImageTk.PhotoImage(load)
-label = Label(Globals.form, image=render)
+label = Label(Globals.scroll_frame, image=render)
 label.image = render
 label.grid(row = 0, column = 0, sticky=W)# place(relwidt=0.61,relheight=0.15, relx=0.02, rely=0.0)
 label.config(bg='#FFFFFF') 
@@ -109,6 +109,12 @@ CoMet_save_button = ImageTk.PhotoImage(file=CoMet_save_button_file)
 CoMet_correct_button_file = "correct_button.png"
 CoMet_correct_button_image= ImageTk.PhotoImage(file=CoMet_correct_button_file)
 
+CoMet_clear_all_button_file = "clear_all.png"
+CoMet_clear_all_button_image = ImageTk.PhotoImage(file=CoMet_clear_all_button_file)
+
+CoMet_empty_image_file = "empty_corrected_image.png"
+CoMet_empty_image_image = ImageTk.PhotoImage(file=CoMet_empty_image_file)
+
 ###################################### INTRO TAB #################################################
 
 
@@ -121,7 +127,7 @@ intro_tab_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness=0)
 
 
 tab1_text_box = tk.Frame(intro_tab_canvas, height=230, width=400)
-tab1_text_box.grid(row=0, column=0, pady=(30,30), padx=(95,0))
+tab1_text_box.grid(row=0, column=0, pady=(30,30), padx=(55,0))
 tab1_text_box.config(bd=0, bg='#E5f9ff')
 
 
@@ -147,7 +153,7 @@ tab1_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font
 tab1_text_box.grid_columnconfigure(2,weight=1)
 tab1_text_box.grid_rowconfigure(2,weight=1)
 
-tab1_box_figure = Image.open("CoMet_ikon.PNG")
+tab1_box_figure = Image.open("icon_comet.png")
 tab1_figure = ImageTk.PhotoImage(tab1_box_figure)
 tab1_figure_label = Label(tab1_text_box, image=tab1_figure)
 tab1_figure_label.image = tab1_figure
@@ -162,7 +168,7 @@ tab1_readmore = tk.Button(tab1_text_box, text='Read more',cursor='hand2',font=('
 tab1_readmore.place(relwidth=0.25, relheight=0.13, relx=0.27, rely=0.054)
 """
 tab2_text_box = tk.Frame(intro_tab_canvas, height=230, width=400)
-tab2_text_box.grid(row=0, column=1, pady=(30,30), padx=(85,40))
+tab2_text_box.grid(row=0, column=1, pady=(30,30), padx=(65,0))
 tab2_text_box.config(bd=0, bg='#E5f9ff')
 
 tab2_title = tk.Text(tab2_text_box, height=1, width=12)
@@ -187,7 +193,7 @@ tab2_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font
 tab2_text_box.grid_columnconfigure(2, weight=1)
 tab2_text_box.grid_rowconfigure(2, weight=1)
 
-tab2_box_figure = Image.open("kalibrering_ikon.PNG")
+tab2_box_figure = Image.open("icon_dose_response.png")
 tab2_figure = ImageTk.PhotoImage(tab2_box_figure)
 tab2_figure_label = Label(tab2_text_box, image=tab2_figure)
 tab2_figure_label.image = tab2_figure
@@ -197,7 +203,7 @@ tab2_text_box.grid_columnconfigure(3, weight=1)
 tab2_text_box.grid_rowconfigure(3, weight=1)
 
 tab3_text_box = tk.Frame(intro_tab_canvas, height=230, width=400)
-tab3_text_box.grid(row=1, column=0, pady=(0,30), padx=(95,0))
+tab3_text_box.grid(row=1, column=0, pady=(0,30), padx=(55,0))
 tab3_text_box.config(bd=0, bg='#E5f9ff')
 
 tab3_title = tk.Text(tab3_text_box, height=1, width=8)
@@ -222,7 +228,7 @@ tab3_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font
 tab3_text_box.grid_columnconfigure(2, weight=1)
 tab3_text_box.grid_rowconfigure(2, weight=1)
 
-tab3_box_figure = Image.open("gammaTest_ikon.PNG")
+tab3_box_figure = Image.open("icon_map_dose.png")
 tab3_figure = ImageTk.PhotoImage(tab3_box_figure)
 tab3_figure_label = Label(tab3_text_box, image=tab3_figure)
 tab3_figure_label.image = tab3_figure
@@ -232,7 +238,7 @@ tab3_text_box.grid_columnconfigure(3, weight=1)
 tab3_text_box.grid_rowconfigure(3, weight=1)
 
 tab4_text_box = tk.Frame(intro_tab_canvas, height=230, width=400)
-tab4_text_box.grid(row=1, column=1, pady=(0,30), padx=(85,40))
+tab4_text_box.grid(row=1, column=1, pady=(0,30), padx=(65,0))
 tab4_text_box.config(bd=0, bg='#E5f9ff')
 
 tab4_title = tk.Text(tab4_text_box, height=1, width=7)
@@ -257,7 +263,7 @@ tab4_readmore_text.config(state=DISABLED, bd=0, bg='#E5f9ff', fg='#130E07', font
 tab4_text_box.grid_columnconfigure(2, weight=1)
 tab4_text_box.grid_rowconfigure(2, weight=1)
 
-tab4_box_figure = Image.open("profil_ikon.PNG")
+tab4_box_figure = Image.open("icon_profiles.png")
 tab4_figure = ImageTk.PhotoImage(tab4_box_figure)
 tab4_figure_label = Label(tab4_text_box, image=tab4_figure)
 tab4_figure_label.image = tab4_figure
@@ -274,6 +280,7 @@ intro_tab_canvas.grid(row=0, column=0, sticky=N+S+W)#pack(side=LEFT, fill=BOTH)
 
 ##################################### TAB 1 - CoMet ############################################
 
+
 Globals.tab1_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness=0)
 
 CoMet_explained = tk.Text(Globals.tab1_canvas, height=4)#, width=200)
@@ -282,10 +289,10 @@ CoMet_explained.insert(INSERT, \
 treatment. Using a modulator, electron gun and RF power source electrons are released and \n\
 accelerated through a waveguide. The modulator provide high voltage pulses to the RF pulse which\n\
 leads to a propagating electromagnetic ﬁeld inside the waveguide.")
-CoMet_explained.grid(row=0, column = 0, columnspan=4, sticky=N+S+E+W, padx=(20,20), pady=(10,20))
+CoMet_explained.grid(row=0, column = 0, columnspan=4, sticky=N+S+E+W, padx=(20,20), pady=(10,10))
 Globals.tab1_canvas.grid_columnconfigure(0, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(0, weight=0)
-CoMet_explained.config(state=DISABLED, bg='#ffffff', font=('calibri', '13'), relief=FLAT)
+CoMet_explained.config(state=DISABLED, bg='#E5f9ff', font=('calibri', '13'), relief=FLAT)
 
 Globals.CoMet_border_1_label = Label(Globals.tab1_canvas, image = CoMet_border_dark,width=50)
 Globals.CoMet_border_1_label.image=CoMet_border_dark
@@ -300,8 +307,8 @@ Globals.tab1_canvas.grid_columnconfigure(2, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(2, weight=0)
 CoMet_upload_button_frame.config(bg = '#ffffff')
 
-CoMet_upload_button = tk.Button(CoMet_upload_button_frame, text='Browse', image = upload_button_image ,cursor='hand2',font=('calibri', '14'),\
-    relief=FLAT, state=ACTIVE, command=CoMet_functions.UploadAction)
+CoMet_upload_button = tk.Button(CoMet_upload_button_frame, text='Browse', image = upload_button_image, \
+    cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=CoMet_functions.UploadAction)
 CoMet_upload_button.pack(expand=True, fill=BOTH)
 CoMet_upload_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 CoMet_upload_button.image = upload_button_image
@@ -337,7 +344,7 @@ CoMet_save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gr
 
 ## Function to test the filename the user chooses for the corrected image
 def testFilename():   
-    Globals.CoMet_corrected_image_filename.set(CoMet_save_filename.get("1.0",'end-1c'))
+    Globals.CoMet_corrected_image_filename.set(Globals.CoMet_save_filename.get("1.0",'end-1c'))
     if(Globals.CoMet_corrected_image_filename.get() == " " or Globals.CoMet_corrected_image_filename.get() == "Filename"):
         Globals.CoMet_corrected_image_filename.set("Error!")
     elif(len(Globals.CoMet_corrected_image_filename.get()) >21):
@@ -347,46 +354,54 @@ def testFilename():
         messagebox.showerror("Error","Filename can only contain letters and/or numbers")
         Globals.CoMet_corrected_image_filename.set("Error!")
     else:
-        CoMet_save_button_1.config(state=DISABLED)
-        CoMet_save_filename.config(state=DISABLED)
+        Globals.CoMet_save_button_1.config(state=DISABLED)
+        Globals.CoMet_save_filename.config(state=DISABLED)
         Globals.CoMet_progressbar_counter += 1
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
+        Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, width = 5, height=1)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
+        if(Globals.CoMet_progressbar_counter*25 == 100):
+            Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
+        else:
+            Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff', font=('calibri', '10', 'bold'))
     
 
-Globals.CoMet_border_3_label = Label(Globals.tab1_canvas, image = CoMet_border_light)
-Globals.CoMet_border_3_label.image=CoMet_border_light
+Globals.CoMet_border_3_label = Label(Globals.tab1_canvas, image = CoMet_border_dark)
+Globals.CoMet_border_3_label.image=CoMet_border_dark
 Globals.CoMet_border_3_label.grid(row=3, column=0, columnspan=3, sticky=N+S+E+W, padx = (0, 50), pady=(10,0))
 Globals.tab1_canvas.grid_columnconfigure(5, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(5, weight=0)
 Globals.CoMet_border_3_label.config(bg='#ffffff', borderwidth=0)
 
-CoMet_save_button_frame_1 = tk.Frame(Globals.tab1_canvas)
-CoMet_save_button_frame_1.grid(row=3, column = 2, padx = (60, 0), pady=(10,0))
+Globals.CoMet_save_button_frame_1 = tk.Frame(Globals.tab1_canvas)
+Globals.CoMet_save_button_frame_1.grid(row=3, column = 2, padx = (60, 0), pady=(10,0))
 Globals.tab1_canvas.grid_columnconfigure(6, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(6, weight=0)
-CoMet_save_button_frame_1.config(bg = '#ffffff')
+Globals.CoMet_save_button_frame_1.config(bg = '#ffffff')
 
-CoMet_save_button_1 = tk.Button(CoMet_save_button_frame_1, text='Save', image = CoMet_save_button ,cursor='hand2',font=('calibri', '14'),\
+
+Globals.CoMet_save_button_1 = tk.Button(Globals.CoMet_save_button_frame_1, text='Save', image = CoMet_save_button ,cursor='hand2',font=('calibri', '14'),\
     relief=FLAT, state=ACTIVE, command=testFilename)
-CoMet_save_button_1.pack(expand=True, fill=BOTH)
-CoMet_save_button_1.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-CoMet_save_button_1.image = CoMet_save_button
+Globals.CoMet_save_button_1.pack(expand=True, fill=BOTH)
+Globals.CoMet_save_button_1.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.CoMet_save_button_1.image = CoMet_save_button
 
-CoMet_save_filename = tk.Text(Globals.CoMet_border_3_label, height=1, width=30)
-CoMet_save_filename.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
-CoMet_save_filename.insert(END,"Filename (will be saved as *.dcm)")
-CoMet_save_filename.config(state=NORMAL, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
+Globals.CoMet_save_filename = tk.Text(Globals.CoMet_border_3_label, height=1, width=30)
+Globals.CoMet_save_filename.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+Globals.CoMet_save_filename.insert(END,"Filename (will be saved as *.dcm)")
+Globals.CoMet_save_filename.config(state=NORMAL, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
 
 
 def writeFilename(event):
-    current = CoMet_save_filename.get("1.0", tk.END)
+    current = Globals.CoMet_save_filename.get("1.0", tk.END)
     if(current == "Filename (will be saved as *.dcm)\n"):
-        CoMet_save_filename.delete("1.0", tk.END)
+        Globals.CoMet_save_filename.delete("1.0", tk.END)
     else:
-        CoMet_save_filename.insert("1.0", "Filename (will be saved as *.dcm)")
+        Globals.CoMet_save_filename.insert("1.0", "Filename (will be saved as *.dcm)")
 
-CoMet_save_filename.bind("<FocusIn>", writeFilename)
-CoMet_save_filename.bind("<FocusOut>", writeFilename)
+Globals.CoMet_save_filename.bind("<FocusIn>", writeFilename)
+Globals.CoMet_save_filename.bind("<FocusOut>", writeFilename)
 
 
 #Functioin to validate the patient name written in by the user
@@ -405,9 +420,9 @@ def testName():
         CoMet_save_patientName.config(state=DISABLED)
 
 
-Globals.CoMet_border_4_label = Label(Globals.tab1_canvas, image = CoMet_border_light)
-Globals.CoMet_border_4_label.image=CoMet_border_light
-Globals.CoMet_border_4_label.grid(row=4, column=0, columnspan=3, sticky=E+W, padx = (0, 50), pady=(0,0))
+Globals.CoMet_border_4_label = Label(Globals.tab1_canvas, image = CoMet_border_dark)
+Globals.CoMet_border_4_label.image=CoMet_border_dark
+Globals.CoMet_border_4_label.grid(row=4, column=0, columnspan=3, sticky=E+W, padx = (0, 50), pady=(20,0))
 Globals.tab1_canvas.grid_columnconfigure(7, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(7, weight=0)
 Globals.CoMet_border_4_label.config(bg='#ffffff', borderwidth=0)
@@ -426,26 +441,26 @@ CoMet_save_button_2.image = CoMet_save_button
 
 CoMet_save_patientName = tk.Text(Globals.CoMet_border_4_label, height=1, width=30)
 CoMet_save_patientName.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
-CoMet_save_patientName.insert(END,"Patient name")
+CoMet_save_patientName.insert(END,"Patient name (Optional)")
 CoMet_save_patientName.config(state=NORMAL, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
 
 def writePname(event):
     current = CoMet_save_patientName.get("1.0", tk.END)
-    if(current == "Patient name\n"):
+    if(current == "Patient name (Optional)\n"):
         CoMet_save_patientName.delete("1.0", tk.END)
     else:
-        CoMet_save_patientName.insert("1.0", "Patient name")
+        CoMet_save_patientName.insert("1.0", "Patient name (Optional)")
 
 CoMet_save_patientName.bind("<FocusIn>", writePname)
 CoMet_save_patientName.bind("<FocusOut>", writePname)
 
 CoMet_correct_button_frame = tk.Frame(Globals.tab1_canvas)
-CoMet_correct_button_frame.grid(row=4, column = 4,rowspan=2, padx = (0, 0), pady=(0,0))
+CoMet_correct_button_frame.grid(row=4, column = 4,rowspan=2, padx = (0, 0), pady=(0,0), sticky=W)
 Globals.tab1_canvas.grid_columnconfigure(9, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(9, weight=0)
 CoMet_correct_button_frame.config(bg = '#ffffff')
 
-CoMet_correct_button = tk.Button(CoMet_correct_button_frame, text='Save', image = CoMet_correct_button_image ,cursor='hand2',font=('calibri', '14'),\
+CoMet_correct_button = tk.Button(CoMet_correct_button_frame, text='Correct', image = CoMet_correct_button_image ,cursor='hand2',font=('calibri', '14'),\
     relief=FLAT, state=ACTIVE, command=CoMet_functions.Correct)
 CoMet_correct_button.pack(expand=True, fill=BOTH)
 CoMet_correct_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
@@ -456,6 +471,88 @@ Globals.CoMet_print_corrected_image.grid(row=0, column=4, rowspan=3, sticky=N+W+
 Globals.CoMet_print_corrected_image.config(bg='#ffffff', bd = 0, relief=FLAT)
 Globals.tab1_canvas.grid_columnconfigure(11,weight=0)
 Globals.tab1_canvas.grid_rowconfigure(11, weight=0)
+Globals.CoMet_print_corrected_image.create_image(123,148,image=CoMet_empty_image_image)
+Globals.CoMet_print_corrected_image.image = CoMet_empty_image_image
+
+
+def clearAll():
+    #Clear out the filename
+    Globals.CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label, height=1, width=31)
+    Globals.CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+    Globals.CoMet_uploaded_file_text.insert(INSERT, "Upload the image you want to correct")
+    Globals.CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
+    Globals.CoMet_uploaded_filename.set("Error!")
+
+    #Clear out folder
+    CoMet_save_to_folder = tk.Text(Globals.CoMet_border_2_label, height=1, width=32)
+    CoMet_save_to_folder.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+    CoMet_save_to_folder.insert(INSERT,"Folder to save the corrected image:")
+    CoMet_save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
+    Globals.CoMet_export_folder.set("Error!")
+
+    #Clear filename of corrected file
+    Globals.CoMet_save_filename = tk.Text(Globals.CoMet_border_3_label, height=1, width=30)
+    Globals.CoMet_save_filename.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+    Globals.CoMet_save_filename.insert(END,"Filename (will be saved as *.dcm)")
+    Globals.CoMet_save_filename.config(state=NORMAL, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
+    Globals.CoMet_corrected_image_filename.set("Error!")
+    Globals.CoMet_save_button_1.config(state=ACTIVE)
+
+    def writeFilename(event):
+        current = Globals.CoMet_save_filename.get("1.0", tk.END)
+        if(current == "Filename (will be saved as *.dcm)\n"):
+            Globals.CoMet_save_filename.delete("1.0", tk.END)
+        else:
+            Globals.CoMet_save_filename.insert("1.0", "Filename (will be saved as *.dcm)")
+
+    Globals.CoMet_save_filename.bind("<FocusIn>", writeFilename)
+    Globals.CoMet_save_filename.bind("<FocusOut>", writeFilename)
+
+    #Clear patientname
+    CoMet_save_patientName = tk.Text(Globals.CoMet_border_4_label, height=1, width=30)
+    CoMet_save_patientName.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+    CoMet_save_patientName.insert(END,"Patient name (Optional)")
+    CoMet_save_patientName.config(state=NORMAL, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
+    Globals.CoMet_patientName.set("Error!")
+    CoMet_save_button_2.config(state=ACTIVE)
+
+    def writePname(event):
+        current = CoMet_save_patientName.get("1.0", tk.END)
+        if(current == "Patient name (Optional)\n"):
+            CoMet_save_patientName.delete("1.0", tk.END)
+        else:
+            CoMet_save_patientName.insert("1.0", "Patient name (Optional)")
+
+
+    CoMet_save_patientName.bind("<FocusIn>", writePname)
+    CoMet_save_patientName.bind("<FocusOut>", writePname)
+
+    #Clear image
+    Globals.CoMet_print_corrected_image.delete('all')
+    Globals.CoMet_print_corrected_image.create_image(123,148,image=CoMet_empty_image_image)
+    Globals.CoMet_print_corrected_image.image = CoMet_empty_image_image
+
+    #Clear progressbar
+    Globals.CoMet_progressbar["value"]=0
+    CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
+    CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+    CoMet_progressbar_text.insert(INSERT, "0%")
+    CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff',font=('calibri', '10', 'bold'))
+
+
+
+
+CoMet_clear_all_button_frame = tk.Frame(Globals.tab1_canvas)
+CoMet_clear_all_button_frame.grid(row=4, column=4, rowspan=2, padx=(0,0), pady=(0,0), sticky=E)
+Globals.tab1_canvas.grid_columnconfigure(13, weight=0)
+Globals.tab1_canvas.grid_rowconfigure(13, weight=0)
+CoMet_clear_all_button_frame.config(bg='#ffffff')
+
+CoMet_clear_all_button = tk.Button(CoMet_clear_all_button_frame, text="Clear all", image=CoMet_clear_all_button_image, cursor='hand2', font=('calibri', '14'),\
+    relief=FLAT, state=ACTIVE, command=clearAll)
+CoMet_clear_all_button.pack(expand=True, fill=BOTH)
+CoMet_clear_all_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+CoMet_clear_all_button.image=CoMet_clear_all_button_image
 
 Globals.tab1_canvas.pack(expand=True, fill=BOTH)
 

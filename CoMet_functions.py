@@ -1,7 +1,7 @@
 import Globals
 import tkinter as tk
 from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, PhotoImage, BOTH, \
-    E, S, N, W
+    E, S, N, W, ACTIVE, FLAT
 import os
 from os.path import normpath, basename
 import cv2
@@ -20,15 +20,23 @@ def UploadAction(event=None):
     Globals.CoMet_uploaded_filename.set(filedialog.askopenfilename())
     ext = os.path.splitext(Globals.CoMet_uploaded_filename.get())[-1].lower()
     if(ext==".tif"):
-        CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label,  height=1, width=32)
-        CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
-        CoMet_uploaded_file_text.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
-        CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
+        Globals.CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label,  height=1, width=32)
+        Globals.CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+        Globals.CoMet_uploaded_file_text.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
+        Globals.CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
 
         if (Globals.CoMet_progressbar_check_file):
             Globals.CoMet_progressbar_counter +=1
             Globals.CoMet_progressbar_check_file = False
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
+        Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height = 1, width=5)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25)+"%")
+        if(Globals.CoMet_progressbar_counter*25 == 100):
+            Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
+        else:
+            Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff', font=('calibri', '10', 'bold'))
+        
 
     elif(ext==""):
         Globals.CoMet_uploaded_filename.set("Error!") 
@@ -47,7 +55,7 @@ def setCoMet_export_folder():
     Globals.CoMet_export_folder.set(filedialog.askdirectory())
     if(Globals.CoMet_export_folder.get() == ""):
         #If this: the dialogbox was closed and no folder selected.
-        Globals.CoMet_export_folder = "Error!"
+        Globals.CoMet_export_folder.set("Error!")
     else:
         current_folder = os.getcwd()
         os.chdir(Globals.CoMet_export_folder.get())
@@ -60,6 +68,13 @@ def setCoMet_export_folder():
             Globals.CoMet_progressbar_counter +=1
             Globals.CoMet_progressbar_check_folder = False
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
+        Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
+        if(Globals.CoMet_progressbar_counter*25 == 100):
+            Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
+        else:
+            Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff', font=('calibri', '10', 'bold'))
         
 
 ## Function to check that user has filled inn everything
@@ -104,12 +119,21 @@ def Correct():
     current_folder = os.getcwd()
     os.chdir(Globals.CoMet_export_folder.get())
     if(os.path.exists(Globals.CoMet_export_folder.get() + '/' + Globals.CoMet_corrected_image_filename.get().lstrip() + Globals.CoMet_saveAs.get()) is True):
-        answer = simpledialog.askstring("Input", "The file already exists. Write another filename",parent=Globals.tab1)
-        if(answer is None):
-            return
+        os.chdir(current_folder)
+        messagebox.showerror("Error", "Filename already exists in folder. Please write a new filename")
+        Globals.CoMet_progressbar_counter -= 1
+        Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
+        Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, width = 5, height=1)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
+        if(Globals.CoMet_progressbar_counter*25 == 100):
+            Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
         else:
-            Globals.CoMet_corrected_image_filename.set(answer)
-            Correct()
+            Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff', font=('calibri', '10', 'bold'))
+        Globals.CoMet_save_button_1.config(state=ACTIVE)
+        Globals.CoMet_save_filename.config(state=NORMAL)
+        return
+
     os.chdir(current_folder)
     
     
@@ -118,15 +142,20 @@ def Correct():
     if (Globals.CoMet_correctedImage is None):
         messagebox.showerror("Error", "The image could not be corrected. Please check all the specifications and try again.")
         Globals.CoMet_progressbar["value"]=0
+        Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.insert(INSERT, "0%")
+        Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff', font=('calibri', '10', 'bold'))
     else:
-        #conf_text=tk.Text(Globals.tab1_canvas)
-        #conf_text.grid(row=4, column=3)
-        #conf_text.insert(INSERT, "File " + Globals.CoMet_corrected_image_filename.get() + " is saved\n in folder " +  basename(normpath(Globals.CoMet_export_folder.get())))
-        #conf_text.config(state=DISABLED, bd=0, font=('calibri', '13'), bg ='#D98880', fg='#FBFCFC')
-        #Globals.tab1_canvas.grid_columnconfigure(10, weight=0)
-        #Globals.tab1_canvas.grid_rowconfigure(10, weight=0)
         Globals.CoMet_progressbar_counter +=1
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
+        Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
+        if(Globals.CoMet_progressbar_counter*25 == 100):
+            Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
+        else:
+            Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff', font=('calibri', '10', 'bold'))
 
     R=Globals.CoMet_correctedImage[:,:,2];G=Globals.CoMet_correctedImage[:,:,1];B=Globals.CoMet_correctedImage[:,:,0]
     if(Globals.CoMet_dpi.get()=="127"):
@@ -170,8 +199,8 @@ def Correct():
     
     img8 = img8.resize((250, 300))   
     
-    image_to_canvas =  ImageTk.PhotoImage(image=img8)
+    Globals.CoMet_image_to_canvas =  ImageTk.PhotoImage(image=img8)
 
-    Globals.CoMet_print_corrected_image.create_image(123,148,image=image_to_canvas)
-    Globals.CoMet_print_corrected_image.image = image_to_canvas
+    Globals.CoMet_print_corrected_image.create_image(123,148,image=Globals.CoMet_image_to_canvas)
+    Globals.CoMet_print_corrected_image.image = Globals.CoMet_image_to_canvas
    

@@ -1,14 +1,41 @@
 import tkinter as tk
-from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, HORIZONTAL, E, W, N, S, BOTH, Frame, Canvas, LEFT, FLAT
+from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, \
+    HORIZONTAL, E, W, N, S, BOTH, Frame, Canvas, LEFT, FLAT, INSERT, DISABLED, ALL, X, BOTTOM
 import numpy as np
 
 global form 
 form = tk.Tk()
 
+over_all_frame = tk.Frame(form, bd=0, relief=FLAT)
+over_all_canvas = Canvas(over_all_frame)
+
+xscrollbar = Scrollbar(over_all_frame, orient=HORIZONTAL, command=over_all_canvas.xview)
+yscrollbar = Scrollbar(over_all_frame, command=over_all_canvas.yview)
+
+scroll_frame = ttk.Frame(over_all_canvas)
+
+scroll_frame.bind("<Configure>", lambda e: over_all_canvas.configure(scrollregion=over_all_canvas.bbox('all')))
+
+over_all_canvas.create_window((0,0), window=scroll_frame, anchor='nw')
+over_all_canvas.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
+
+over_all_frame.config(highlightthickness=0, bg='#ffffff')
+over_all_canvas.config(highlightthickness=0, bg='#ffffff')
+over_all_frame.pack(expand=True, fill=BOTH)
+over_all_canvas.grid(row=0, column=0, sticky=N+S+E+W)
+over_all_frame.grid_columnconfigure(0, weight=1)
+over_all_frame.grid_rowconfigure(0, weight=1)
+xscrollbar.grid(row=1, column=0, sticky=E+W)
+over_all_frame.grid_columnconfigure(1, weight=0)
+over_all_frame.grid_rowconfigure(1, weight=0)
+yscrollbar.grid(row=0, column=1, sticky=N+S)
+over_all_frame.grid_columnconfigure(2, weight=0)
+over_all_frame.grid_rowconfigure(2, weight=0)
+
 global tab_parent
-tab_parent = ttk.Notebook(form)
+tab_parent = ttk.Notebook(scroll_frame)
 tab_parent.borderWidth=0
-tab_parent.grid(row=1, column=0, sticky=E+W+N+S, pady=(0,0), padx =(0,0)) #pack(fill=BOTH, expand=True)
+tab_parent.grid(row=1, column=0, sticky=E+W+N+S, pady=(0,0), padx =(0,0))
 
 global intro_tab
 intro_tab = ttk.Frame(tab_parent)
@@ -22,12 +49,14 @@ tab3 = ttk.Frame(tab_parent)
 global tab4
 tab4 = ttk.Frame(tab_parent)
 
+
 global tab1_canvas
 tab1_canvas = tk.Canvas(tab1)
 
+
 global CoMet_progressbar
 CoMet_progressbar = ttk.Progressbar(tab1_canvas,orient ="horizontal",length = 200, mode ="determinate")
-CoMet_progressbar.grid(row=5, column=1, columnspan=2, sticky=E+W)
+CoMet_progressbar.grid(row=5, column=1, columnspan=2, sticky=E+W+S, pady=(40,0))
 tab1_canvas.grid_columnconfigure(12, weight=0)
 tab1_canvas.grid_rowconfigure(12, weight=0)
 CoMet_progressbar["maximum"] = 100
@@ -42,6 +71,13 @@ CoMet_progressbar_check_file = True
 global CoMet_progressbar_check_folder
 CoMet_progressbar_check_folder = True
 
+global CoMet_progressbar_text
+CoMet_progressbar_text = tk.Text(tab1_canvas, height=1, width=5)
+CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+tab1_canvas.grid_columnconfigure(14, weight=0)
+tab1_canvas.grid_rowconfigure(14, weight=0)
+CoMet_progressbar_text.insert(INSERT, "0%")
+CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff',font=('calibri', '10', 'bold'))
 
 global dose_response_scroll_window_1
 dose_response_scroll_window_1 = tk.Canvas(tab2, width=200, height=100)
@@ -70,6 +106,8 @@ global CoMet_export_folder
 CoMet_export_folder=StringVar(tab1)
 CoMet_export_folder.set("Error!")
 
+global CoMet_image_to_canvas
+
 global doseResponse_uploaded_filename 
 doseResponse_uploaded_filename=StringVar(tab2)
 doseResponse_uploaded_filename.set("Error!")
@@ -93,11 +131,20 @@ CoMet_border_1_label = tk.Label(tab1_canvas)
 global CoMet_border_2_label
 CoMet_border_2_label = tk.Label(tab1_canvas)
 
-global CoMet_boder_3_label
-CoMet_boder_3_label = tk.Label(tab1_canvas)
+global CoMet_border_3_label
+CoMet_border_3_label = tk.Label(tab1_canvas)
 
 global CoMet_border_4_label
 CoMet_border_4_label = tk.Label(tab1_canvas)
+
+global CoMet_save_button_frame_1
+CoMet_save_button_frame_1 = tk.Frame(tab1_canvas)
+
+global CoMet_save_button_1
+CoMet_save_button_1 = tk.Button(CoMet_save_button_frame_1)
+
+global CoMet_save_filename
+CoMet_save_filename = tk.Text(CoMet_border_3_label, height=1, width=30)
 
 global CoMet_print_corrected_image
 CoMet_print_corrected_image = tk.Canvas(tab1_canvas)
