@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
     NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton, FLAT, PhotoImage, Label,\
-        SOLID, N, S, W, E, END, LEFT, Scrollbar, RIGHT, Y, BOTH
+        SOLID, N, S, W, E, END, LEFT, Scrollbar, RIGHT, Y, BOTH, TOP
 import Globals
 import re
 import CoMet_functions, intro_tab_functions, Map_Dose
@@ -91,10 +91,10 @@ helpmenu.add_command(label="About", command=CoMet_functions.nothingButton)
 menubar.add_cascade(label="Help", menu=helpmenu)
 Globals.form.config(menu=menubar)
 
-upload_button_file = "uploadbutton2.png"
+upload_button_file = "uploadbutton3.png" #"test_button.png" #"uploadbutton2.png"
 upload_button_image = ImageTk.PhotoImage(file=upload_button_file)
 
-select_folder_button_file = "select_folder.png"
+select_folder_button_file = "select_folder_button2.png"
 select_folder_image = ImageTk.PhotoImage(file=select_folder_button_file)
 
 CoMet_border_dark_file = "border.png"
@@ -103,17 +103,20 @@ CoMet_border_dark = ImageTk.PhotoImage(file=CoMet_border_dark_file)
 CoMet_border_light_file = "border_light.png"
 CoMet_border_light = ImageTk.PhotoImage(file=CoMet_border_light_file)
 
-CoMet_save_button_file = "save.png"
+CoMet_save_button_file = "save_button2.png"
 CoMet_save_button = ImageTk.PhotoImage(file=CoMet_save_button_file)
 
-CoMet_correct_button_file = "correct_button.png"
+CoMet_correct_button_file = "icon_correct.png"
 CoMet_correct_button_image= ImageTk.PhotoImage(file=CoMet_correct_button_file)
 
-CoMet_clear_all_button_file = "clear_all.png"
+CoMet_clear_all_button_file = "icon_clear_all.png"
 CoMet_clear_all_button_image = ImageTk.PhotoImage(file=CoMet_clear_all_button_file)
 
 CoMet_empty_image_file = "empty_corrected_image.png"
 CoMet_empty_image_image = ImageTk.PhotoImage(file=CoMet_empty_image_file)
+
+dose_response_calibration_button_file = "save_calibration_button.png"
+dose_response_calibration_button_image = ImageTk.PhotoImage(file=dose_response_calibration_button_file)
 
 ###################################### INTRO TAB #################################################
 
@@ -283,26 +286,26 @@ intro_tab_canvas.grid(row=0, column=0, sticky=N+S+W)#pack(side=LEFT, fill=BOTH)
 
 Globals.tab1_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness=0)
 
-CoMet_explained = tk.Text(Globals.tab1_canvas, height=4)#, width=200)
+CoMet_explained = tk.Text(Globals.tab1_canvas, height=4, width=105)
 CoMet_explained.insert(INSERT, \
-"A linear accelerator is a tool used to generate ionizing radiation, which can be used in radiotherapy\n\
-treatment. Using a modulator, electron gun and RF power source electrons are released and \n\
-accelerated through a waveguide. The modulator provide high voltage pulses to the RF pulse which\n\
-leads to a propagating electromagnetic ﬁeld inside the waveguide.")
-CoMet_explained.grid(row=0, column = 0, columnspan=4, sticky=N+S+E+W, padx=(20,20), pady=(10,10))
+"Start the correction by choosing the correct *.tif file containing the scanned image of the GafChromic film. \
+The film \nshould be scanned using Epson Perfection v750 Pro with dpi setting 72 or 127. Then pick which \
+folder the corrected file \nshould be uploaded to. The corrected file will be saved as a DICOM. Write filename \
+and patient name (optional) before \ndoing the correction. An illustration of the corrected image will appear.")
+CoMet_explained.grid(row=0, column = 0, columnspan=4, sticky=N+S+E+W, padx=(20,40), pady=(10,10))
 Globals.tab1_canvas.grid_columnconfigure(0, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(0, weight=0)
-CoMet_explained.config(state=DISABLED, bg='#E5f9ff', font=('calibri', '13'), relief=FLAT)
+CoMet_explained.config(state=DISABLED, bg='#ffffff', font=('calibri', '11'), relief=FLAT)
 
 Globals.CoMet_border_1_label = Label(Globals.tab1_canvas, image = CoMet_border_dark,width=50)
 Globals.CoMet_border_1_label.image=CoMet_border_dark
-Globals.CoMet_border_1_label.grid(row=1, column=0, columnspan=3, sticky = W+E, padx = (0, 50), pady=(10,15))
+Globals.CoMet_border_1_label.grid(row=1, column=0, columnspan=3, sticky = W+E, padx = (0, 50), pady=(10,5))
 Globals.tab1_canvas.grid_columnconfigure(1, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(1, weight=0)
 Globals.CoMet_border_1_label.config(bg='#ffffff', borderwidth=0)
 
 CoMet_upload_button_frame = tk.Frame(Globals.tab1_canvas)
-CoMet_upload_button_frame.grid(row=1, column = 2, padx = (60, 0), pady=(10,15))
+CoMet_upload_button_frame.grid(row=1, column = 2, padx = (60, 0), pady=(10,5))
 Globals.tab1_canvas.grid_columnconfigure(2, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(2, weight=0)
 CoMet_upload_button_frame.config(bg = '#ffffff')
@@ -320,13 +323,13 @@ Globals.CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '
 
 Globals.CoMet_border_2_label = Label(Globals.tab1_canvas, image = CoMet_border_dark)
 Globals.CoMet_border_2_label.image=CoMet_border_dark
-Globals.CoMet_border_2_label.grid(row=2, column=0, columnspan=3, sticky=N+S+E+W, padx = (0, 50), pady=(10,15))
+Globals.CoMet_border_2_label.grid(row=2, column=0, columnspan=3, sticky=N+S+E+W, padx = (0, 50), pady=(0,15))
 Globals.tab1_canvas.grid_columnconfigure(3, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(3, weight=0)
 Globals.CoMet_border_2_label.config(bg='#ffffff', borderwidth=0)
 
 CoMet_folder_button_frame = tk.Frame(Globals.tab1_canvas)
-CoMet_folder_button_frame.grid(row=2, column = 2, padx = (60, 0), pady=(10,15))
+CoMet_folder_button_frame.grid(row=2, column = 2, padx = (60, 0), pady=(0,15))
 Globals.tab1_canvas.grid_columnconfigure(4, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(4, weight=0)
 CoMet_folder_button_frame.config(bg = '#ffffff')
@@ -337,9 +340,9 @@ CoMet_folder_button.pack(expand=True, fill=BOTH)
 CoMet_folder_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 CoMet_folder_button.image=select_folder_image
 
-CoMet_save_to_folder = tk.Text(Globals.CoMet_border_2_label, height=1, width=32)
-CoMet_save_to_folder.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
-CoMet_save_to_folder.insert(INSERT,"Folder to save the corrected image:")
+CoMet_save_to_folder = tk.Text(Globals.CoMet_border_2_label, height=1, width=31)
+CoMet_save_to_folder.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(25,0), padx=(80,0))
+CoMet_save_to_folder.insert(INSERT,"Folder to save the corrected image")
 CoMet_save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff') 
 
 ## Function to test the filename the user chooses for the corrected image
@@ -359,7 +362,7 @@ def testFilename():
         Globals.CoMet_progressbar_counter += 1
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, width = 5, height=1)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
         Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
         if(Globals.CoMet_progressbar_counter*25 == 100):
             Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
@@ -369,13 +372,13 @@ def testFilename():
 
 Globals.CoMet_border_3_label = Label(Globals.tab1_canvas, image = CoMet_border_dark)
 Globals.CoMet_border_3_label.image=CoMet_border_dark
-Globals.CoMet_border_3_label.grid(row=3, column=0, columnspan=3, sticky=N+S+E+W, padx = (0, 50), pady=(10,0))
+Globals.CoMet_border_3_label.grid(row=3, column=0, columnspan=3, sticky=N+S+E+W, padx = (0, 50), pady=(0,0))
 Globals.tab1_canvas.grid_columnconfigure(5, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(5, weight=0)
 Globals.CoMet_border_3_label.config(bg='#ffffff', borderwidth=0)
 
 Globals.CoMet_save_button_frame_1 = tk.Frame(Globals.tab1_canvas)
-Globals.CoMet_save_button_frame_1.grid(row=3, column = 2, padx = (60, 0), pady=(10,0))
+Globals.CoMet_save_button_frame_1.grid(row=3, column = 2, padx = (60, 0), pady=(0,0))
 Globals.tab1_canvas.grid_columnconfigure(6, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(6, weight=0)
 Globals.CoMet_save_button_frame_1.config(bg = '#ffffff')
@@ -422,13 +425,13 @@ def testName():
 
 Globals.CoMet_border_4_label = Label(Globals.tab1_canvas, image = CoMet_border_dark)
 Globals.CoMet_border_4_label.image=CoMet_border_dark
-Globals.CoMet_border_4_label.grid(row=4, column=0, columnspan=3, sticky=E+W, padx = (0, 50), pady=(20,0))
+Globals.CoMet_border_4_label.grid(row=4, column=0, columnspan=3, sticky=E+W, padx = (0, 50), pady=(25,0))
 Globals.tab1_canvas.grid_columnconfigure(7, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(7, weight=0)
 Globals.CoMet_border_4_label.config(bg='#ffffff', borderwidth=0)
 
 CoMet_save_button_frame_2 = tk.Frame(Globals.tab1_canvas)
-CoMet_save_button_frame_2.grid(row=4, column = 2, padx = (60, 0), pady=(0,0))
+CoMet_save_button_frame_2.grid(row=4, column = 2, padx = (60, 0), pady=(20,0))
 Globals.tab1_canvas.grid_columnconfigure(8, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(8, weight=0)
 CoMet_save_button_frame_2.config(bg = '#ffffff')
@@ -485,8 +488,8 @@ def clearAll():
 
     #Clear out folder
     CoMet_save_to_folder = tk.Text(Globals.CoMet_border_2_label, height=1, width=32)
-    CoMet_save_to_folder.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
-    CoMet_save_to_folder.insert(INSERT,"Folder to save the corrected image:")
+    CoMet_save_to_folder.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(25,0), padx=(80,0))
+    CoMet_save_to_folder.insert(INSERT,"Folder to save the corrected image")
     CoMet_save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
     Globals.CoMet_export_folder.set("Error!")
 
@@ -534,8 +537,11 @@ def clearAll():
 
     #Clear progressbar
     Globals.CoMet_progressbar["value"]=0
+    Globals.CoMet_progressbar_counter = 0
+    Globals.CoMet_progressbar_check_file = True
+    Globals.CoMet_progressbar_check_folder = True
     CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
-    CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+    CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
     CoMet_progressbar_text.insert(INSERT, "0%")
     CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff',font=('calibri', '10', 'bold'))
 
@@ -557,84 +563,112 @@ CoMet_clear_all_button.image=CoMet_clear_all_button_image
 Globals.tab1_canvas.pack(expand=True, fill=BOTH)
 
 ##################################### TAB 2 - Dose response ############################################
-#img_file_name="default.png"
-#path_img=db_config.photo_directory + img_file_name
 
+#"To be able to perform an accurate dose caluclations using GafChromic film EBT3 \n\
+#it is necessary to create a dose-respons curve for each batch of film, in addition\n\
+#to a calibration scan before/along every use. The respons of GafChromic film \n\
+#EBT3 is modelled using a rational function, X(D,n) = a + b/(D-c), as this has \n\
+#proven to fit well with the film behavior. In the model X(D,n) is the scanner \n\
+#respons in color channel n and a, b and c are constants. Because of the nature \n\
+#of asymptotic fitting functions a good fit will be achieved by using doses in \n\
+#geomteric progression, D, nD, nnD, etc.. Also, to avoid scanner uncertainties\n\
+#each dose should be scannet three times and uploaded here where an average will be used."
 
-## Text and buttons for the user to choose DPI
-#choose_doseResponse_dpi = tk.Text(Globals.tab2, height=1, width=1)
-#choose_doseResponse_dpi.place(relwidth=0.35, relheight=0.5, relx=0.07, rely=0.61)
-#choose_doseResponse_dpi.insert(tk.CURRENT,"Dots per inch (dpi) used during scanning: ")
-#choose_doseResponse_dpi.config(state=DISABLED, bd=0, font=('calibri', '15'))
-#Radiobutton(Globals.tab2, text='72 dpi',cursor='hand2',font=('calibri', '14'), \
-#    variable=Globals.doseResponse_dpi, value=72, command=CoMet_functions.nothingButton).place(relwidth=0.075, relheight=0.05, relx=0.13, rely=0.66)
-#Radiobutton(Globals.tab2, text='127 dpi',cursor='hand2',font=('calibri', '14'), \
-#    variable=Globals.doseResponse_dpi, value=127, command=CoMet_functions.nothingButton).place(relwidth=0.077, relheight=0.05, relx= 0.23, rely=0.66)
+#Irradiate film piece of size (Bestemt med maske?) with known doses. Place one and one\n\
+#film piece in the center of the scanner and perfom three scans per dose.  "
 
-#openImageTabOne=Image.open(path_img)
-#imgTabOne=ImageTk.PhotoImage(openImageTabOne)
-#imgLabelTabOne=tk.Label(tab2,image=imgTabOne)
+Globals.tab2_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness=0)
 
+dose_response_explain_text = tk.Text(Globals.tab2_canvas, height=4, width=140)
+dose_response_explain_text.insert(INSERT, "\
+Follow the calibration specifications given under 'Help' or 'Read more' at the first window. Upload the scanned *.tif files (there should be at least 3 of each\n\
+dose level) and save. The dose response curve along with the equation will appear when enough data points are given. The uploaded files must have dpi \n\
+setting 72 or 127. When saving the calibration the dose response data will be saved and can be used chosen for later use of this software. The dose response \n\
+curve will be found for all three color channels, but can be removed using the check boxes. A dose response equation will only be fitted for the red channel.  " )
+dose_response_explain_text.grid(row=0, column=0, columnspan=5, sticky=N+S+E+W, pady=(20,20), padx=(20,10))
+Globals.tab2_canvas.grid_columnconfigure(0, weight=0)
+Globals.tab2_canvas.grid_rowconfigure(0, weight=0)
+dose_response_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
 
-why_dose_response_text = tk.Text(Globals.tab2, height=1, width=1)
-why_dose_response_text.place(relwidt=0.48, relheight=0.4, relx=0.004, rely=0.005)
-why_dose_response_text.insert(INSERT,\
-"To be able to perform an accurate dose caluclations using GafChromic film EBT3 \n\
-it is necessary to create a dose-respons curve for each batch of film, in addition\n\
-to a calibration scan before/along every use. The respons of GafChromic film \n\
-EBT3 is modelled using a rational function, X(D,n) = a + b/(D-c), as this has \n\
-proven to fit well with the film behavior. In the model X(D,n) is the scanner \n\
-respons in color channel n and a, b and c are constants. Because of the nature \n\
-of asymptotic fitting functions a good fit will be achieved by using doses in \n\
-geomteric progression, D, nD, nnD, etc.. Also, to avoid scanner uncertainties\n\
-each dose should be scannet three times and uploaded here where an average will be used." )
-why_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
+dose_response_upload_button_frame = tk.Frame(Globals.tab2_canvas_files)
+dose_response_upload_button_frame.grid(row=0, column = 0, columnspan=8, padx = (60, 0), pady=(10,5))
+Globals.tab2_canvas_files.grid_columnconfigure(0, weight=0)
+Globals.tab2_canvas_files.grid_rowconfigure(0, weight=0)
+dose_response_upload_button_frame.config(bg = '#ffffff')
 
-how_dose_response_text = tk.Text(Globals.tab2, height=1, width=1)
-how_dose_response_text.place(relwidt=0.48, relheight=0.4, relx=0.51, rely=0.005)
-how_dose_response_text.insert(INSERT,\
-"Irradiate film piece of size (Bestemt med maske?) with known doses. Place one and one\n\
-film piece in the center of the scanner and perfom three scans per dose.  " )
-how_dose_response_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
+dose_response_upload_button = tk.Button(dose_response_upload_button_frame, text='Upload file', image=upload_button_image,\
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Dose_response_functions.create_window)
+dose_response_upload_button.pack(expand=True, fill=BOTH)
+dose_response_upload_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+dose_response_upload_button.image = upload_button_image
 
+check1 = Checkbutton(Globals.tab2_canvas_files, variable=Globals.dose_response_var1, command=Dose_response_functions.plot_dose_response)
+check1.grid(row=1, column=1, sticky=E, padx=(30,15))
+Globals.tab2_canvas_files.grid_columnconfigure(5, weight=0)
+Globals.tab2_canvas_files.grid_rowconfigure(5, weight=0)
+check1.config(bg='#ffffff')
 
-upload_button1 = tk.Button(Globals.dose_response_scroll_window_1, text='Upload file', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
-    overrelief=GROOVE, state=ACTIVE, width=12, command=Dose_response_functions.create_window)
-upload_button1.place(relwidth=0.5, relheight=0.1, relx=0.3, rely=0.03)
+check2 = Checkbutton(Globals.tab2_canvas_files, variable=Globals.dose_response_var2, command=Dose_response_functions.plot_dose_response)
+check2.grid(row=1, column=3, sticky=E, padx=(45,15))
+Globals.tab2_canvas_files.grid_columnconfigure(6, weight=0)
+Globals.tab2_canvas_files.grid_rowconfigure(6, weight=0)
+check2.config(bg='#ffffff')
 
-red = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
-red.place(relwidth=0.1, relheight=0.08, relx=0.3, rely=0.2)
+check3 = Checkbutton(Globals.tab2_canvas_files, variable=Globals.dose_response_var3, command=Dose_response_functions.plot_dose_response)
+check3.grid(row=1, column=5, sticky=E, padx=(35,10))
+Globals.tab2_canvas_files.grid_columnconfigure(7, weight=0)
+Globals.tab2_canvas_files.grid_rowconfigure(7, weight=0)
+check3.config(bg='#ffffff')
+
+red = tk.Text(Globals.tab2_canvas_files, height=1, width=4)
 red.insert(INSERT, "Red")
+red.grid(row=1, column=1, sticky=W, padx=(0,0))
+Globals.tab2_canvas_files.grid_columnconfigure(1, weight=0)
+Globals.tab2_canvas_files.grid_rowconfigure(1, weight=0)
 red.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-green = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
-green.place(relwidth=0.1, relheight=0.08, relx=0.5, rely=0.2)
+green = tk.Text(Globals.tab2_canvas_files, height=1, width=5)
 green.insert(INSERT, "Green")
+green.grid(row = 1, column = 3, sticky=W, padx=(0,0))
+Globals.tab2_canvas_files.grid_columnconfigure(2, weight=0)
+Globals.tab2_canvas_files.grid_rowconfigure(2, weight=0)
 green.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-blue = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
-blue.place(relwidth=0.1, relheight=0.08, relx=0.75, rely=0.2)
+blue = tk.Text(Globals.tab2_canvas_files, height=1, width=4)
 blue.insert(INSERT, "Blue")
+blue.grid(row=1, column=5, sticky=W, padx=(0,0))
+Globals.tab2_canvas_files.grid_columnconfigure(3, weight=0)
+Globals.tab2_canvas_files.grid_rowconfigure(3, weight=0)
 blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-dose_title = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
-dose_title.place(relheight=0.08, relwidth=0.15, relx= 0.05, rely=0.2)
+dose_title = tk.Text(Globals.tab2_canvas_files, height=1, width=10)
 dose_title.insert(INSERT, "Dose (cGy)")
+dose_title.grid(row=1, column=0, sticky=N+S+W+E, padx=(0,15))
+Globals.tab2_canvas_files.grid_columnconfigure(4, weight=0)
+Globals.tab2_canvas_files.grid_rowconfigure(4, weight=0)
 dose_title.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-check1 = Checkbutton(Globals.dose_response_scroll_window_1, variable=Globals.dose_response_var1, command=Dose_response_functions.plot_dose_response)
-check1.place(relx=0.4, rely=0.19)
+dose_response_save_calibration_button_frame = tk.Frame(Globals.tab2_canvas)
+dose_response_save_calibration_button_frame.grid(row=2, column = 1, sticky=N+S+E+W, padx=(35,0), pady=(60,0))
+Globals.tab2_canvas.grid_columnconfigure(10, weight=0)
+Globals.tab2_canvas.grid_rowconfigure(10, weight=0)
+dose_response_save_calibration_button_frame.config(bg = '#ffffff', height=1, width=100)
+dose_response_save_calibration_button_frame.grid_propagate(0)
 
-check2 = Checkbutton(Globals.dose_response_scroll_window_1, variable=Globals.dose_response_var2, command=Dose_response_functions.plot_dose_response)
-check2.place(relx=0.6, rely=0.19)
+Globals.dose_response_save_calibration_button = tk.Button(dose_response_save_calibration_button_frame, text='Save calibration', image=dose_response_calibration_button_image, \
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Dose_response_functions.saveCalibration)
+Globals.dose_response_save_calibration_button.pack(expand=True, fill=BOTH, side=TOP)
+Globals.dose_response_save_calibration_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.dose_response_save_calibration_button.image = dose_response_calibration_button_image
 
-check3 = Checkbutton(Globals.dose_response_scroll_window_1, variable=Globals.dose_response_var3, command=Dose_response_functions.plot_dose_response)
-check3.place(relx=0.85, rely=0.19)
+delete_text = tk.Text(Globals.tab2_canvas_files, height=1, widt=7)
+delete_text.insert(INSERT, "Delete")
+delete_text.grid(row=1, column=7, sticky=N+S+E+W, padx=(0,0))
+Globals.tab2_canvas_files.grid_columnconfigure(4, weight=0)
+Globals.tab2_canvas_files.grid_rowconfigure(4, weight=0)
+delete_text.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
-Globals.dose_response_save_calibration_button = tk.Button(Globals.tab2, text='Save calibration', cursor='hand2', font=('calibri', '12'), highlightthickness=7, \
-    overrelief=GROOVE, state=DISABLED, width=12, command=Dose_response_functions.saveCalibration)
-Globals.dose_response_save_calibration_button.place(relwidth=0.1, relheight=0.05, relx=0.4, rely=0.4)
-
+Globals.tab2_canvas.pack(expand=True, fill=BOTH)
 ##################################### TAB 3 - Map dose ############################################
 
 #path = os.path.dirname(sys.argv[0])
