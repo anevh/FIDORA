@@ -6,6 +6,7 @@ import numpy as np
 global form 
 form = tk.Tk()
 
+#Main-window
 over_all_frame = tk.Frame(form, bd=0, relief=FLAT)
 over_all_canvas = Canvas(over_all_frame)
 
@@ -13,7 +14,6 @@ xscrollbar = Scrollbar(over_all_frame, orient=HORIZONTAL, command=over_all_canva
 yscrollbar = Scrollbar(over_all_frame, command=over_all_canvas.yview)
 
 scroll_frame = ttk.Frame(over_all_canvas)
-
 scroll_frame.bind("<Configure>", lambda e: over_all_canvas.configure(scrollregion=over_all_canvas.bbox('all')))
 
 over_all_canvas.create_window((0,0), window=scroll_frame, anchor='nw')
@@ -49,14 +49,15 @@ tab3 = ttk.Frame(tab_parent)
 global tab4
 tab4 = ttk.Frame(tab_parent)
 
-
 global tab1_canvas
 tab1_canvas = tk.Canvas(tab1)
+global tab2_canvas
+tab2_canvas = tk.Canvas(tab2)
 
-
+########################################   CoMet related   ###################################################
 global CoMet_progressbar
 CoMet_progressbar = ttk.Progressbar(tab1_canvas,orient ="horizontal",length = 200, mode ="determinate")
-CoMet_progressbar.grid(row=5, column=1, columnspan=2, sticky=E+W+S, pady=(40,0))
+CoMet_progressbar.grid(row=5, column=0, columnspan=3, sticky=E+W+S, pady=(40,0), padx=(50,70))
 tab1_canvas.grid_columnconfigure(12, weight=0)
 tab1_canvas.grid_rowconfigure(12, weight=0)
 CoMet_progressbar["maximum"] = 100
@@ -73,26 +74,15 @@ CoMet_progressbar_check_folder = True
 
 global CoMet_progressbar_text
 CoMet_progressbar_text = tk.Text(tab1_canvas, height=1, width=5)
-CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
 tab1_canvas.grid_columnconfigure(14, weight=0)
 tab1_canvas.grid_rowconfigure(14, weight=0)
 CoMet_progressbar_text.insert(INSERT, "0%")
 CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff',font=('calibri', '10', 'bold'))
 
-global dose_response_scroll_window_1
-dose_response_scroll_window_1 = tk.Canvas(tab2, width=200, height=100)
-dose_response_scroll_window_1.place(relwidth=0.48, relheight=0.55, relx = 0.5, rely = 0.42)
-
-global dose_response_save_calibration_button
-
-
 global CoMet_dpi
 CoMet_dpi = StringVar(tab1)
 CoMet_dpi.set("127")
-
-global doseResponse_dpi
-doseResponse_dpi=StringVar(tab2)
-doseResponse_dpi.set("127")
 
 global CoMet_saveAs
 CoMet_saveAs = tk.StringVar(tab1)
@@ -107,10 +97,6 @@ CoMet_export_folder=StringVar(tab1)
 CoMet_export_folder.set("Error!")
 
 global CoMet_image_to_canvas
-
-global doseResponse_uploaded_filename 
-doseResponse_uploaded_filename=StringVar(tab2)
-doseResponse_uploaded_filename.set("Error!")
 
 global CoMet_correcte_image_filename_box
 
@@ -151,6 +137,54 @@ CoMet_print_corrected_image = tk.Canvas(tab1_canvas)
 
 global CoMet_uploaded_file_text
 
+
+########################################   Dose response related   ###################################################
+tab2_scroll_frame = tk.Frame(tab2_canvas)
+tab2_scroll_frame.grid(row=2, column=4, columnspan=1, rowspan=3, sticky=N)
+tab2_canvas.grid_columnconfigure(1, weight=0)
+tab2_canvas.grid_rowconfigure(1, weight=0)
+tab2_scroll_frame.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0, height=200, width=450)
+tab2_scroll_frame.grid_propagate(0)
+
+tab2_scroll = tk.Scrollbar(tab2_scroll_frame)
+tab2_scroll.pack(side=RIGHT, fill=Y) #grid(row=0, column=1, sticky=N+S+E+W)
+
+#tab2_scroll_canvas = ttk.Frame(over_all_canvas)
+#croll_frame.bind("<Configure>", lambda e: over_all_canvas.configure(scrollregion=over_all_canvas.bbox('all')))
+
+#global tab2_canvas_files
+#tab2_canvas_files = tk.Canvas(tab2_scroll_frame, yscrollcommand=tab2_scroll.set)
+#tab2_canvas_files.grid(row=0, column=0, sticky=N+S+E+W)
+#tab2_canvas_files.grid(row=2, column=4, columnspan=1, rowspan=3, sticky=N)
+#tab2_canvas.grid_columnconfigure(1, weight=0)
+#tab2_canvas.grid_rowconfigure(1, weight=0)
+#tab2_canvas_files.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0)
+#tab2_canvas_files.grid_propagate(0)
+
+
+tab2_scroll_canvas = tk.Canvas(tab2_scroll_frame, yscrollcommand=tab2_scroll.set)
+tab2_scroll_canvas.pack(expand=True, fill = BOTH, side=LEFT)#grid(row=0, column=0, sticky=N+S+E+W)
+tab2_scroll_canvas.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0, height=400, width=450)
+tab2_scroll_canvas.grid_propagate(0)
+tab2_scroll.config(command=tab2_scroll_canvas.yview)
+
+tab2_scroll_canvas.bind("<Configure>", lambda e: tab2_scroll_frame.configure(scrollregion=tab2_scroll_frame.bbox('all')))
+
+global tab2_canvas_files
+tab2_canvas_files = tk.Canvas(tab2_scroll_canvas)
+tab2_canvas_files.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0)
+tab2_canvas_files.pack(expand=True, fill=BOTH)
+
+global dose_response_save_calibration_button
+
+global doseResponse_dpi
+doseResponse_dpi=StringVar(tab2)
+doseResponse_dpi.set("127")
+
+global doseResponse_uploaded_filename 
+doseResponse_uploaded_filename=StringVar(tab2)
+doseResponse_uploaded_filename.set("Error!")
+
 global dose_response_var1 
 dose_response_var1= IntVar()
 dose_response_var1.set(1)
@@ -184,8 +218,14 @@ avg_green_vector = []
 global avg_blue_vector
 avg_blue_vector = []
 
-global dose_response_results_coordY
-dose_response_results_coordY = 0.35
+#global dose_response_results_coordY
+#dose_response_results_coordY = 0.35
+
+global dose_response_files_row_count
+dose_response_files_row_count = 2
+
+global dose_response_files_weightcount
+dose_response_files_weightcount = 8
 
 global dose_response_inOrOut
 dose_response_inOrOut = True
@@ -210,6 +250,24 @@ popt_red = np.zeros(3)
 
 global dose_response_batch_number
 dose_response_batch_number = "-"
+
+global dose_response_equation_frame
+dose_response_equation_frame = tk.Frame(tab2_canvas)
+dose_response_equation_frame.grid(row=1, column=4, columnspan=1, sticky=E+W+N, padx=(0,10), pady=(0,0))
+tab2_canvas.grid_columnconfigure(8, weight=0)
+tab2_canvas.grid_rowconfigure(8, weight=0)
+dose_response_equation_frame.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, width=400, height=200)
+dose_response_equation_frame.grid_propagate(0)
+
+global dose_response_plot_frame
+dose_response_plot_frame = tk.Frame(tab2_canvas)
+dose_response_plot_frame.grid(row=1, column=0, rowspan=2, columnspan=4, sticky=N+S+E+W, pady=(5,5), padx=(5,5))
+tab2_canvas.grid_columnconfigure(9, weight=0)
+tab2_canvas.grid_rowconfigure(9, weight=0)
+dose_response_plot_frame.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, height=350,width=500)
+dose_response_plot_frame.grid_propagate(0)
+########################################   Map dose related   ###################################################
+
 
 global map_dose_film_dataset
 map_dose_film_dataset=StringVar(tab3)

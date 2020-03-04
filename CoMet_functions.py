@@ -30,7 +30,7 @@ def UploadAction(event=None):
             Globals.CoMet_progressbar_check_file = False
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height = 1, width=5)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
         Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25)+"%")
         if(Globals.CoMet_progressbar_counter*25 == 100):
             Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
@@ -60,7 +60,7 @@ def setCoMet_export_folder():
         current_folder = os.getcwd()
         os.chdir(Globals.CoMet_export_folder.get())
         save_to_folder=tk.Text(Globals.CoMet_border_2_label, height=1, width=32)
-        save_to_folder.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+        save_to_folder.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(25,0), padx=(80,0))
         save_to_folder.insert(INSERT, basename(normpath(Globals.CoMet_export_folder.get())))
         save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
         os.chdir(current_folder)
@@ -69,7 +69,7 @@ def setCoMet_export_folder():
             Globals.CoMet_progressbar_check_folder = False
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
         Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
         if(Globals.CoMet_progressbar_counter*25 == 100):
             Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
@@ -124,7 +124,7 @@ def Correct():
         Globals.CoMet_progressbar_counter -= 1
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, width = 5, height=1)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
         Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
         if(Globals.CoMet_progressbar_counter*25 == 100):
             Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
@@ -143,14 +143,14 @@ def Correct():
         messagebox.showerror("Error", "The image could not be corrected. Please check all the specifications and try again.")
         Globals.CoMet_progressbar["value"]=0
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
         Globals.CoMet_progressbar_text.insert(INSERT, "0%")
         Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff', font=('calibri', '10', 'bold'))
     else:
         Globals.CoMet_progressbar_counter +=1
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E)
+        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
         Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
         if(Globals.CoMet_progressbar_counter*25 == 100):
             Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))

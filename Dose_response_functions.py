@@ -1,7 +1,7 @@
 import Globals
 import tkinter as tk
 from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, \
-    PhotoImage, BOTH, Toplevel, GROOVE, ACTIVE, FLAT
+    PhotoImage, BOTH, Toplevel, GROOVE, ACTIVE, FLAT, N, S, W, E
 import cv2
 import numpy as np
 import os
@@ -159,8 +159,12 @@ def plot_dose_response():
     temp_avg_green = [item[1] for item in Globals.avg_green_vector]
     temp_avg_blue = [item[1] for item in Globals.avg_blue_vector]
     
-    fig = Figure(figsize=(3,3))
+    fig = Figure(figsize=(4,3))
     a = fig.add_subplot(111)
+    canvas = FigureCanvasTkAgg(fig, master=Globals.dose_response_plot_frame)
+    canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+S+E)#grid(row=1, column=0, rowspan=4, columnspan=3, sticky=N+S+E+W, pady=(5,5), padx=(5,5))
+    #Globals.tab2_canvas.grid_columnconfigure(9, weight=0)
+    #Globals.tab2_canvas.grid_rowconfigure(9, weight=0)
     if(Globals.dose_response_var1.get()):
         a.plot(temp_dose,temp_avg_red, 'ro')
     if(Globals.dose_response_var2.get()):
@@ -201,18 +205,20 @@ def plot_dose_response():
             a.plot(sorted_temp_dose, sorted_temp_avg_blue , color='blue')
 
         out_text_function = "Pixel value = " + str(round(Globals.popt_red[0])) + " + " + str(round(Globals.popt_red[1])) + "/(dose - (" + str(round(Globals.popt_red[2])) + "))"
-        write_out_respons_function = tk.Text(Globals.tab2, height=1, width=1)
-        write_out_respons_function.place(relwidt=0.48, relheight=0.06, relx=0, rely=0.46)
+        write_out_respons_function = tk.Text(Globals.dose_response_equation_frame, height=2, width=20)
         write_out_respons_function.insert(INSERT, out_text_function )
-        write_out_respons_function.config(state=DISABLED, bd=0, font=('calibri', '12'))    
+        write_out_respons_function.grid(row=0, column=0, sticky=N+S+W+E, pady=(5,5), padx=(5,5))
+        Globals.dose_response_equation_frame.grid_columnconfigure(0, weight=0)
+        Globals.dose_response_equation_frame.grid_rowconfigure(0, weight=0)
+        write_out_respons_function.config(state=DISABLED, bd=0, font=('calibri', '12'), bg='#ffffff')    
 
     ####
     a.set_title ("Title", fontsize=12)
     a.set_ylabel("Pixel value", fontsize=12)
     a.set_xlabel("Dose", fontsize=12)
-
-    canvas = FigureCanvasTkAgg(fig, master=Globals.tab2)
-    canvas.get_tk_widget().place(relwidth=0.4, relheight=0.45, relx = 0, rely=0.52)
+    fig.tight_layout()
+    
+    
     canvas.draw()
 
     return
@@ -247,7 +253,7 @@ def fitted_dose_response(D, a, b, c):
 
 ## Function to find mean of uploaded images with same dose.
 def avgAllFiles(write_dose_box, new_window):
-    #First block is to test that everythin is filled in and as expected.
+    #First block is to test that everything is filled in and as expected.
     dose_input = write_dose_box.get("1.0",'end-1c')
     if (dose_input == " "):
         messagebox.showerror("Error", "Input dose")
@@ -291,40 +297,62 @@ def avgAllFiles(write_dose_box, new_window):
     
     temp_dose = [item[0] for item in Globals.avg_red_vector]
 
-    result_red = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
-    result_red.place(relwidth=0.1, relheight=0.08, relx=0.3, rely=Globals.dose_response_results_coordY)
+
+    result_red = tk.Text(Globals.tab2_canvas_files, height=1, width=7)
     result_red.insert(INSERT, round(avg_red))
+    result_red.grid(row=Globals.dose_response_files_row_count, column=1, sticky=N+S+W+E, padx=(0,0))
+    Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
+    Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
+    #result_red.place(relwidth=0.1, relheight=0.08, relx=0.3, rely=Globals.dose_response_results_coordY)
     result_red.config(state=DISABLED, bd=0, font=('calibri', '12'))
     Globals.dose_response_red_list.append(result_red)
+    Globals.dose_response_files_weightcount+=1
 
-    result_green = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
-    result_green.place(relwidth=0.1, relheight=0.08, relx=0.5, rely=Globals.dose_response_results_coordY)
+    result_green = tk.Text(Globals.tab2_canvas_files, height=1, width=7)
     result_green.insert(INSERT, round(avg_green))
+    result_green.grid(row=Globals.dose_response_files_row_count, column=3, sticky=N+S+W+E, padx=(0,0))
+    Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
+    Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
+    #result_green.place(relwidth=0.1, relheight=0.08, relx=0.5, rely=Globals.dose_response_results_coordY)
     result_green.config(state=DISABLED, bd=0, font=('calibri', '12'))
     Globals.dose_response_green_list.append(result_green)
+    Globals.dose_response_files_weightcount+=1
 
-    result_blue = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
-    result_blue.place(relwidth=0.1, relheight=0.08, relx=0.75, rely=Globals.dose_response_results_coordY)
+    result_blue = tk.Text(Globals.tab2_canvas_files, height=1, width=7)
     result_blue.insert(INSERT, round(avg_blue))
+    result_blue.grid(row=Globals.dose_response_files_row_count, column=5, sticky=N+S+W+E, padx=(0,5))
+    Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
+    Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
+    #result_blue.place(relwidth=0.1, relheight=0.08, relx=0.75, rely=Globals.dose_response_results_coordY)
     result_blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
     Globals.dose_response_blue_list.append(result_blue)
+    Globals.dose_response_files_weightcount+=1
 
-    dose_print = tk.Text(Globals.dose_response_scroll_window_1, height=1, width=1)
-    dose_print.place(relwidth=0.15, relheight=0.08, relx = 0.05, rely=Globals.dose_response_results_coordY)
+    dose_print = tk.Text(Globals.tab2_canvas_files, height=1, width=10)
     dose_print.insert(INSERT, dose_input)
+    dose_print.grid(row=Globals.dose_response_files_row_count, column=0, sticky=N+S+W+E, padx=(0,15))
+    Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
+    Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
+    #dose_print.place(relwidth=0.15, relheight=0.08, relx = 0.05, rely=Globals.dose_response_results_coordY)
     dose_print.config(state=DISABLED, bd=0, font=('calibri', '12'))
     Globals.dose_response_dose_list.append(dose_print)
+    Globals.dose_response_files_weightcount+=1
 
     path = os.path.dirname(sys.argv[0])
     path = path + "\delete.png"
     img = ImageTk.PhotoImage(file=path)
 
-    delete_button = tk.Button(Globals.dose_response_scroll_window_1, text='Remove', image=img, cursor='hand2',font=('calibri', '18'),highlightthickness= 0,\
-        relief=FLAT, state=ACTIVE, width = 15, command=lambda: delete_line(delete_button)) 
+    delete_button = tk.Button(Globals.tab2_canvas_files, text='Remove', image=img, cursor='hand2',font=('calibri', '18'),\
+        highlightthickness= 0, relief=FLAT, state=ACTIVE, width = 15, command=lambda: delete_line(delete_button)) 
     delete_button.image = img
     Globals.dose_response_delete_buttons.append(delete_button)
-    delete_button.place(relwidth=0.06, relheight=0.06, relx=0.9, rely=Globals.dose_response_results_coordY)
-    Globals.dose_response_results_coordY += 0.1
+    delete_button.grid(row=Globals.dose_response_files_row_count, column=7, sticky=N+S+W+E, padx=(5,5))
+    Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
+    Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
+    #delete_button.place(relwidth=0.06, relheight=0.06, relx=0.9, rely=Globals.dose_response_results_coordY)
+    #Globals.dose_response_results_coordY += 0.1
+    Globals.dose_response_files_row_count+=1
+    Globals.dose_response_files_weightcount+=1
 
     plot_dose_response()
     new_window.destroy()
