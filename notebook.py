@@ -112,6 +112,9 @@ CoMet_correct_button_image= ImageTk.PhotoImage(file=CoMet_correct_button_file)
 CoMet_clear_all_button_file = "icon_clear_all.png"
 CoMet_clear_all_button_image = ImageTk.PhotoImage(file=CoMet_clear_all_button_file)
 
+dose_response_clear_all_button_file = "icon_clear_all_small.png"
+dose_response_clear_all_button_image = ImageTk.PhotoImage(file=dose_response_clear_all_button_file)
+
 CoMet_empty_image_file = "empty_corrected_image.png"
 CoMet_empty_image_image = ImageTk.PhotoImage(file=CoMet_empty_image_file)
 
@@ -649,7 +652,7 @@ Globals.tab2_canvas_files.grid_rowconfigure(4, weight=0)
 dose_title.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
 dose_response_save_calibration_button_frame = tk.Frame(Globals.tab2_canvas)
-dose_response_save_calibration_button_frame.grid(row=2, column = 1, sticky=N+S+E+W, padx=(35,0), pady=(60,0))
+dose_response_save_calibration_button_frame.grid(row=3, column = 2, sticky=N+S+E+W, padx=(0,0), pady=(0,0))
 Globals.tab2_canvas.grid_columnconfigure(10, weight=0)
 Globals.tab2_canvas.grid_rowconfigure(10, weight=0)
 dose_response_save_calibration_button_frame.config(bg = '#ffffff', height=1, width=100)
@@ -660,6 +663,19 @@ Globals.dose_response_save_calibration_button = tk.Button(dose_response_save_cal
 Globals.dose_response_save_calibration_button.pack(expand=True, fill=BOTH, side=TOP)
 Globals.dose_response_save_calibration_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 Globals.dose_response_save_calibration_button.image = dose_response_calibration_button_image
+
+dose_response_clear_all_button_frame = tk.Frame(Globals.tab2_canvas)
+dose_response_clear_all_button_frame.grid(row=3, column=1, sticky=N+S+E+W, padx=(0,0), pady=(0,0))
+Globals.tab2_canvas.grid_columnconfigure(11, weight=0)
+Globals.tab2_canvas.grid_rowconfigure(11, weight=0)
+dose_response_clear_all_button_frame.config(bg='#ffffff', height=1, width=100)
+dose_response_clear_all_button_frame.grid_propagate(0)
+
+dose_response_clear_all_button = tk.Button(dose_response_clear_all_button_frame, text='Clear all', image=dose_response_clear_all_button_image, \
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=ACTIVE, command=Dose_response_functions.nothingButton)
+dose_response_clear_all_button.pack(expand=True, fill=BOTH, side=TOP)
+dose_response_clear_all_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+dose_response_clear_all_button.image = dose_response_clear_all_button_image
 
 delete_text = tk.Text(Globals.tab2_canvas_files, height=1, widt=7)
 delete_text.insert(INSERT, "Delete")
