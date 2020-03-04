@@ -139,41 +139,34 @@ global CoMet_uploaded_file_text
 
 
 ########################################   Dose response related   ###################################################
-tab2_scroll_frame = tk.Frame(tab2_canvas)
-tab2_scroll_frame.grid(row=2, column=4, columnspan=1, rowspan=3, sticky=N)
-tab2_canvas.grid_columnconfigure(1, weight=0)
-tab2_canvas.grid_rowconfigure(1, weight=0)
-tab2_scroll_frame.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0, height=200, width=450)
-tab2_scroll_frame.grid_propagate(0)
+tab2_files_frame = tk.Frame(tab2_canvas)
+tab2_files_frame.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0)#, height=200, width=450)
+#tab2_files_frame.grid_propagate(0)
 
-tab2_scroll = tk.Scrollbar(tab2_scroll_frame)
-tab2_scroll.pack(side=RIGHT, fill=Y) #grid(row=0, column=1, sticky=N+S+E+W)
-
-#tab2_scroll_canvas = ttk.Frame(over_all_canvas)
-#croll_frame.bind("<Configure>", lambda e: over_all_canvas.configure(scrollregion=over_all_canvas.bbox('all')))
-
-#global tab2_canvas_files
-#tab2_canvas_files = tk.Canvas(tab2_scroll_frame, yscrollcommand=tab2_scroll.set)
-#tab2_canvas_files.grid(row=0, column=0, sticky=N+S+E+W)
-#tab2_canvas_files.grid(row=2, column=4, columnspan=1, rowspan=3, sticky=N)
-#tab2_canvas.grid_columnconfigure(1, weight=0)
-#tab2_canvas.grid_rowconfigure(1, weight=0)
-#tab2_canvas_files.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0)
-#tab2_canvas_files.grid_propagate(0)
-
-
-tab2_scroll_canvas = tk.Canvas(tab2_scroll_frame, yscrollcommand=tab2_scroll.set)
-tab2_scroll_canvas.pack(expand=True, fill = BOTH, side=LEFT)#grid(row=0, column=0, sticky=N+S+E+W)
-tab2_scroll_canvas.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0, height=400, width=450)
+tab2_scroll_canvas = tk.Canvas(tab2_files_frame)
+tab2_scroll_canvas.config(height=200, width=400)
 tab2_scroll_canvas.grid_propagate(0)
-tab2_scroll.config(command=tab2_scroll_canvas.yview)
 
-tab2_scroll_canvas.bind("<Configure>", lambda e: tab2_scroll_frame.configure(scrollregion=tab2_scroll_frame.bbox('all')))
+scroll = ttk.Scrollbar(tab2_files_frame, command=tab2_scroll_canvas.yview)
+
+scrollable_frame= tk.Frame(tab2_scroll_canvas)
+
+scrollable_frame.bind("<Configure>", lambda e: tab2_scroll_canvas.configure(scrollregion=tab2_scroll_canvas.bbox('all')))
+tab2_scroll_canvas.create_window((0,0), window=scrollable_frame, anchor='nw')
+tab2_scroll_canvas.configure(yscrollcommand=scroll.set)
+
 
 global tab2_canvas_files
-tab2_canvas_files = tk.Canvas(tab2_scroll_canvas)
+tab2_canvas_files = tk.Canvas(scrollable_frame)
 tab2_canvas_files.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0)
-tab2_canvas_files.pack(expand=True, fill=BOTH)
+tab2_canvas_files.pack(fill =BOTH, expand=True)
+
+tab2_files_frame.grid(row=2, column=4, columnspan=1, rowspan=3, sticky=N)
+tab2_canvas.grid_columnconfigure(1, weight=0)
+tab2_canvas.grid_rowconfigure(1, weight=0)
+tab2_scroll_canvas.pack(side=LEFT, fill=BOTH, expand=True)
+scroll.pack(side=RIGHT, fill=Y)
+
 
 global dose_response_save_calibration_button
 
