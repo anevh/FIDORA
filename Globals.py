@@ -2,6 +2,12 @@ import tkinter as tk
 from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, \
     HORIZONTAL, E, W, N, S, BOTH, Frame, Canvas, LEFT, FLAT, INSERT, DISABLED, ALL, X, BOTTOM
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+global upload_button_image
+global dose_response_dose_border
 
 global form 
 form = tk.Tk()
@@ -140,11 +146,11 @@ global CoMet_uploaded_file_text
 
 ########################################   Dose response related   ###################################################
 tab2_files_frame = tk.Frame(tab2_canvas)
-tab2_files_frame.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0)#, height=200, width=450)
+tab2_files_frame.config(relief=FLAT, bg='#ffffff', highlightthickness=0)#, height=200, width=450)
 #tab2_files_frame.grid_propagate(0)
 
 tab2_scroll_canvas = tk.Canvas(tab2_files_frame)
-tab2_scroll_canvas.config(height=200, width=400)
+tab2_scroll_canvas.config(bg='#ffffff', height=200, width=400,highlightthickness=0)
 tab2_scroll_canvas.grid_propagate(0)
 
 scroll = ttk.Scrollbar(tab2_files_frame, command=tab2_scroll_canvas.yview)
@@ -158,7 +164,7 @@ tab2_scroll_canvas.configure(yscrollcommand=scroll.set)
 
 global tab2_canvas_files
 tab2_canvas_files = tk.Canvas(scrollable_frame)
-tab2_canvas_files.config(relief=FLAT, bg='#E5f9ff', highlightthickness=0)
+tab2_canvas_files.config(relief=FLAT, bg='#ffffff', highlightthickness=0, bd=0)
 tab2_canvas_files.pack(fill =BOTH, expand=True)
 
 tab2_files_frame.grid(row=2, column=4, columnspan=1, rowspan=3, sticky=N)
@@ -171,12 +177,9 @@ scroll.pack(side=RIGHT, fill=Y)
 global dose_response_save_calibration_button
 
 global doseResponse_dpi
-doseResponse_dpi=StringVar(tab2)
+doseResponse_dpi=StringVar()
 doseResponse_dpi.set("127")
 
-global doseResponse_uploaded_filename 
-doseResponse_uploaded_filename=StringVar(tab2)
-doseResponse_uploaded_filename.set("Error!")
 
 global dose_response_var1 
 dose_response_var1= IntVar()
@@ -190,17 +193,14 @@ global dose_response_var3
 dose_response_var3 = IntVar()
 dose_response_var3.set(1)
 
-global dose_response_var4
-dose_response_var4 = IntVar()
-
-global dose_response_var5
-dose_response_var5 = IntVar()
-
 global dose_response_uploaded_filenames
 dose_response_uploaded_filenames = np.array([])
 
-global dose_response_new_window_countY
-dose_response_new_window_countY = 0.2
+global dose_response_new_window_row_count
+dose_response_new_window_row_count = 4
+
+global dose_response_new_window_weight_count
+dose_response_new_window_weight_count = 4
 
 global avg_red_vector
 avg_red_vector = []
@@ -211,8 +211,6 @@ avg_green_vector = []
 global avg_blue_vector
 avg_blue_vector = []
 
-#global dose_response_results_coordY
-#dose_response_results_coordY = 0.35
 
 global dose_response_files_row_count
 dose_response_files_row_count = 2
@@ -225,6 +223,7 @@ dose_response_inOrOut = True
 
 global dose_response_delete_buttons
 dose_response_delete_buttons = []
+
 
 global dose_response_red_list
 dose_response_red_list = []
@@ -252,13 +251,25 @@ tab2_canvas.grid_rowconfigure(8, weight=0)
 dose_response_equation_frame.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, width=400, height=200)
 dose_response_equation_frame.grid_propagate(0)
 
+
 global dose_response_plot_frame
 dose_response_plot_frame = tk.Frame(tab2_canvas)
-dose_response_plot_frame.grid(row=1, column=0, rowspan=2, columnspan=4, sticky=N+S+E+W, pady=(5,5), padx=(5,5))
+dose_response_plot_frame.grid(row=1, column=0, rowspan=2, columnspan=4, sticky=N+S+E+W, pady=(0,5), padx=(5,5))
 tab2_canvas.grid_columnconfigure(9, weight=0)
 tab2_canvas.grid_rowconfigure(9, weight=0)
-dose_response_plot_frame.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, height=350,width=500)
+dose_response_plot_frame.config(bg='#ffffff', relief=FLAT, highlightthickness=0, height=350,width=500)
 dose_response_plot_frame.grid_propagate(0)
+
+fig = Figure(figsize=(5,3))
+a = fig.add_subplot(111, ylim=(0,40000), xlim=(0,500))
+plot_canvas = FigureCanvasTkAgg(fig, master=dose_response_plot_frame)
+plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+S+E+W, padx=(5,0), pady=(0,0))
+a.set_title ("Dose-response", fontsize=12)
+a.set_ylabel("Pixel value", fontsize=12)
+a.set_xlabel("Dose", fontsize=12)
+fig.tight_layout()
+
+
 ########################################   Map dose related   ###################################################
 
 

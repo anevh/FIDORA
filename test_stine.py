@@ -1,15 +1,7 @@
-from tkinter import *
-
-master = Tk()
-
-scrollbar = Scrollbar(master)
-scrollbar.pack(side=RIGHT, fill=Y)
-
-listbox = Listbox(master, yscrollcommand=scrollbar.set)
-for i in range(1000):
-    listbox.insert(END, str(i))
-listbox.pack(side=LEFT, fill=BOTH)
-
-scrollbar.config(command=listbox.yview)
-
-mainloop()
+A = [1,2,3,4,1,4,5]
+print(A)
+print(A[2])
+del(A[2])
+print(A)
+print(A[2])
+import numpy as np
