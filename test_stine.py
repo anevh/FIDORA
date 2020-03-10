@@ -1,7 +1,16 @@
-A = [1,2,3,4,1,4,5]
+A = []
+
+A.append([1,2,3])
+
 print(A)
-print(A[2])
-del(A[2])
+
+A.append([10])
+
 print(A)
-print(A[2])
-import numpy as np
+
+B = [8,9,11]
+
+for i in range(len(B)):
+    A[1].append(B[i])
+
+print(A)

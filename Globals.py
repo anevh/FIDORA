@@ -269,7 +269,14 @@ a.set_ylabel("Pixel value", fontsize=12)
 a.set_xlabel("Dose", fontsize=12)
 fig.tight_layout()
 
+global dose_response_sd_list_red
+dose_response_sd_list_red = []
 
+global dose_response_sd_list_green
+dose_response_sd_list_green = []
+
+global dose_response_sd_list_blue
+dose_response_sd_list_blue = []
 ########################################   Map dose related   ###################################################
 
 

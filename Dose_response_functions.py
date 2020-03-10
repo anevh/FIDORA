@@ -2,7 +2,7 @@ import Globals
 import tkinter as tk
 from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, \
     PhotoImage, BOTH, Toplevel, GROOVE, ACTIVE, FLAT, N, S, W, E, ALL, ttk, LEFT, RIGHT, Y,\
-    Label, X
+    Label, X, END
 import cv2
 import numpy as np
 import os
@@ -97,13 +97,11 @@ def UploadAction(new_window, event=None):
         return 
     else:
         messagebox.showerror("Error", "The file must be a .tif file")
-    #print(Globals.dose_response_uploaded_filenames)
 
 def readImage(filename):
     image = cv2.imread(filename, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
     if(image is None):
         current_folder = os.getcwd()
-        #script_path = Globals.CoMet_uploaded_filename.get()
         parent = os.path.dirname(filename)
         os.chdir(parent)
         image=cv2.imread(basename(normpath(filename)), cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
@@ -152,26 +150,28 @@ def readImage(filename):
 
 
 def plot_dose_response():
-
+    sd_red_arr=[];sd_green_arr=[];sd_blue_arr=[]
     temp_dose = [item[0] for item in Globals.avg_red_vector]
     temp_avg_red = [item[1] for item in Globals.avg_red_vector]
     temp_avg_green = [item[1] for item in Globals.avg_green_vector]
     temp_avg_blue = [item[1] for item in Globals.avg_blue_vector]
     
+    for i in range(len(temp_dose)):
+        sd_red_arr.append(np.std(Globals.dose_response_sd_list_red[i]))
+        sd_green_arr.append(np.std(Globals.dose_response_sd_list_green[i]))
+        sd_blue_arr.append(np.std(Globals.dose_response_sd_list_blue[i]))
+
     fig = Figure(figsize=(5,3))
     a = fig.add_subplot(111)
     canvas = FigureCanvasTkAgg(fig, master=Globals.dose_response_plot_frame)
     canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+S+E+W, padx=(5,0), pady=(0,0))
     if(Globals.dose_response_var1.get()):
-        a.plot(temp_dose,temp_avg_red, 'ro')
+        a.errorbar(temp_dose,temp_avg_red,yerr=sd_red_arr, fmt='ro')
     if(Globals.dose_response_var2.get()):
-        a.plot(temp_dose, temp_avg_green, 'g^')
+        a.errorbar(temp_dose, temp_avg_green, yerr=sd_green_arr, fmt='g^')
     if(Globals.dose_response_var3.get()):
-        a.plot(temp_dose, temp_avg_blue, 'bs')
-    #a.plot(xdata, ydata, color='red')
-    #a.plot(p, range(2 +max(x)),color='blue')
+        a.errorbar(temp_dose, temp_avg_blue, yerr=sd_blue_arr, fmt='bs')
     
-    #a.invert_yaxis()
     if(len(temp_avg_red) > 3):
         Globals.dose_response_save_calibration_button.config(state=ACTIVE)
         sorted_temp_red = sorted(Globals.avg_red_vector,key=lambda l:l[0])
@@ -187,13 +187,12 @@ def plot_dose_response():
         try:
             Globals.popt_red, pcov_red = curve_fit(fitted_dose_response, sorted_temp_dose, sorted_temp_avg_red, p0=[1700, 15172069, -390], maxfev=10000)
             popt_green, pcov_green = curve_fit(fitted_dose_response, sorted_temp_dose, sorted_temp_avg_green, p0=[1700, 15172069, -390], maxfev=10000)
-            #popt_blue, pcov_blue = curve_fit(fitted_dose_response, sorted_temp_dose, sorted_temp_avg_blue, p0=[1700, 15172069, -390], maxfev=10000)
+            
             xdata = np.linspace(0,500,1001)
-            ydata_red = np.zeros(len(xdata));ydata_green=np.zeros(len(xdata))#;ydata_blue=np.zeros(len(xdata))
+            ydata_red = np.zeros(len(xdata));ydata_green=np.zeros(len(xdata))
             for i in range(len(xdata)):
                 ydata_red[i] = fitted_dose_response(xdata[i], Globals.popt_red[0], Globals.popt_red[1], Globals.popt_red[2])
                 ydata_green[i] = fitted_dose_response(xdata[i], popt_green[0], popt_green[1], popt_green[2])
-                #ydata_blue[i] = fitted_dose_response(xdata[i], popt_blue[0], popt_blue[1], popt_blue[2])
             if(Globals.dose_response_var1.get()):
                 a.plot(xdata, ydata_red, color='red')
             if(Globals.dose_response_var2.get()):
@@ -243,11 +242,17 @@ def delete_line(delete_button):
         del(Globals.avg_green_vector[button_index])
         del(Globals.avg_blue_vector[button_index])
         del(Globals.dose_response_delete_buttons[button_index])
+        del(Globals.dose_response_sd_list_red[button_index])
+        del(Globals.dose_response_sd_list_green[button_index])
+        del(Globals.dose_response_sd_list_blue[button_index])
     else:
         Globals.avg_red_vector = []
         Globals.avg_green_vector = []
         Globals.avg_blue_vector = []
         Globals.dose_response_delete_buttons = []
+        Globals.dose_response_sd_list_red = []
+        Globals.dose_response_sd_list_green = []
+        Globals.dose_response_sd_list_blue = []
     
     Globals.dose_response_files_row_count = 2
     for i in range(len(Globals.dose_response_delete_buttons)):
@@ -284,6 +289,7 @@ def avgAllFiles(write_dose_box, new_window):
 
     #Calculates the mean in each color channel
     avg_red=0;avg_green=0;avg_blue=0
+    red_temp_sd_list = []; green_temp_sd_list = []; blue_temp_sd_list = []
     for i in range(0, len(Globals.dose_response_uploaded_filenames)):
         if(readImage(Globals.dose_response_uploaded_filenames[i])==False):
             messagebox.showerror("Error", "A mistake has happend in readImage()")
@@ -293,83 +299,108 @@ def avgAllFiles(write_dose_box, new_window):
         avg_green+=green
         avg_blue+=blue
 
+        red_temp_sd_list.append(red)
+        green_temp_sd_list.append(green)
+        blue_temp_sd_list.append(blue)
+
+
     avg_red = avg_red/len(Globals.dose_response_uploaded_filenames)
     avg_green = avg_green/len(Globals.dose_response_uploaded_filenames)
     avg_blue = avg_blue/len(Globals.dose_response_uploaded_filenames)
-
     temp_dose = [item[0] for item in Globals.avg_red_vector]
+    isTest = False
     try:
         indx = temp_dose.index(dose_input)
         Globals.avg_red_vector[indx][1] = (avg_red + Globals.avg_red_vector[indx][1])/2
         Globals.avg_green_vector[indx][1] = (avg_green + Globals.avg_green_vector[indx][1])/2
         Globals.avg_blue_vector[indx][1] = (avg_blue + Globals.avg_blue_vector[indx][1])/2
-       
+
+        for i in range(0, len(red_temp_sd_list)):
+            Globals.dose_response_sd_list_red[indx].append(red_temp_sd_list[i])
+            Globals.dose_response_sd_list_green[indx].append(green_temp_sd_list[i])
+            Globals.dose_response_sd_list_blue[indx].append(blue_temp_sd_list[i])
+
     except:
         Globals.avg_red_vector.append([dose_input, avg_red])
         Globals.avg_green_vector.append([dose_input, avg_green])
         Globals.avg_blue_vector.append([dose_input, avg_blue])
 
-    
+        Globals.dose_response_sd_list_red.append(red_temp_sd_list)
+        Globals.dose_response_sd_list_green.append(green_temp_sd_list)
+        Globals.dose_response_sd_list_blue.append(blue_temp_sd_list)
+
+        isTest = True
+
     temp_dose = [item[0] for item in Globals.avg_red_vector]
 
+    if(isTest):
+        result_red = tk.Text(Globals.tab2_canvas_files, height=1, width=7)
+        result_red.insert(INSERT, round(avg_red))
+        result_red.grid(row=Globals.dose_response_files_row_count, column=1, sticky=N+S+W+E, padx=(0,0))
+        Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
+        Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
+        result_red.config(state=DISABLED, bd=0, font=('calibri', '12'))
+        Globals.dose_response_red_list.append(result_red)
+        Globals.dose_response_files_weightcount+=1
 
-    result_red = tk.Text(Globals.tab2_canvas_files, height=1, width=7)
-    result_red.insert(INSERT, round(avg_red))
-    result_red.grid(row=Globals.dose_response_files_row_count, column=1, sticky=N+S+W+E, padx=(0,0))
-    Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
-    Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
-    #result_red.place(relwidth=0.1, relheight=0.08, relx=0.3, rely=Globals.dose_response_results_coordY)
-    result_red.config(state=DISABLED, bd=0, font=('calibri', '12'))
-    Globals.dose_response_red_list.append(result_red)
-    Globals.dose_response_files_weightcount+=1
+        result_green = tk.Text(Globals.tab2_canvas_files, height=1, width=7)
+        result_green.insert(INSERT, round(avg_green))
+        result_green.grid(row=Globals.dose_response_files_row_count, column=3, sticky=N+S+W+E, padx=(0,0))
+        Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
+        Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
+        result_green.config(state=DISABLED, bd=0, font=('calibri', '12'))
+        Globals.dose_response_green_list.append(result_green)
+        Globals.dose_response_files_weightcount+=1
 
-    result_green = tk.Text(Globals.tab2_canvas_files, height=1, width=7)
-    result_green.insert(INSERT, round(avg_green))
-    result_green.grid(row=Globals.dose_response_files_row_count, column=3, sticky=N+S+W+E, padx=(0,0))
-    Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
-    Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
-    #result_green.place(relwidth=0.1, relheight=0.08, relx=0.5, rely=Globals.dose_response_results_coordY)
-    result_green.config(state=DISABLED, bd=0, font=('calibri', '12'))
-    Globals.dose_response_green_list.append(result_green)
-    Globals.dose_response_files_weightcount+=1
+        result_blue = tk.Text(Globals.tab2_canvas_files, height=1, width=7)
+        result_blue.insert(INSERT, round(avg_blue))
+        result_blue.grid(row=Globals.dose_response_files_row_count, column=5, sticky=N+S+W+E, padx=(0,5))
+        Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
+        Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
+        result_blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
+        Globals.dose_response_blue_list.append(result_blue)
+        Globals.dose_response_files_weightcount+=1
 
-    result_blue = tk.Text(Globals.tab2_canvas_files, height=1, width=7)
-    result_blue.insert(INSERT, round(avg_blue))
-    result_blue.grid(row=Globals.dose_response_files_row_count, column=5, sticky=N+S+W+E, padx=(0,5))
-    Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
-    Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
-    #result_blue.place(relwidth=0.1, relheight=0.08, relx=0.75, rely=Globals.dose_response_results_coordY)
-    result_blue.config(state=DISABLED, bd=0, font=('calibri', '12'))
-    Globals.dose_response_blue_list.append(result_blue)
-    Globals.dose_response_files_weightcount+=1
+        dose_print = tk.Text(Globals.tab2_canvas_files, height=1, width=10)
+        dose_print.insert(INSERT, dose_input)
+        dose_print.grid(row=Globals.dose_response_files_row_count, column=0, sticky=N+S+W+E, padx=(0,15))
+        Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
+        Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
+        dose_print.config(state=DISABLED, bd=0, font=('calibri', '12'))
+        Globals.dose_response_dose_list.append(dose_print)
+        Globals.dose_response_files_weightcount+=1
 
-    dose_print = tk.Text(Globals.tab2_canvas_files, height=1, width=10)
-    dose_print.insert(INSERT, dose_input)
-    dose_print.grid(row=Globals.dose_response_files_row_count, column=0, sticky=N+S+W+E, padx=(0,15))
-    Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
-    Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
-    #dose_print.place(relwidth=0.15, relheight=0.08, relx = 0.05, rely=Globals.dose_response_results_coordY)
-    dose_print.config(state=DISABLED, bd=0, font=('calibri', '12'))
-    Globals.dose_response_dose_list.append(dose_print)
-    Globals.dose_response_files_weightcount+=1
+        path = os.path.dirname(sys.argv[0])
+        path = path + "\delete.png"
+        img = ImageTk.PhotoImage(file=path)
 
-    path = os.path.dirname(sys.argv[0])
-    path = path + "\delete.png"
-    img = ImageTk.PhotoImage(file=path)
+        delete_button = tk.Button(Globals.tab2_canvas_files, text='Remove', image=img, cursor='hand2',font=('calibri', '18'),\
+            highlightthickness= 0, relief=FLAT, state=ACTIVE, width = 15)
+        delete_button.image = img
+        Globals.dose_response_delete_buttons.append(delete_button)
+        delete_button.config(command=lambda: delete_line(delete_button))
+        delete_button.grid(row=Globals.dose_response_files_row_count, column=7, sticky=N+S+W+E, padx=(5,5))
+        Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
+        Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
+        delete_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+        Globals.dose_response_files_row_count+=1
+        Globals.dose_response_files_weightcount+=1
 
-    delete_button = tk.Button(Globals.tab2_canvas_files, text='Remove', image=img, cursor='hand2',font=('calibri', '18'),\
-        highlightthickness= 0, relief=FLAT, state=ACTIVE, width = 15)
-    delete_button.image = img
-    Globals.dose_response_delete_buttons.append(delete_button)
-    delete_button.config(command=lambda: delete_line(delete_button))
-    delete_button.grid(row=Globals.dose_response_files_row_count, column=7, sticky=N+S+W+E, padx=(5,5))
-    Globals.tab2_canvas_files.grid_columnconfigure(Globals.dose_response_files_weightcount, weight=0)
-    Globals.tab2_canvas_files.grid_rowconfigure(Globals.dose_response_files_weightcount, weight=0)
-    delete_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-    Globals.dose_response_files_row_count+=1
-    Globals.dose_response_files_weightcount+=1
+    else:
+        Globals.dose_response_red_list[indx].config(state=NORMAL)
+        Globals.dose_response_red_list[indx].delete('1.0', END)
+        Globals.dose_response_red_list[indx].insert(INSERT, round(Globals.avg_red_vector[indx][1]))
+        Globals.dose_response_red_list[indx].config(state=DISABLED)
 
-   
+        Globals.dose_response_green_list[indx].config(state=NORMAL)
+        Globals.dose_response_green_list[indx].delete('1.0', END)
+        Globals.dose_response_green_list[indx].insert(INSERT, round(Globals.avg_green_vector[indx][1]))
+        Globals.dose_response_green_list[indx].config(state=DISABLED)
+
+        Globals.dose_response_blue_list[indx].config(state=NORMAL)
+        Globals.dose_response_blue_list[indx].delete('1.0', END)
+        Globals.dose_response_blue_list[indx].insert(INSERT, round(Globals.avg_blue_vector[indx][1]))
+        Globals.dose_response_blue_list[indx].config(state=DISABLED)
 
     plot_dose_response()
     new_window.destroy()
@@ -472,6 +503,10 @@ def clear_all():
     Globals.dose_response_green_list = []
     Globals.dose_response_blue_list = []
     Globals.dose_response_delete_buttons = []
+    
+    Globals.dose_response_sd_list_red = []
+    Globals.dose_response_sd_list_green = []
+    Globals.dose_response_sd_list_blue = []
 
     Globals.dose_response_var1.set(1)
     Globals.dose_response_var2.set(1)
