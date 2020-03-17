@@ -9,6 +9,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 global upload_button_image
 global dose_response_dose_border
+global save_button
 
 global form 
 form = tk.Tk()

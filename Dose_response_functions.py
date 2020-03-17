@@ -27,17 +27,24 @@ def nothingButton():
 
 def saveCalibration():
     ask_batch_window = tk.Toplevel(Globals.tab2)
-    ask_batch_window.geometry("800x400")
+    ask_batch_window.geometry("400x180")
     ask_batch_window.grab_set()
+    ask_batch_window_canvas = tk.Canvas(ask_batch_window)
+    ask_batch_window_canvas.config(bg='#ffffff', bd=0, highlightthickness=0)
+    ask_batch_window_canvas.pack(expand=True, fill=BOTH)
 
-    batch_info = tk.Text(ask_batch_window, width=1, height=1)
-    batch_info.place(relwidth = 0.8, relheight = 0.5, relx = 0.1, rely =0.1)
-    batch_info.insert(INSERT, 'Write the batch number of current GafChromic film:\n\
+    batch_info = tk.Text(ask_batch_window_canvas, width=50, height=3)
+    batch_info.grid(row=0, column=0, columnspan=2, sticky=N+S+E+W, padx=(10,10), pady=(30,10))
+    ask_batch_window_canvas.grid_columnconfigure(0, weight=0)
+    ask_batch_window_canvas.grid_rowconfigure(0, weight=0)
+    batch_info.insert(INSERT, 'Write the LOT number of current GafChromic film:\n\
         (Defaults to -)')
-    batch_info.config(state=DISABLED, bd = 0, font=('calibri', '13'))
+    batch_info.config(state=DISABLED, bd = 0, font=('calibri', '12'))
 
-    batch = tk.Text(ask_batch_window, width=1, height=1)
-    batch.place(relwidth = 0.4, relheight = 0.07, relx = 0.2, rely = 0.6)
+    batch = tk.Text(ask_batch_window_canvas, width=20, height=1)
+    batch.grid(row=1, column=0, sticky=N+S+W+E, padx=(5,5), pady=(10,10))
+    ask_batch_window_canvas.grid_columnconfigure(1, weight=0)
+    ask_batch_window_canvas.grid_rowconfigure(1, weight=0)
     batch.insert(INSERT, " ")
     batch.config(state=NORMAL, bd = 3, font=('calibri', '12'))
 
@@ -48,7 +55,7 @@ def saveCalibration():
             save_batch_button.config(state=DISABLED)
             ask_batch_window.destroy()
         elif(re.match("^[A-Za-z0-9_]*$", (Globals.dose_response_batch_number).lstrip())==None):
-            messagebox.showerror("Error","Batch number can only contain letters and/or numbers")
+            messagebox.showerror("Error","LOT number can only contain letters and/or numbers")
             ask_batch_window.destroy()
             saveCalibration()
             return
@@ -72,12 +79,18 @@ def saveCalibration():
                 f.write(new_lines[i])
             f.close()
 
-    save_batch_button = tk.Button(ask_batch_window, text='Save', cursor='hand2',font=('calibri', '13'),\
-        highlightthickness= 7,overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=save_batch)
-    save_batch_button.place(relwidth=0.2, relheight=0.1, relx=0.5, rely=0.55)
+        messagebox.showinfo("Info", "The calibration has been saved")
 
-    
-    Globals.dose_response_save_calibration_button.config(state=DISABLED)
+    save_button_frame = tk.Frame(ask_batch_window_canvas)
+    save_button_frame.grid(row=1, column = 1, padx=(5,5), pady=(10,10))
+    ask_batch_window_canvas.grid_columnconfigure(2, weight=0)
+    ask_batch_window_canvas.grid_rowconfigure(2, weight=0)
+    save_button_frame.config(bg = '#ffffff')
+
+    save_batch_button = tk.Button(save_button_frame, text='Save', image=Globals.save_button, cursor='hand2',font=('calibri', '14'),\
+        relief=FLAT, state=ACTIVE, command=save_batch)
+    save_batch_button.pack(fill=BOTH, expand=True)
+    save_batch_button.image = Globals.save_button
 
 
 def UploadAction(new_window, event=None):
@@ -210,7 +223,6 @@ def plot_dose_response():
         a.errorbar(temp_dose, temp_avg_blue, yerr=sd_blue_arr, fmt='bs')
     
     if(len(temp_avg_red) > 3):
-        Globals.dose_response_save_calibration_button.config(state=ACTIVE)
         sorted_temp_red = sorted(Globals.avg_red_vector,key=lambda l:l[0])
         sorted_temp_avg_red = [item[1] for item in sorted_temp_red]
         sorted_temp_dose = [item[0] for item in sorted_temp_red]
@@ -243,7 +255,8 @@ def plot_dose_response():
             write_out_respons_function.grid(row=0, column=0, sticky=N+S+W+E, pady=(5,5), padx=(5,5))
             Globals.dose_response_equation_frame.grid_columnconfigure(0, weight=0)
             Globals.dose_response_equation_frame.grid_rowconfigure(0, weight=0)
-            write_out_respons_function.config(state=DISABLED, bd=0, font=('calibri', '12'), bg='#ffffff')    
+            write_out_respons_function.config(state=DISABLED, bd=0, font=('calibri', '12'), bg='#ffffff') 
+            Globals.dose_response_save_calibration_button.config(state=ACTIVE)   
         except OptimizeWarning:
             messagebox.showwarning("Warning", "It appears that you have optimization problems. \
 Try adding more data points to improve the optimization.\
@@ -300,6 +313,9 @@ def delete_line(delete_button):
         Globals.dose_response_delete_buttons[i].grid(row=Globals.dose_response_files_row_count, column=7, sticky=N+S+W+E, padx=(5,5))
         Globals.dose_response_files_row_count+=1
     
+    if(len(Globals.dose_response_delete_buttons) < 4):
+        Globals.dose_response_save_calibration_button.config(state=DISABLED)
+
     plot_dose_response()
 
 def fitted_dose_response(D, a, b, c):
