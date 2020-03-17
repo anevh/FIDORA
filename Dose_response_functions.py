@@ -11,12 +11,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-<<<<<<< HEAD
 matplotlib.rcParams['text.usetex'] = True #lagt til for å kunne skrive latex i string
 from scipy.optimize import curve_fit
-=======
 from scipy.optimize import curve_fit, OptimizeWarning
->>>>>>> 9306f7612c68e06a71c291da2a469b8cb1fb74f9
 from PIL import Image, ImageTk
 import sys
 from datetime import datetime
