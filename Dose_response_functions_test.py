@@ -205,7 +205,28 @@ def plot_dose_response():
         if(Globals.dose_response_var3.get()):
             a.plot(sorted_temp_dose, sorted_temp_avg_blue , color='blue')
 
-        out_text_function = "Pixel value = " + str(round(Globals.popt_red[0])) + " + " + str(round(Globals.popt_red[1])) + "/(dose - (" + str(round(Globals.popt_red[2])) + "))"
+       ##### testing latex ##########
+        def graph(text):
+            out_text_function= "Pixel value = " + str(round(Globals.popt_red[0])) + " + " + str(round(Globals.popt_red[1])) + "/(dose - (" + str(round(Globals.popt_red[2])) + "))"
+            tmptext = "$"+out_text_function+"$"
+            ax.clear()
+            ax.text(0.2, 0.6, tmptext, fontsize = 20)  
+            canvas.draw()
+
+
+        widget = Button(Globals.dose_response_equation_frame, text='Display dose reponse equation')
+        widget.pack()
+        widget.bind('<Button-1>', graph)
+        fig = matplotlib.figure.Figure(figsize=(5, 4), dpi=100)
+        ax = fig.add_subplot(111)
+        canvas = FigureCanvasTkAgg(fig, master=label)
+        canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+        canvas._tkcanvas.pack(side=TOP, fill=BOTH, expand=1)
+        ax.get_xaxis().set_visible(False) 
+        ax.get_yaxis().set_visible(False)
+
+       ######### test over ############
+        #out_text_function = "Pixel value = " + str(round(Globals.popt_red[0])) + " + " + str(round(Globals.popt_red[1])) + "/(dose - (" + str(round(Globals.popt_red[2])) + "))"
         write_out_respons_function = tk.Text(Globals.dose_response_equation_frame, height=2, width=20)
         write_out_respons_function.insert(INSERT, out_text_function )
         write_out_respons_function.grid(row=0, column=0, sticky=N+S+W+E, pady=(5,5), padx=(5,5))
