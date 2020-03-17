@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, \
-    HORIZONTAL, E, W, N, S, BOTH, Frame, Canvas, LEFT, FLAT, INSERT, DISABLED, ALL, X, BOTTOM
+    HORIZONTAL, E, W, N, S, BOTH, Frame, Canvas, LEFT, FLAT, INSERT, DISABLED, ALL, X, BOTTOM, \
+    DoubleVar
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -59,6 +60,10 @@ global tab1_canvas
 tab1_canvas = tk.Canvas(tab1)
 global tab2_canvas
 tab2_canvas = tk.Canvas(tab2)
+global tab3_canvas
+tab3_canvas = tk.Canvas(tab3)
+global tab4_canvas
+tab4_canvas = tk.Canvas(tab4)
 
 ########################################   CoMet related   ###################################################
 global CoMet_progressbar
@@ -277,6 +282,68 @@ dose_response_sd_list_green = []
 
 global dose_response_sd_list_blue
 dose_response_sd_list_blue = []
+
+global dose_response_sd_avg_red
+dose_response_sd_avg_red = DoubleVar()
+dose_response_sd_avg_red.set(0)
+
+global dose_response_sd_avg_green
+dose_response_sd_avg_green = DoubleVar()
+dose_response_sd_avg_green.set(0)
+
+global dose_response_sd_avg_blue
+dose_response_sd_avg_blue = DoubleVar()
+dose_response_sd_avg_blue.set(0)
+
+global dose_response_sd_min_red
+dose_response_sd_min_red = DoubleVar()
+dose_response_sd_min_red.set(0)
+
+global dose_response_sd_min_red_dose
+dose_response_sd_min_red_dose = StringVar()
+dose_response_sd_min_red_dose.set('-')
+
+global dose_response_sd_min_green
+dose_response_sd_min_green = DoubleVar()
+dose_response_sd_min_green.set(0)
+
+global dose_response_sd_min_green_dose
+dose_response_sd_min_green_dose = StringVar()
+dose_response_sd_min_green_dose.set('-')
+
+global dose_response_sd_min_blue
+dose_response_sd_min_blue = DoubleVar()
+dose_response_sd_min_blue.set(0)
+
+global dose_response_sd_min_blue_dose
+dose_response_sd_min_blue_dose = StringVar()
+dose_response_sd_min_blue_dose.set('-')
+
+global dose_response_sd_max_red
+dose_response_sd_max_red = DoubleVar()
+dose_response_sd_max_red.set(0)
+
+global dose_response_sd_max_red_dose
+dose_response_sd_max_red_dose = StringVar()
+dose_response_sd_max_red_dose.set('-')
+
+global dose_response_sd_max_green
+dose_response_sd_max_green = DoubleVar()
+dose_response_sd_max_green.set(0)
+
+global dose_response_sd_max_green_dose
+dose_response_sd_max_green_dose = StringVar()
+dose_response_sd_max_green_dose.set('-')
+
+global dose_response_sd_max_blue
+dose_response_sd_max_blue = DoubleVar()
+dose_response_sd_max_blue.set(0)
+
+global dose_response_sd_max_blue_dose
+dose_response_sd_max_blue_dose = StringVar()
+dose_response_sd_max_blue_dose.set('-')
+
+
 ########################################   Map dose related   ###################################################
 
 
@@ -318,8 +385,18 @@ global map_dose_ROI_y_end
 map_dose_ROI_y_end = IntVar()
 map_dose_ROI_y_end.set(0)
 
+############################### Profiles ######################################
 
-############################### Correction matrix ######################################3
+global profile_film_visual
+profile_film_visual = tk.Frame(tab4_canvas)
+profile_film_visual.grid(row=2, column=0, rowspan=3, columnspan=2, sticky=N+S+E+W, pady=(0,5), padx=(30,5))
+tab2_canvas.grid_columnconfigure(3, weight=0)
+tab2_canvas.grid_rowconfigure(3, weight=0)
+profile_film_visual.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, height=330,width=10)
+profile_film_visual.grid_propagate(0)
+
+
+############################### Correction matrix ######################################
 
 global correction127_red
 with open('output_red_127.txt', 'r') as f:

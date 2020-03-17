@@ -162,6 +162,43 @@ def plot_dose_response():
         sd_red_arr.append(np.std(Globals.dose_response_sd_list_red[i]))
         sd_green_arr.append(np.std(Globals.dose_response_sd_list_green[i]))
         sd_blue_arr.append(np.std(Globals.dose_response_sd_list_blue[i]))
+    
+    if(len(sd_red_arr) > 0):
+        Globals.dose_response_sd_avg_red.set(sum(sd_red_arr)/len(sd_red_arr))
+        Globals.dose_response_sd_avg_green.set(sum(sd_green_arr)/len(sd_green_arr))
+        Globals.dose_response_sd_avg_blue.set(sum(sd_blue_arr)/len(sd_blue_arr))
+
+        Globals.dose_response_sd_max_red.set(max(sd_red_arr))
+        Globals.dose_response_sd_max_red_dose.set(str(temp_dose[sd_red_arr.index(Globals.dose_response_sd_max_red.get())]))
+        Globals.dose_response_sd_max_green.set(max(sd_green_arr))
+        Globals.dose_response_sd_max_green_dose.set(str(temp_dose[sd_green_arr.index(Globals.dose_response_sd_max_green.get())]))
+        Globals.dose_response_sd_max_blue.set(max(sd_blue_arr))
+        Globals.dose_response_sd_max_blue_dose.set(str(temp_dose[sd_blue_arr.index(Globals.dose_response_sd_max_blue.get())]))
+
+        Globals.dose_response_sd_min_red.set(min(sd_red_arr))
+        Globals.dose_response_sd_min_red_dose.set(str(temp_dose[sd_red_arr.index(Globals.dose_response_sd_min_red.get())]))
+        Globals.dose_response_sd_min_green.set(min(sd_green_arr))
+        Globals.dose_response_sd_min_green_dose.set(str(temp_dose[sd_green_arr.index(Globals.dose_response_sd_min_green.get())]))
+        Globals.dose_response_sd_min_blue.set(min(sd_blue_arr))
+        Globals.dose_response_sd_min_blue_dose.set(str(temp_dose[sd_blue_arr.index(Globals.dose_response_sd_min_blue.get())]))
+
+    else:
+        Globals.dose_response_sd_avg_red.set(0)
+        Globals.dose_response_sd_avg_green.set(0)
+        Globals.dose_response_sd_avg_blue.set(0)
+        Globals.dose_response_sd_max_red.set(0)
+        Globals.dose_response_sd_max_red_dose.set('-')
+        Globals.dose_response_sd_max_green.set(0)
+        Globals.dose_response_sd_max_green_dose.set('-')
+        Globals.dose_response_sd_max_blue.set(0)
+        Globals.dose_response_sd_max_blue_dose.set('-')
+        Globals.dose_response_sd_min_red.set(0)
+        Globals.dose_response_sd_min_red_dose.set('-')
+        Globals.dose_response_sd_min_green.set(0)
+        Globals.dose_response_sd_min_green_dose.set('-')
+        Globals.dose_response_sd_min_blue.set(0)
+        Globals.dose_response_sd_min_blue_dose.set('-')
+
 
     fig = Figure(figsize=(5,3))
     a = fig.add_subplot(111)
