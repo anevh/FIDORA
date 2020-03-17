@@ -5,7 +5,7 @@ from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
 import Globals
 import re
 import CoMet_functions, intro_tab_functions, Map_Dose
-import Dose_response_functions
+import Dose_response_functions, Profile_functions
 from PIL import Image, ImageTk
 import os
 import sys
@@ -695,14 +695,56 @@ Globals.tab2_canvas.pack(expand=True, fill=BOTH)
 #path= "upload.png"
 #upload_button_image = ImageTk.PhotoImage(file=path)
 
+Globals.tab3_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness=0)
 
 
-upload_film_data = tk.Button(Globals.tab3, text='Upload',image=Globals.upload_button_image, cursor='hand2', font=('calibri', '12'), \
+upload_film_data = tk.Button(Globals.tab3_canvas, text='Upload',image=Globals.upload_button_image, cursor='hand2', font=('calibri', '12'), \
     relief=FLAT, state=ACTIVE, width=12, command=lambda: Map_Dose.UploadAction("FILM"))
 upload_film_data.place(relwidth=0.17, relheight=0.11, relx=0.3, rely=0.03)
 upload_film_data.image = Globals.upload_button_image
+
+
+Globals.tab3_canvas.pack(expand=True, fill=BOTH)
 ##################################### TAB 4 - Profiles ###########################################
 
+Globals.tab4_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness=0)
+
+profiles_explain_text = tk.Text(Globals.tab4_canvas, height=4, width=140)
+profiles_explain_text.insert(INSERT, "\
+ " )
+profiles_explain_text.grid(row=0, column=0, columnspan=5, sticky=N+S+E+W, pady=(20,20), padx=(20,10))
+Globals.tab4_canvas.grid_columnconfigure(0, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(0, weight=0)
+profiles_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
+
+
+profiles_upload_film_border = Label(Globals.tab4_canvas, image = CoMet_border_dark,width=50)
+profiles_upload_film_border.image=CoMet_border_dark
+profiles_upload_film_border.grid(row=1, column=0, columnspan=3, sticky = W+E, padx = (0,50), pady=(10,0))
+Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
+profiles_upload_film_border.config(bg='#ffffff', borderwidth=0)
+
+profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
+profiles_upload_film_frame.grid(row=1, column = 2, padx = (0, 0), pady=(10,0))
+Globals.tab4_canvas.grid_columnconfigure(2, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(2, weight=0)
+profiles_upload_film_frame.config(bg = '#ffffff')
+
+profiles_upload_button_film = tk.Button(profiles_upload_film_frame, text='Browse', image = Globals.upload_button_image, \
+    cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.UploadAction)
+profiles_upload_button_film.pack(expand=True, fill=BOTH)
+profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+profiles_upload_button_film.image = Globals.upload_button_image
+
+profiles_upload_film_text = tk.Text(profiles_upload_film_border, height=1, width=31)
+profiles_upload_film_text.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+profiles_upload_film_text.insert(INSERT, "Upload film file")
+profiles_upload_film_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
+
+
+
+Globals.tab4_canvas.pack(expand=True, fill=BOTH)
 
 
 ##################################### End statements ############################################

@@ -107,7 +107,7 @@ def prepare_Image():
     ok_batch_button = tk.Button(choose_batch_window, text='OK', cursor='hand2',\
         font=('calibri', '14'), overrelief=GROOVE, state=tk.ACTIVE, width = 15, command=set_batch)
     ok_batch_button.place(relwidth=0.2, relheight=0.2, relx=0.4, rely=0.9)
-
+    r.close()
 
 def draw_ROI(img, scale_horizontal, scale_vertical):
     draw_ROI_window = tk.Toplevel(Globals.tab3)
