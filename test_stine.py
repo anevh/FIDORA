@@ -1,15 +1,16 @@
-from tkinter import *
+A = []
 
-master = Tk()
+A.append([1,2,3])
 
-scrollbar = Scrollbar(master)
-scrollbar.pack(side=RIGHT, fill=Y)
+print(A)
 
-listbox = Listbox(master, yscrollcommand=scrollbar.set)
-for i in range(1000):
-    listbox.insert(END, str(i))
-listbox.pack(side=LEFT, fill=BOTH)
+A.append([10])
 
-scrollbar.config(command=listbox.yview)
+print(A)
 
-mainloop()
+B = [8,9,11]
+
+for i in range(len(B)):
+    A[1].append(B[i])
+
+print(A)

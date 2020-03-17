@@ -91,8 +91,8 @@ helpmenu.add_command(label="About", command=CoMet_functions.nothingButton)
 menubar.add_cascade(label="Help", menu=helpmenu)
 Globals.form.config(menu=menubar)
 
-upload_button_file = "uploadbutton3.png" #"test_button.png" #"uploadbutton2.png"
-upload_button_image = ImageTk.PhotoImage(file=upload_button_file)
+upload_button_file = "uploadbutton3.png" 
+Globals.upload_button_image = ImageTk.PhotoImage(file=upload_button_file)
 
 select_folder_button_file = "select_folder_button2.png"
 select_folder_image = ImageTk.PhotoImage(file=select_folder_button_file)
@@ -120,6 +120,9 @@ CoMet_empty_image_image = ImageTk.PhotoImage(file=CoMet_empty_image_file)
 
 dose_response_calibration_button_file = "save_calibration_button.png"
 dose_response_calibration_button_image = ImageTk.PhotoImage(file=dose_response_calibration_button_file)
+
+dose_response_dose_border_file = "dose_border.png"
+Globals.dose_response_dose_border = ImageTk.PhotoImage(file=dose_response_dose_border_file)
 
 ###################################### INTRO TAB #################################################
 
@@ -313,11 +316,11 @@ Globals.tab1_canvas.grid_columnconfigure(2, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(2, weight=0)
 CoMet_upload_button_frame.config(bg = '#ffffff')
 
-CoMet_upload_button = tk.Button(CoMet_upload_button_frame, text='Browse', image = upload_button_image, \
+CoMet_upload_button = tk.Button(CoMet_upload_button_frame, text='Browse', image = Globals.upload_button_image, \
     cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=CoMet_functions.UploadAction)
 CoMet_upload_button.pack(expand=True, fill=BOTH)
 CoMet_upload_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-CoMet_upload_button.image = upload_button_image
+CoMet_upload_button.image = Globals.upload_button_image
 
 Globals.CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label, height=1, width=31)
 Globals.CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
@@ -392,6 +395,7 @@ Globals.CoMet_save_button_1 = tk.Button(Globals.CoMet_save_button_frame_1, text=
 Globals.CoMet_save_button_1.pack(expand=True, fill=BOTH)
 Globals.CoMet_save_button_1.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 Globals.CoMet_save_button_1.image = CoMet_save_button
+
 
 Globals.CoMet_save_filename = tk.Text(Globals.CoMet_border_3_label, height=1, width=30)
 Globals.CoMet_save_filename.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
@@ -591,7 +595,7 @@ curve will be found for all three color channels, but can be removed using the c
 dose_response_explain_text.grid(row=0, column=0, columnspan=5, sticky=N+S+E+W, pady=(20,20), padx=(20,10))
 Globals.tab2_canvas.grid_columnconfigure(0, weight=0)
 Globals.tab2_canvas.grid_rowconfigure(0, weight=0)
-dose_response_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
+dose_response_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#ffffff', relief=FLAT)
 
 dose_response_upload_button_frame = tk.Frame(Globals.tab2_canvas_files)
 dose_response_upload_button_frame.grid(row=0, column = 0, columnspan=8, padx = (60, 0), pady=(10,5))
@@ -599,11 +603,11 @@ Globals.tab2_canvas_files.grid_columnconfigure(0, weight=0)
 Globals.tab2_canvas_files.grid_rowconfigure(0, weight=0)
 dose_response_upload_button_frame.config(bg = '#ffffff')
 
-dose_response_upload_button = tk.Button(dose_response_upload_button_frame, text='Upload file', image=upload_button_image,\
+dose_response_upload_button = tk.Button(dose_response_upload_button_frame, text='Upload file', image=Globals.upload_button_image,\
     cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Dose_response_functions.create_window)
 dose_response_upload_button.pack(expand=True, fill=BOTH)
 dose_response_upload_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-dose_response_upload_button.image = upload_button_image
+dose_response_upload_button.image = Globals.upload_button_image
 
 check1 = Checkbutton(Globals.tab2_canvas_files, variable=Globals.dose_response_var1, command=Dose_response_functions.plot_dose_response)
 check1.grid(row=1, column=1, sticky=E, padx=(30,15))
@@ -652,7 +656,7 @@ Globals.tab2_canvas_files.grid_rowconfigure(4, weight=0)
 dose_title.config(state=DISABLED, bd=0, font=('calibri', '12'))
 
 dose_response_save_calibration_button_frame = tk.Frame(Globals.tab2_canvas)
-dose_response_save_calibration_button_frame.grid(row=3, column = 2, sticky=N+S+E+W, padx=(0,0), pady=(0,0))
+dose_response_save_calibration_button_frame.grid(row=2, column = 2, sticky=N+S+E+W, padx=(0,0), pady=(120,0))
 Globals.tab2_canvas.grid_columnconfigure(10, weight=0)
 Globals.tab2_canvas.grid_rowconfigure(10, weight=0)
 dose_response_save_calibration_button_frame.config(bg = '#ffffff', height=1, width=100)
@@ -665,14 +669,14 @@ Globals.dose_response_save_calibration_button.config(bg='#ffffff', activebackgro
 Globals.dose_response_save_calibration_button.image = dose_response_calibration_button_image
 
 dose_response_clear_all_button_frame = tk.Frame(Globals.tab2_canvas)
-dose_response_clear_all_button_frame.grid(row=3, column=1, sticky=N+S+E+W, padx=(0,0), pady=(0,0))
+dose_response_clear_all_button_frame.grid(row=2, column=1, sticky=N+S+E+W, padx=(0,0), pady=(120,0))
 Globals.tab2_canvas.grid_columnconfigure(11, weight=0)
 Globals.tab2_canvas.grid_rowconfigure(11, weight=0)
 dose_response_clear_all_button_frame.config(bg='#ffffff', height=1, width=100)
 dose_response_clear_all_button_frame.grid_propagate(0)
 
 dose_response_clear_all_button = tk.Button(dose_response_clear_all_button_frame, text='Clear all', image=dose_response_clear_all_button_image, \
-    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=ACTIVE, command=Dose_response_functions.nothingButton)
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=ACTIVE, command=Dose_response_functions.clear_all)
 dose_response_clear_all_button.pack(expand=True, fill=BOTH, side=TOP)
 dose_response_clear_all_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 dose_response_clear_all_button.image = dose_response_clear_all_button_image
@@ -693,10 +697,10 @@ Globals.tab2_canvas.pack(expand=True, fill=BOTH)
 
 
 
-upload_film_data = tk.Button(Globals.tab3, text='Upload',image=upload_button_image, cursor='hand2', font=('calibri', '12'), \
+upload_film_data = tk.Button(Globals.tab3, text='Upload',image=Globals.upload_button_image, cursor='hand2', font=('calibri', '12'), \
     relief=FLAT, state=ACTIVE, width=12, command=lambda: Map_Dose.UploadAction("FILM"))
 upload_film_data.place(relwidth=0.17, relheight=0.11, relx=0.3, rely=0.03)
-upload_film_data.image = upload_button_image
+upload_film_data.image = Globals.upload_button_image
 ##################################### TAB 4 - Profiles ###########################################
 
 
