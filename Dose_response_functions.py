@@ -260,7 +260,7 @@ def plot_dose_response():
             write_out_respons_function = tk.Text(Globals.dose_response_equation_frame, height=4, width=40)
             write_out_respons_function.insert(INSERT, out_text_function )
             ##ekstra linje med standardavvik, prøver å inserte de også
-            write_out_respons_function.insert(INSERT,standardavvik_rgb)
+            #write_out_respons_function.insert(INSERT,standardavvik_rgb)
             
             write_out_respons_function.grid(row=0, column=0, sticky=N+S+W+E, pady=(5,5), padx=(5,5))
             Globals.dose_response_equation_frame.grid_columnconfigure(0, weight=0)
