@@ -105,6 +105,7 @@ CoMet_border_light = ImageTk.PhotoImage(file=CoMet_border_light_file)
 
 CoMet_save_button_file = "save_button2.png"
 CoMet_save_button = ImageTk.PhotoImage(file=CoMet_save_button_file)
+Globals.save_button = ImageTk.PhotoImage(file=CoMet_save_button_file)
 
 CoMet_correct_button_file = "icon_correct.png"
 CoMet_correct_button_image= ImageTk.PhotoImage(file=CoMet_correct_button_file)
