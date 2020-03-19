@@ -24,6 +24,8 @@ def dose_to_pixel(D,a,b,c):
 def pixel_to_dose(P,a,b,c):
     return c + b/(P-a)
 
+
+#### LEgg til medianfilter
 def calculate_dose_map(cv2Img):
     wid = Globals.map_dose_ROI_x_end.get() - Globals.map_dose_ROI_x_start.get()
     heig = Globals.map_dose_ROI_y_end.get() - Globals.map_dose_ROI_y_start.get()
@@ -38,7 +40,7 @@ def calculate_dose_map(cv2Img):
     
     fig = Figure(figsize=(0.8,0.8))
     a = fig.add_subplot(111)
-    plot_image = a.pcolormesh(doseMap_film, cmap='hsv', rasterized=True, vmin=0, vmax=600)
+    plot_image = a.pcolormesh(doseMap_film, cmap='viridis', rasterized=True, vmin=0, vmax=600)
     fig.colorbar(plot_image, ax=a)
     canvas_dosemap_film = FigureCanvasTkAgg(fig,master = Globals.tab3)
     canvas_dosemap_film.get_tk_widget().place(relwidth=0.3, relheight=0.55, relx = 0.03, rely=0.1)

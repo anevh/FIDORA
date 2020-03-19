@@ -7,9 +7,11 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+
 global upload_button_image
 global dose_response_dose_border
 global save_button
+
 
 global form 
 form = tk.Tk()
@@ -266,14 +268,14 @@ tab2_canvas.grid_rowconfigure(9, weight=0)
 dose_response_plot_frame.config(bg='#ffffff', relief=FLAT, highlightthickness=0, height=350,width=500)
 dose_response_plot_frame.grid_propagate(0)
 
-fig = Figure(figsize=(5,3))
-a = fig.add_subplot(111, ylim=(0,40000), xlim=(0,500))
-plot_canvas = FigureCanvasTkAgg(fig, master=dose_response_plot_frame)
-plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+S+E+W, padx=(5,0), pady=(0,0))
-a.set_title ("Dose-response", fontsize=12)
-a.set_ylabel("Pixel value", fontsize=12)
-a.set_xlabel("Dose", fontsize=12)
-fig.tight_layout()
+dose_response_fig = Figure(figsize=(5,3))
+dose_response_a = dose_response_fig.add_subplot(111, ylim=(0,40000), xlim=(0,500))
+dose_response_plot_canvas = FigureCanvasTkAgg(dose_response_fig, master=dose_response_plot_frame)
+dose_response_plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+S+E+W, padx=(5,0), pady=(0,0))
+dose_response_a.set_title ("Dose-response", fontsize=12)
+dose_response_a.set_ylabel("Pixel value", fontsize=12)
+dose_response_a.set_xlabel("Dose", fontsize=12)
+dose_response_fig.tight_layout()
 
 global dose_response_sd_list_red
 dose_response_sd_list_red = []
@@ -391,12 +393,28 @@ map_dose_ROI_y_end.set(0)
 global profile_film_visual
 profile_film_visual = tk.Frame(tab4_canvas)
 profile_film_visual.grid(row=2, column=0, rowspan=3, columnspan=2, sticky=N+S+E+W, pady=(0,5), padx=(30,5))
-tab2_canvas.grid_columnconfigure(3, weight=0)
-tab2_canvas.grid_rowconfigure(3, weight=0)
-profile_film_visual.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, height=330,width=10)
-profile_film_visual.grid_propagate(0)
+tab4_canvas.grid_columnconfigure(3, weight=0)
+tab4_canvas.grid_rowconfigure(3, weight=0)
+profile_film_visual.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
 
+global profiles_film_dataset
+global profiles_doseplan_dataset
 
+global profile_plot_canvas
+profile_plot_canvas = tk.Canvas(tab4_canvas)
+profile_plot_canvas.grid(row=2, column=2, rowspan=3, columnspan=3, sticky=N+S+E+W, pady=(0,5), padx=(5,10))
+tab4_canvas.grid_columnconfigure(4, weight=0)
+tab4_canvas.grid_rowconfigure(4, weight=0)
+profile_plot_canvas.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
+
+profiles_fig = Figure(figsize=(5,3))
+profiles_a = profiles_fig.add_subplot(111, ylim=(0,40000), xlim=(0,500))
+profiles_plot_canvas = FigureCanvasTkAgg(profiles_fig, master=profile_plot_canvas)
+profiles_plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+S+E+W, padx=(5,0), pady=(0,0))
+profiles_a.set_title ("Dose-response", fontsize=12)
+profiles_a.set_ylabel("Pixel value", fontsize=12)
+profiles_a.set_xlabel("Dose", fontsize=12)
+profiles_fig.tight_layout()
 ############################### Correction matrix ######################################
 
 global correction127_red

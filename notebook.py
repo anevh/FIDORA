@@ -125,6 +125,12 @@ dose_response_calibration_button_image = ImageTk.PhotoImage(file=dose_response_c
 dose_response_dose_border_file = "dose_border.png"
 Globals.dose_response_dose_border = ImageTk.PhotoImage(file=dose_response_dose_border_file)
 
+profiles_add_doseplan_button_file = "add_doseplan_button.png"
+profiles_add_doseplan_button_image = ImageTk.PhotoImage(file=profiles_add_doseplan_button_file)
+
+profiles_add_film_button_file = "add_film_button.png"
+profiles_add_film_button_image = ImageTk.PhotoImage(file=profiles_add_film_button_file)
+
 ###################################### INTRO TAB #################################################
 
 
@@ -712,37 +718,38 @@ Globals.tab4_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness
 
 profiles_explain_text = tk.Text(Globals.tab4_canvas, height=4, width=140)
 profiles_explain_text.insert(INSERT, "\
- " )
+Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det,  \n\
+Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det, \n\
+Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det, \n\
+Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det, " )
 profiles_explain_text.grid(row=0, column=0, columnspan=5, sticky=N+S+E+W, pady=(20,20), padx=(20,10))
 Globals.tab4_canvas.grid_columnconfigure(0, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(0, weight=0)
 profiles_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
 
-
-profiles_upload_film_border = Label(Globals.tab4_canvas, image = CoMet_border_dark,width=50)
-profiles_upload_film_border.image=CoMet_border_dark
-profiles_upload_film_border.grid(row=1, column=0, columnspan=3, sticky = W+E, padx = (0,50), pady=(10,0))
+profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
+profiles_upload_film_frame.grid(row=1, column = 0, padx = (0, 0), pady=(10,0))
 Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
-profiles_upload_film_border.config(bg='#ffffff', borderwidth=0)
+profiles_upload_film_frame.config(bg = '#ffffff')
 
-profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_film_frame.grid(row=1, column = 2, padx = (0, 0), pady=(10,0))
+profiles_upload_button_film = tk.Button(profiles_upload_film_frame, text='Browse', image = profiles_add_film_button_image, \
+    cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: Profile_functions.UploadAction(True))
+profiles_upload_button_film.pack(expand=True, fill=BOTH)
+profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+profiles_upload_button_film.image = profiles_add_film_button_image
+
+profiles_upload_doseplan_frame = tk.Frame(Globals.tab4_canvas)
+profiles_upload_doseplan_frame.grid(row=1, column = 1, padx = (0,0), pady=(10,0))
 Globals.tab4_canvas.grid_columnconfigure(2, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(2, weight=0)
 profiles_upload_film_frame.config(bg = '#ffffff')
 
-profiles_upload_button_film = tk.Button(profiles_upload_film_frame, text='Browse', image = Globals.upload_button_image, \
-    cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.UploadAction)
-profiles_upload_button_film.pack(expand=True, fill=BOTH)
-profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-profiles_upload_button_film.image = Globals.upload_button_image
-
-profiles_upload_film_text = tk.Text(profiles_upload_film_border, height=1, width=31)
-profiles_upload_film_text.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
-profiles_upload_film_text.insert(INSERT, "Upload film file")
-profiles_upload_film_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
-
+profiles_upload_button_doseplan = tk.Button(profiles_upload_doseplan_frame, text='Browse', image=profiles_add_doseplan_button_image,\
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: Profile_functions.UploadAction(False))
+profiles_upload_button_doseplan.pack(expand=True, fill=BOTH)
+profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
 
 
 Globals.tab4_canvas.pack(expand=True, fill=BOTH)
