@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
     NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton, FLAT, PhotoImage, Label,\
-        SOLID, N, S, W, E, END, LEFT, Scrollbar, RIGHT, Y, BOTH, TOP
+        SOLID, N, S, W, E, END, LEFT, Scrollbar, RIGHT, Y, BOTH, TOP, OptionMenu
 import Globals
 import re
 import CoMet_functions, intro_tab_functions, Map_Dose
@@ -728,7 +728,7 @@ Globals.tab4_canvas.grid_rowconfigure(0, weight=0)
 profiles_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
 
 profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_film_frame.grid(row=1, column = 0, padx = (0, 0), pady=(10,0))
+profiles_upload_film_frame.grid(row=2, column = 0, padx = (20, 0), pady=(10,0), sticky=N+S+W)
 Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
 profiles_upload_film_frame.config(bg = '#ffffff')
@@ -740,7 +740,7 @@ profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', act
 profiles_upload_button_film.image = profiles_add_film_button_image
 
 profiles_upload_doseplan_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_doseplan_frame.grid(row=1, column = 1, padx = (0,0), pady=(10,0))
+profiles_upload_doseplan_frame.grid(row=2, column = 0, padx = (0,0), pady=(10,0), sticky=N+S+E)
 Globals.tab4_canvas.grid_columnconfigure(2, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(2, weight=0)
 profiles_upload_film_frame.config(bg = '#ffffff')
@@ -751,6 +751,20 @@ profiles_upload_button_doseplan.pack(expand=True, fill=BOTH)
 profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
 
+film_orientation_menu = OptionMenu(Globals.tab4_canvas, Globals.profiles_film_orientation, 'Axial', 'Coronal', 'Sagittal')
+film_orientation_menu.grid(row=1, column=0, sticky=N+S+E, padx=(5,20))
+Globals.tab4_canvas.grid_columnconfigure(5, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(5, weight=0)
+film_orientation_menu.config(bg = '#ffffff', width=15, relief=FLAT)
+
+Globals.profiles_film_orientation.trace('w', Profile_functions.trace_film_orientation)
+
+film_orientation_menu_text = tk.Text(Globals.tab4_canvas, width=14, height=1)
+film_orientation_menu_text.insert(INSERT, "Film orientation:")
+film_orientation_menu_text.config(state=DISABLED, font=('calibri', '10'), bd = 0, relief=FLAT)
+film_orientation_menu_text.grid(row=1, column=0, sticky=N+S+W, padx=(60,0), pady=(5,0))
+Globals.tab4_canvas.grid_columnconfigure(6, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(6, weight=0)
 
 Globals.tab4_canvas.pack(expand=True, fill=BOTH)
 

@@ -32,7 +32,7 @@ def UploadAction(isFilm):
                 return
 
             canvas_film = Canvas(Globals.profile_film_visual, bd=0)
-            canvas_film.grid(row=0, column=0, sticky=N+S+E+W, pady=(5,0))
+            canvas_film.grid(row=0, column=0, sticky=N+S+E+W, pady=(5,0), padx = (100,30))
             Globals.profile_film_visual.grid_columnconfigure(0, weight=0)
             Globals.profile_film_visual.grid_rowconfigure(0, weight=0)
             scale_horizontal = 8
@@ -65,7 +65,7 @@ def UploadAction(isFilm):
             doseplan=doseplan_dataset.DoseGridScaling*doseplan*100   #converts from pixel to cGy
 
             canvas_doseplan = Canvas(Globals.profile_film_visual, bd=0)
-            canvas_doseplan.grid(row=1, column=0, sticky=N+S+E+W, pady=(5,0))
+            canvas_doseplan.grid(row=1, column=0, sticky=N+S+E+W, pady=(5,0), padx=(100,30))
             Globals.profile_film_visual.grid_columnconfigure(1, weight=0)
             Globals.profile_film_visual.grid_rowconfigure(1, weight=0)
             
@@ -89,3 +89,13 @@ def UploadAction(isFilm):
             return
         else:
             messagebox.showerror("Error", "The file must be a *.dmc file")
+
+
+def plot_profiles():
+    print(Globals.profiles_film_orientation.get())
+    return
+
+def trace_film_orientation(a,b,c):
+    plot_profiles()
+    return
+

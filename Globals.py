@@ -390,12 +390,18 @@ map_dose_ROI_y_end.set(0)
 
 ############################### Profiles ######################################
 
+global profiles_film_orientation
+profiles_film_orientation = StringVar()
+profiles_film_orientation.set('Axial')
+
+
 global profile_film_visual
 profile_film_visual = tk.Frame(tab4_canvas)
-profile_film_visual.grid(row=2, column=0, rowspan=3, columnspan=2, sticky=N+S+E+W, pady=(0,5), padx=(30,5))
+profile_film_visual.grid(row=3, column=0, rowspan=3, columnspan=1, sticky=N+S+E+W, pady=(5,0), padx=(0,0))
 tab4_canvas.grid_columnconfigure(3, weight=0)
 tab4_canvas.grid_rowconfigure(3, weight=0)
-profile_film_visual.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
+profile_film_visual.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, width=140, height=350)
+profile_film_visual.grid_propagate(0)
 
 global profiles_film_dataset
 global profiles_doseplan_dataset
@@ -411,9 +417,9 @@ profiles_fig = Figure(figsize=(5,3))
 profiles_a = profiles_fig.add_subplot(111, ylim=(0,40000), xlim=(0,500))
 profiles_plot_canvas = FigureCanvasTkAgg(profiles_fig, master=profile_plot_canvas)
 profiles_plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+S+E+W, padx=(5,0), pady=(0,0))
-profiles_a.set_title ("Dose-response", fontsize=12)
+profiles_a.set_title ("Profiles", fontsize=12)
 profiles_a.set_ylabel("Pixel value", fontsize=12)
-profiles_a.set_xlabel("Dose", fontsize=12)
+profiles_a.set_xlabel("Distance (mm)", fontsize=12)
 profiles_fig.tight_layout()
 ############################### Correction matrix ######################################
 
