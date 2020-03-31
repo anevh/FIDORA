@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
     NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton, FLAT, PhotoImage, Label,\
-        SOLID, N, S, W, E, END, LEFT, Scrollbar, RIGHT, Y, BOTH, TOP
+        SOLID, N, S, W, E, END, LEFT, Scrollbar, RIGHT, Y, BOTH, TOP, OptionMenu
 import Globals
 import re
 import CoMet_functions, intro_tab_functions, Map_Dose
@@ -718,8 +718,8 @@ Globals.tab4_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness
 
 profiles_explain_text = tk.Text(Globals.tab4_canvas, height=4, width=140)
 profiles_explain_text.insert(INSERT, "\
-Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det,  \n\
-Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det, \n\
+SliceThickness i plan må være ['1','1'], ['2','2'] eller ['3','3'], Filmen må legges i xy, xz eller yz planet (lage figur?), Filmen må scannes  \n\
+parallelt med retningene i skanneren (programmet vil anta dette), \n\
 Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det, \n\
 Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det, " )
 profiles_explain_text.grid(row=0, column=0, columnspan=5, sticky=N+S+E+W, pady=(20,20), padx=(20,10))
@@ -727,34 +727,69 @@ Globals.tab4_canvas.grid_columnconfigure(0, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(0, weight=0)
 profiles_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
 
-profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_film_frame.grid(row=1, column = 0, padx = (0, 0), pady=(10,0))
+#profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
+#profiles_upload_film_frame.grid(row=2, column = 0, padx = (20, 0), pady=(10,0), sticky=N+S+W)
+#Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
+#Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
+#profiles_upload_film_frame.config(bg = '#ffffff')
+
+#profiles_upload_button_film = tk.Button(profiles_upload_film_frame, text='Browse', image = profiles_add_film_button_image, \
+#    cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: Profile_functions.UploadAction(True))
+#profiles_upload_button_film.pack(expand=True, fill=BOTH)
+#profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+#profiles_upload_button_film.image = profiles_add_film_button_image
+
+#profiles_upload_doseplan_frame = tk.Frame(Globals.tab4_canvas)
+#profiles_upload_doseplan_frame.grid(row=2, column = 0, padx = (0,0), pady=(10,0), sticky=N+S+E)
+#Globals.tab4_canvas.grid_columnconfigure(2, weight=0)
+#Globals.tab4_canvas.grid_rowconfigure(2, weight=0)
+#profiles_upload_film_frame.config(bg = '#ffffff')
+
+#profiles_upload_button_doseplan = tk.Button(profiles_upload_doseplan_frame, text='Browse', image=profiles_add_doseplan_button_image,\
+#    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: Profile_functions.UploadAction(False))
+#profiles_upload_button_doseplan.pack(expand=True, fill=BOTH)
+#profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+#profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
+
+profiles_getData_frame = tk.Frame(Globals.tab4_canvas)
+profiles_getData_frame.grid(row = 2, column=0, padx = (0,0), pady=(0,0))
 Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
-profiles_upload_film_frame.config(bg = '#ffffff')
+profiles_getData_frame.config(bg='#ffffff')
 
-profiles_upload_button_film = tk.Button(profiles_upload_film_frame, text='Browse', image = profiles_add_film_button_image, \
-    cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: Profile_functions.UploadAction(True))
-profiles_upload_button_film.pack(expand=True, fill=BOTH)
-profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-profiles_upload_button_film.image = profiles_add_film_button_image
+profiles_getData_button = tk.Button(profiles_getData_frame, text='Upload data', image=Globals.upload_button_image, \
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.uploadData)
+profiles_getData_button.pack(expand=True, fill=BOTH)
+profiles_getData_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+profiles_getData_button.image = Globals.upload_button_image
 
-profiles_upload_doseplan_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_doseplan_frame.grid(row=1, column = 1, padx = (0,0), pady=(10,0))
+Globals.profiles_film_orientation_menu = OptionMenu(Globals.tab4_canvas, Globals.profiles_film_orientation, 'Axial', 'Coronal', 'Sagittal')
+Globals.profiles_film_orientation_menu.grid(row=1, column=0, sticky=N+S+E, padx=(5,20))
 Globals.tab4_canvas.grid_columnconfigure(2, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(2, weight=0)
-profiles_upload_film_frame.config(bg = '#ffffff')
+Globals.profiles_film_orientation_menu.config(bg = '#ffffff', width=15, relief=FLAT)
 
-profiles_upload_button_doseplan = tk.Button(profiles_upload_doseplan_frame, text='Browse', image=profiles_add_doseplan_button_image,\
-    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: Profile_functions.UploadAction(False))
-profiles_upload_button_doseplan.pack(expand=True, fill=BOTH)
-profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
+film_orientation_menu_text = tk.Text(Globals.tab4_canvas, width=14, height=1)
+film_orientation_menu_text.insert(INSERT, "Film orientation:")
+film_orientation_menu_text.config(state=DISABLED, font=('calibri', '10'), bd = 0, relief=FLAT)
+film_orientation_menu_text.grid(row=1, column=0, sticky=N+S+W, padx=(60,0), pady=(5,0))
+Globals.tab4_canvas.grid_columnconfigure(3, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(3, weight=0)
+
+profiles_resetAll_frame = tk.Frame(Globals.tab4_canvas)
+profiles_resetAll_frame.grid(row=10,column=0, padx=(0,0), pady=(0,0))
+Globals.tab4_canvas.grid_columnconfigure(5, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(5, weight=0)
+profiles_resetAll_frame.config(bg='#ffffff')
+
+profiles_resetAll_button = tk.Button(profiles_resetAll_frame, text='Reset', image=dose_response_clear_all_button_image, \
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.clearAll)
+profiles_resetAll_button.pack(expand=True, fill=BOTH)
+profiles_resetAll_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+profiles_resetAll_button.image = dose_response_clear_all_button_image
 
 
 Globals.tab4_canvas.pack(expand=True, fill=BOTH)
-
-
 ##################################### End statements ############################################
 #Globals.tab_parent.place(relwidth=1, relheight=0.9, relx=0, rely=0.15)
 Globals.form.mainloop()

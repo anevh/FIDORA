@@ -1,7 +1,8 @@
 import Globals
 import tkinter as tk
 from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog,\
-    PhotoImage, BOTH, Canvas, N, S, W, E, ALL, Frame, SUNKEN, Radiobutton, GROOVE
+    PhotoImage, BOTH, Canvas, N, S, W, E, ALL, Frame, SUNKEN, Radiobutton, GROOVE, ACTIVE, \
+    FLAT
 import os
 from os.path import normpath, basename
 from PIL import Image, ImageTk
@@ -32,7 +33,7 @@ def UploadAction(isFilm):
                 return
 
             canvas_film = Canvas(Globals.profile_film_visual, bd=0)
-            canvas_film.grid(row=0, column=0, sticky=N+S+E+W, pady=(5,0))
+            canvas_film.grid(row=0, column=0, sticky=N+S+E+W, pady=(5,0), padx = (100,30))
             Globals.profile_film_visual.grid_columnconfigure(0, weight=0)
             Globals.profile_film_visual.grid_rowconfigure(0, weight=0)
             scale_horizontal = 8
@@ -65,7 +66,7 @@ def UploadAction(isFilm):
             doseplan=doseplan_dataset.DoseGridScaling*doseplan*100   #converts from pixel to cGy
 
             canvas_doseplan = Canvas(Globals.profile_film_visual, bd=0)
-            canvas_doseplan.grid(row=1, column=0, sticky=N+S+E+W, pady=(5,0))
+            canvas_doseplan.grid(row=1, column=0, sticky=N+S+E+W, pady=(5,0), padx=(100,30))
             Globals.profile_film_visual.grid_columnconfigure(1, weight=0)
             Globals.profile_film_visual.grid_rowconfigure(1, weight=0)
             
@@ -89,3 +90,19 @@ def UploadAction(isFilm):
             return
         else:
             messagebox.showerror("Error", "The file must be a *.dmc file")
+
+
+def uploadData():
+    if(Globals.profiles_film_orientation.get() == '-'):
+        messagebox.showerror("Missing variables", "You must fill in film orientation, ")
+        return
+    Globals.profiles_film_orientation_menu.config(state=DISABLED)
+
+def plot_profiles():
+    print(Globals.profiles_film_orientation.get())
+    return
+
+def clearAll():
+    Globals.profiles_film_orientation.set('-')
+    Globals.profiles_film_orientation_menu.config(state=ACTIVE, bg = '#ffffff', width=15, relief=FLAT)
+    return
