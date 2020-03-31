@@ -257,7 +257,7 @@ def plot_dose_response():
 
             out_text_function = "Pixel value = " + str(round(Globals.popt_red[0])) + " + " + str(round(Globals.popt_red[1])) + "/(dose - (" + str(round(Globals.popt_red[2])) + "))"
             standardavvik_rgb = "Standard deviation red = " + str(round(Globals.dose_response_sd_avg_red.get()))
-            write_out_respons_function = tk.Text(Globals.dose_response_equation_frame, height=4, width=40)
+            write_out_respons_function = tk.Text(Globals.dose_response_equation_frame, height=1, width=10)
             write_out_respons_function.insert(INSERT, out_text_function )
             ##ekstra linje med standardavvik, prøver å inserte de også
             #write_out_respons_function.insert(INSERT,standardavvik_rgb)
