@@ -392,16 +392,18 @@ map_dose_ROI_y_end.set(0)
 
 global profiles_film_orientation
 profiles_film_orientation = StringVar()
-profiles_film_orientation.set('Axial')
+profiles_film_orientation.set('-')
+
+global profiles_film_orientation_menu
 
 
-global profile_film_visual
-profile_film_visual = tk.Frame(tab4_canvas)
-profile_film_visual.grid(row=3, column=0, rowspan=3, columnspan=1, sticky=N+S+E+W, pady=(5,0), padx=(0,0))
-tab4_canvas.grid_columnconfigure(3, weight=0)
-tab4_canvas.grid_rowconfigure(3, weight=0)
-profile_film_visual.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, width=140, height=350)
-profile_film_visual.grid_propagate(0)
+#global profile_film_visual
+#profile_film_visual = tk.Frame(tab4_canvas)
+#profile_film_visual.grid(row=3, column=0, rowspan=3, columnspan=1, sticky=N+S+E+W, pady=(5,0), padx=(0,0))
+#tab4_canvas.grid_columnconfigure(3, weight=0)
+#tab4_canvas.grid_rowconfigure(3, weight=0)
+#profile_film_visual.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, width=140, height=350)
+#profile_film_visual.grid_propagate(0)
 
 global profiles_film_dataset
 global profiles_doseplan_dataset

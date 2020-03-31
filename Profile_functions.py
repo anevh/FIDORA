@@ -1,7 +1,8 @@
 import Globals
 import tkinter as tk
 from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog,\
-    PhotoImage, BOTH, Canvas, N, S, W, E, ALL, Frame, SUNKEN, Radiobutton, GROOVE
+    PhotoImage, BOTH, Canvas, N, S, W, E, ALL, Frame, SUNKEN, Radiobutton, GROOVE, ACTIVE, \
+    FLAT
 import os
 from os.path import normpath, basename
 from PIL import Image, ImageTk
@@ -91,11 +92,17 @@ def UploadAction(isFilm):
             messagebox.showerror("Error", "The file must be a *.dmc file")
 
 
+def uploadData():
+    if(Globals.profiles_film_orientation.get() == '-'):
+        messagebox.showerror("Missing variables", "You must fill in film orientation, ")
+        return
+    Globals.profiles_film_orientation_menu.config(state=DISABLED)
+
 def plot_profiles():
     print(Globals.profiles_film_orientation.get())
     return
 
-def trace_film_orientation(a,b,c):
-    plot_profiles()
+def clearAll():
+    Globals.profiles_film_orientation.set('-')
+    Globals.profiles_film_orientation_menu.config(state=ACTIVE, bg = '#ffffff', width=15, relief=FLAT)
     return
-
