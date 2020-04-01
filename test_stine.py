@@ -16,7 +16,7 @@ print(dataset.pixel_array[88,0:10,83:95])
 profile = dataset.pixel_array[88,:,93]
 
 plt.figure()
-plt.imshow(dataset.pixel_array[:,:,94]*dataset.DoseGridScaling)
+plt.imshow(dataset.pixel_array[88,:,:]*dataset.DoseGridScaling)
 #plt.imshow(test_dataset)
 #plt.plot(profile)
 plt.colorbar()

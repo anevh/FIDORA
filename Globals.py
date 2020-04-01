@@ -11,6 +11,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 global upload_button_image
 global dose_response_dose_border
 global save_button
+global help_button
 
 
 global form 
@@ -410,7 +411,7 @@ global profiles_doseplan_dataset
 
 global profile_plot_canvas
 profile_plot_canvas = tk.Canvas(tab4_canvas)
-profile_plot_canvas.grid(row=2, column=2, rowspan=3, columnspan=3, sticky=N+S+E+W, pady=(0,5), padx=(5,10))
+profile_plot_canvas.grid(row=3, column=2, rowspan=3, columnspan=3, sticky=N+S+E+W, pady=(0,5), padx=(5,10))
 tab4_canvas.grid_columnconfigure(4, weight=0)
 tab4_canvas.grid_rowconfigure(4, weight=0)
 profile_plot_canvas.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
@@ -423,6 +424,12 @@ profiles_a.set_title ("Profiles", fontsize=12)
 profiles_a.set_ylabel("Pixel value", fontsize=12)
 profiles_a.set_xlabel("Distance (mm)", fontsize=12)
 profiles_fig.tight_layout()
+
+global profiles_showPlanes_image
+global profiles_showDirections_image
+
+global profiles_depth
+
 ############################### Correction matrix ######################################
 
 global correction127_red
