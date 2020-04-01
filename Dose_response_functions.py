@@ -4,8 +4,8 @@ from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledial
     PhotoImage, BOTH, Toplevel, GROOVE, ACTIVE, FLAT, N, S, W, E, ALL, ttk, LEFT, RIGHT, Y,\
     Label, X, END
 
-import sympy as sp
-from io import BytesIO
+#import sympy as sp
+#from io import BytesIO
 
 import cv2
 import numpy as np
@@ -15,7 +15,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-matplotlib.rcParams['text.usetex'] = True #lagt til for å kunne skrive latex i string
+#matplotlib.rcParams['text.usetex'] = True #lagt til for å kunne skrive latex i string
 from scipy.optimize import curve_fit
 from scipy.optimize import curve_fit, OptimizeWarning
 from PIL import Image, ImageTk
@@ -169,6 +169,7 @@ def readImage(filename):
 
 
 def plot_dose_response():
+    print("sjekk*************************************************************")
     sd_red_arr=[];sd_green_arr=[];sd_blue_arr=[]
     temp_dose = [item[0] for item in Globals.avg_red_vector]
     temp_avg_red = [item[1] for item in Globals.avg_red_vector]
@@ -216,7 +217,7 @@ def plot_dose_response():
         Globals.dose_response_sd_min_blue.set(0)
         Globals.dose_response_sd_min_blue_dose.set('-')
 
-
+    print("sjekk2 **********************************************************")
     fig = Figure(figsize=(5,3))
     a = fig.add_subplot(111)
     canvas = FigureCanvasTkAgg(fig, master=Globals.dose_response_plot_frame)
@@ -257,15 +258,15 @@ def plot_dose_response():
 
             out_text_function = "Pixel value = " + str(round(Globals.popt_red[0])) + " + " + str(round(Globals.popt_red[1])) + "/(dose - (" + str(round(Globals.popt_red[2])) + "))"
             standardavvik_rgb = "Standard deviation red = " + str(round(Globals.dose_response_sd_avg_red.get()))
-            write_out_respons_function = tk.Text(Globals.dose_response_equation_frame, height=1, width=10)
-            write_out_respons_function.insert(INSERT, out_text_function )
+            #write_out_respons_function = tk.Text(Globals.dose_response_equation_frame)#, height=1, width=10)
+            #write_out_respons_function.insert(INSERT, out_text_function )
             ##ekstra linje med standardavvik, prøver å inserte de også
             #write_out_respons_function.insert(INSERT,standardavvik_rgb)
             
-            write_out_respons_function.grid(row=0, column=0, sticky=N+S+W+E, pady=(5,5), padx=(5,5))
-            Globals.dose_response_equation_frame.grid_columnconfigure(0, weight=0)
-            Globals.dose_response_equation_frame.grid_rowconfigure(0, weight=0)
-            write_out_respons_function.config(state=DISABLED, bd=0, font=('calibri', '12'), bg='#ffffff') 
+            #write_out_respons_function.grid(row=0, column=0, sticky=N+S+W+E, pady=(5,5), padx=(5,5))
+            #Globals.dose_response_equation_frame.grid_columnconfigure(0, weight=0)
+            #Globals.dose_response_equation_frame.grid_rowconfigure(0, weight=0)
+            #write_out_respons_function.config(state=DISABLED, bd=0, font=('calibri', '12'), bg='#ffffff') 
             Globals.dose_response_save_calibration_button.config(state=ACTIVE)   
         except OptimizeWarning:
             messagebox.showwarning("Warning", "It appears that you have optimization problems. \
@@ -279,7 +280,9 @@ Or, check that your specified dose matches your uploaded files.")
     a.set_title ("Dose-response", fontsize=12)
     a.set_ylabel("Pixel value", fontsize=12)
     a.set_xlabel("Dose", fontsize=12)
+    print("sjekk3 ************************************************")
     fig.tight_layout()
+    print("sjekk4*************************************************")
 
 
     return
