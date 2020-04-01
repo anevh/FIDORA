@@ -106,3 +106,29 @@ def clearAll():
     Globals.profiles_film_orientation.set('-')
     Globals.profiles_film_orientation_menu.config(state=ACTIVE, bg = '#ffffff', width=15, relief=FLAT)
     return
+
+def help_showPlanes():
+    new_window = tk.Toplevel(Globals.tab4)
+    w = Globals.profiles_showPlanes_image.width()
+    h = Globals.profiles_showPlanes_image.height()
+    new_window.geometry("%dx%d+0+0" % (w, h))
+    new_window.grab_set()
+
+    canvas = tk.Canvas(new_window)
+    canvas.config(relief=FLAT, bg='#ffffff', highlightthickness=0)
+    canvas.create_image(0, 0, image=Globals.profiles_showPlanes_image, anchor='nw')
+    canvas.pack(expand=True, fill=BOTH)
+    
+
+
+def help_showDepth():
+    new_window = tk.Toplevel(Globals.tab4)
+    w = Globals.profiles_showDirections_image.width()
+    h = Globals.profiles_showDirections_image.height()
+    new_window.geometry("%dx%d+0+0" % (w, h))
+    new_window.grab_set()
+
+    canvas = tk.Canvas(new_window)
+    canvas.config(relief=FLAT, bg='#ffffff', highlightthickness=0)
+    canvas.create_image(0,0, image=Globals.profiles_showDirections_image, anchor='nw')
+    canvas.pack(expand=True, fill=BOTH)
