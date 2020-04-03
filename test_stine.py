@@ -1,5 +1,5 @@
 
-
+"""
 import numpy as np
 import pydicom
 import matplotlib.pyplot as plt
@@ -21,3 +21,13 @@ plt.imshow(dataset.pixel_array[88,:,:]*dataset.DoseGridScaling)
 #plt.plot(profile)
 plt.colorbar()
 plt.show()
+
+"""
+
+A =[]
+
+A.append([2,3])
+A.append([3,4])
+
+
+print(len(A))
