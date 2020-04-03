@@ -12,6 +12,7 @@ global upload_button_image
 global dose_response_dose_border
 global save_button
 global help_button
+global done_button_image
 
 
 global form 
@@ -398,20 +399,21 @@ profiles_film_orientation.set('-')
 global profiles_film_orientation_menu
 
 
-#global profile_film_visual
-#profile_film_visual = tk.Frame(tab4_canvas)
-#profile_film_visual.grid(row=3, column=0, rowspan=3, columnspan=1, sticky=N+S+E+W, pady=(5,0), padx=(0,0))
-#tab4_canvas.grid_columnconfigure(3, weight=0)
-#tab4_canvas.grid_rowconfigure(3, weight=0)
-#profile_film_visual.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, width=140, height=350)
-#profile_film_visual.grid_propagate(0)
+global profile_film_visual
+profile_film_visual = tk.Canvas(tab4_canvas)
+profile_film_visual.grid(row=4, column=0, rowspan=3, columnspan=1, sticky=N+S+E+W, pady=(5,0), padx=(0,0))
+tab4_canvas.grid_columnconfigure(3, weight=0)
+tab4_canvas.grid_rowconfigure(3, weight=0)
+profile_film_visual.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=140, height=350)
+profile_film_visual.grid_propagate(0)
 
 global profiles_film_dataset
+global profiles_film_dataset_red_channel
 global profiles_doseplan_dataset
 
 global profile_plot_canvas
 profile_plot_canvas = tk.Canvas(tab4_canvas)
-profile_plot_canvas.grid(row=3, column=2, rowspan=3, columnspan=3, sticky=N+S+E+W, pady=(0,5), padx=(5,10))
+profile_plot_canvas.grid(row=4, column=2, rowspan=3, columnspan=3, sticky=N+S+E+W, pady=(0,5), padx=(5,10))
 tab4_canvas.grid_columnconfigure(4, weight=0)
 tab4_canvas.grid_rowconfigure(4, weight=0)
 profile_plot_canvas.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
@@ -430,6 +432,40 @@ global profiles_showDirections_image
 
 global profiles_depth
 
+global profiles_mark_isocenter_button_image
+global profiles_mark_ROI_button_image
+
+global profiles_iscoenter_coords
+profiles_iscoenter_coords = []
+
+global profiles_film_isocenter
+
+global profiles_mark_isocenter_up_down_line
+profiles_mark_isocenter_up_down_line = []
+global profiles_mark_isocenter_right_left_line
+profiles_mark_isocenter_right_left_line = []
+global profiles_mark_isocenter_oval
+profiles_mark_isocenter_oval = []
+global profiles_mark_ROI_rectangle
+profiles_mark_ROI_rectangle = []
+
+global profiles_ROI_coords
+profiles_ROI_coords = []
+
+global profiles_done_button
+
+global profiles_isocenter_check
+profiles_isocenter_check=False
+
+global profiles_ROI_check
+profiles_ROI_check = False
+
+global profiles_film_batch
+profiles_film_batch = IntVar()
+profiles_film_batch.set(0)
+
+global profiles_popt_red
+profiles_popt_red = np.zeros(3)
 ############################### Correction matrix ######################################
 
 global correction127_red

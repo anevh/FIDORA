@@ -101,6 +101,9 @@ select_folder_image = ImageTk.PhotoImage(file=select_folder_button_file)
 help_button_file = "help_button.png"
 Globals.help_button = ImageTk.PhotoImage(file=help_button_file)
 
+done_button_file = "done_button.png"
+Globals.done_button_image = ImageTk.PhotoImage(file=done_button_file)
+
 CoMet_border_dark_file = "border.png"
 CoMet_border_dark = ImageTk.PhotoImage(file=CoMet_border_dark_file)
 
@@ -140,6 +143,12 @@ Globals.profiles_showPlanes_image = ImageTk.PhotoImage(file=profiles_showPlanes_
 
 profiles_showDirections_file = 'depth_directions.png'
 Globals.profiles_showDirections_image = ImageTk.PhotoImage(file=profiles_showDirections_file)
+
+profiles_mark_isocenter_button_file = 'mark_isocenter_button.png'
+Globals.profiles_mark_isocenter_button_image = ImageTk.PhotoImage(file=profiles_mark_isocenter_button_file)
+
+profiles_mark_ROI_button_file = "mark_ROI_button.png"
+Globals.profiles_mark_ROI_button_image = ImageTk.PhotoImage(file=profiles_mark_ROI_button_file)
 ###################################### INTRO TAB #################################################
 
 
@@ -736,17 +745,17 @@ Globals.tab4_canvas.grid_columnconfigure(0, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(0, weight=0)
 profiles_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
 
-#profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
-#profiles_upload_film_frame.grid(row=2, column = 0, padx = (20, 0), pady=(10,0), sticky=N+S+W)
-#Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
-#Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
-#profiles_upload_film_frame.config(bg = '#ffffff')
+profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
+profiles_upload_film_frame.grid(row=3, column = 0, padx = (20, 0), pady=(10,0))
+Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
+profiles_upload_film_frame.config(bg = '#ffffff')
 
-#profiles_upload_button_film = tk.Button(profiles_upload_film_frame, text='Browse', image = profiles_add_film_button_image, \
-#    cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: Profile_functions.UploadAction(True))
-#profiles_upload_button_film.pack(expand=True, fill=BOTH)
-#profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-#profiles_upload_button_film.image = profiles_add_film_button_image
+profiles_upload_button_film = tk.Button(profiles_upload_film_frame, text='Browse', image = profiles_add_film_button_image, \
+    cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.UploadFilm)
+profiles_upload_button_film.pack(expand=True, fill=BOTH)
+profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+profiles_upload_button_film.image = profiles_add_film_button_image
 
 #profiles_upload_doseplan_frame = tk.Frame(Globals.tab4_canvas)
 #profiles_upload_doseplan_frame.grid(row=2, column = 0, padx = (0,0), pady=(10,0), sticky=N+S+E)
@@ -760,17 +769,17 @@ profiles_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9f
 #profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 #profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
 
-profiles_getData_frame = tk.Frame(Globals.tab4_canvas)
-profiles_getData_frame.grid(row = 3, column=0, padx = (0,0), pady=(0,0))
-Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
-Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
-profiles_getData_frame.config(bg='#ffffff')
+#profiles_getData_frame = tk.Frame(Globals.tab4_canvas)
+#profiles_getData_frame.grid(row = 4, column=0, padx = (0,0), pady=(0,0))
+#Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
+#Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
+#profiles_getData_frame.config(bg='#ffffff')
 
-profiles_getData_button = tk.Button(profiles_getData_frame, text='Upload data', image=Globals.upload_button_image, \
-    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.uploadData)
-profiles_getData_button.pack(expand=True, fill=BOTH)
-profiles_getData_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-profiles_getData_button.image = Globals.upload_button_image
+#profiles_getData_button = tk.Button(profiles_getData_frame, text='Upload data', image=Globals.upload_button_image, \
+#    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.uploadData)
+#profiles_getData_button.pack(expand=True, fill=BOTH)
+#profiles_getData_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+#profiles_getData_button.image = Globals.upload_button_image
 
 Globals.profiles_film_orientation_menu = OptionMenu(Globals.tab4_canvas, Globals.profiles_film_orientation, 'Axial', 'Coronal', 'Sagittal')
 Globals.profiles_film_orientation_menu.grid(row=1, column=0, sticky=N+S, padx=(60,0))
@@ -834,7 +843,6 @@ profiles_help_button_depth = tk.Button(profiles_depth_help_frame, text='help', i
 profiles_help_button_depth.pack(expand=True, fill=BOTH)
 profiles_help_button_depth.configure(bg='#ffffff',activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 profiles_help_button_depth.image=Globals.help_button
-
 
 Globals.tab4_canvas.pack(expand=True, fill=BOTH)
 ##################################### End statements ############################################
