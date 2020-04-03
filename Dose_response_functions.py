@@ -1,5 +1,6 @@
 import Globals
 import tkinter as tk
+import tkinter.ttk 
 from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, \
     PhotoImage, BOTH, Toplevel, GROOVE, ACTIVE, FLAT, N, S, W, E, ALL, ttk, LEFT, RIGHT, Y,\
     Label, X, END
@@ -262,7 +263,44 @@ def plot_dose_response():
             #write_out_respons_function.insert(INSERT, out_text_function )
             ##ekstra linje med standardavvik, prøver å inserte de også
             #write_out_respons_function.insert(INSERT,standardavvik_rgb)
-            
+            def clickFunction(a,b,c):
+                tmptext = StringVar()
+                text = "Pixel value = "
+                a=str(10)   #str(round(Globals.popt_red[0]))
+                b=str(15) #str(round(Globals.popt_red[1]))
+                c=str(20) #str(round(Globals.popt_red[2]))
+                latex= a   + "+ " "\\frac {" + f"{b}" + "}{"+ "Dose" + "-" + f"{c}" + "}"
+                tmptext.set(latex)
+
+                #tmptext = entry.get()
+                tmptext = "$"+tmptext.get()+"$"
+
+                axLatex.clear()
+                axLatex.text(0.1, 0.5, text+tmptext, fontsize = 3)  #this is where the text is added to the axis
+                canvasLatex.draw()
+
+            #root = tk.Tk()
+            #make a frame and place it with grid
+            #mainframe = Frame(root)
+            #mainframe.grid(row=0,column=0)
+
+            #make a label and place it with grid
+            labelLatex = Label(Globals.dose_response_equation_frame)
+            labelLatex.grid(row=0,column=0)
+
+            figLatex = matplotlib.figure.Figure(figsize=(1, 1), dpi=300)
+            axLatex = figLatex.add_subplot(111)
+
+            canvasLatex = FigureCanvasTkAgg(figLatex, master=labelLatex)
+            canvasLatex.get_tk_widget().grid(row=0, column=0, sticky="N")
+            canvasLatex._tkcanvas.grid(row=0, column=0, sticky="N")   # (side=TOP, fill=BOTH, expand=1)
+
+            axLatex.get_xaxis().set_visible(False)
+            axLatex.get_yaxis().set_visible(False)
+
+            displayButton = Button(Globals.dose_response_equation_frame,text="display equation",width=15,command=lambda: clickFunction(12,3,4))
+            displayButton.grid(row=0,column=0,sticky="NS")
+
             #write_out_respons_function.grid(row=0, column=0, sticky=N+S+W+E, pady=(5,5), padx=(5,5))
             #Globals.dose_response_equation_frame.grid_columnconfigure(0, weight=0)
             #Globals.dose_response_equation_frame.grid_rowconfigure(0, weight=0)
