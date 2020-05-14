@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, \
     HORIZONTAL, E, W, N, S, BOTH, Frame, Canvas, LEFT, FLAT, INSERT, DISABLED, ALL, X, BOTTOM, \
-    DoubleVar
+    DoubleVar, PanedWindow, RAISED, TOP
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -72,8 +72,8 @@ tab4_canvas = tk.Canvas(tab4)
 
 ########################################   CoMet related   ###################################################
 global CoMet_progressbar
-CoMet_progressbar = ttk.Progressbar(tab1_canvas,orient ="horizontal",length = 200, mode ="determinate")
-CoMet_progressbar.grid(row=5, column=0, columnspan=3, sticky=E+W+S, pady=(40,0), padx=(50,70))
+CoMet_progressbar = ttk.Progressbar(tab1_canvas,orient ="horizontal",length = 550, mode ="determinate")
+CoMet_progressbar.grid(row=5, column=0, columnspan=1, sticky=W+S, pady=(27,0), padx=(55,50))
 tab1_canvas.grid_columnconfigure(12, weight=0)
 tab1_canvas.grid_rowconfigure(12, weight=0)
 CoMet_progressbar["maximum"] = 100
@@ -90,7 +90,7 @@ CoMet_progressbar_check_folder = True
 
 global CoMet_progressbar_text
 CoMet_progressbar_text = tk.Text(tab1_canvas, height=1, width=5)
-CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
+CoMet_progressbar_text.grid(row=5, column=0, columnspan=1, sticky=E, padx=(0,158), pady=(27,0))
 tab1_canvas.grid_columnconfigure(14, weight=0)
 tab1_canvas.grid_rowconfigure(14, weight=0)
 CoMet_progressbar_text.insert(INSERT, "0%")
@@ -399,21 +399,24 @@ profiles_film_orientation.set('-')
 global profiles_film_orientation_menu
 
 
-global profile_film_visual
-profile_film_visual = tk.Canvas(tab4_canvas)
-profile_film_visual.grid(row=4, column=0, rowspan=3, columnspan=1, sticky=N+S+E+W, pady=(5,0), padx=(0,0))
-tab4_canvas.grid_columnconfigure(3, weight=0)
-tab4_canvas.grid_rowconfigure(3, weight=0)
-profile_film_visual.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=140, height=350)
-profile_film_visual.grid_propagate(0)
-
 global profiles_film_dataset
 global profiles_film_dataset_red_channel
-global profiles_doseplan_dataset
+global profiles_film_dataset_ROI
+global profiles_film_dataset_ROI_red_channel
+global profiles_doseplan_dataset_ROI
+global profiles_film_dataset_ROI_red_channel_dose
+
+global profiles_view_film_doseplan_ROI
+profiles_view_film_doseplan_ROI = tk.Canvas(tab4_canvas)
+profiles_view_film_doseplan_ROI.grid(row=2, column=3, rowspan=10, sticky=E+W+N, pady=(0,5), padx=(5,10))
+tab4_canvas.grid_columnconfigure(11, weight=0)
+tab4_canvas.grid_rowconfigure(11, weight=0)
+profiles_view_film_doseplan_ROI.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
+
 
 global profile_plot_canvas
 profile_plot_canvas = tk.Canvas(tab4_canvas)
-profile_plot_canvas.grid(row=4, column=2, rowspan=3, columnspan=3, sticky=N+S+E+W, pady=(0,5), padx=(5,10))
+profile_plot_canvas.grid(row=4, column=0, rowspan=3, columnspan=2, sticky=N+S+E+W, pady=(0,5), padx=(5,10))
 tab4_canvas.grid_columnconfigure(4, weight=0)
 tab4_canvas.grid_rowconfigure(4, weight=0)
 profile_plot_canvas.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
@@ -431,6 +434,7 @@ global profiles_showPlanes_image
 global profiles_showDirections_image
 
 global profiles_depth
+global profiles_depth_float
 
 global profiles_mark_isocenter_button_image
 global profiles_mark_ROI_button_image
@@ -438,7 +442,11 @@ global profiles_mark_ROI_button_image
 global profiles_iscoenter_coords
 profiles_iscoenter_coords = []
 
+#Given from top left corner [right, down]
 global profiles_film_isocenter
+
+global profiles_distance_isocenter_ROI
+profiles_distance_isocenter_ROI = []
 
 global profiles_mark_isocenter_up_down_line
 profiles_mark_isocenter_up_down_line = []
@@ -453,6 +461,7 @@ global profiles_ROI_coords
 profiles_ROI_coords = []
 
 global profiles_done_button
+profiles_done_button = None
 
 global profiles_isocenter_check
 profiles_isocenter_check=False
@@ -466,6 +475,65 @@ profiles_film_batch.set(0)
 
 global profiles_popt_red
 profiles_popt_red = np.zeros(3)
+
+#global profiles_film_window
+#global profiles_film_window_open
+#profiles_film_window_open = False
+
+global profiles_upload_button_doseplan
+global profiles_upload_button_film
+global profiles_upload_button_rtplan
+
+global profiles_dataset_doseplan
+global profiles_dataset_rtplan
+
+global profiles_test_if_added_doseplan
+global profiles_test_if_added_rtplan
+profiles_test_if_added_doseplan = False
+profiles_test_if_added_rtplan = False
+
+global profiles_isocenter_mm
+global profiles_longitudinal_displacement_mm
+global profiles_lateral_displacement_mm
+global profiles_vertical_displacement_mm
+
+global profiles_dose_scaling_doseplan
+
+global profiles_max_dose_film
+
+
+#global profiles_film_notebook_canvas
+#profiles_film_notebook_canvas = tk.Canvas(profiles_view_film_doseplan_ROI)
+#profiles_film_notebook_canvas.pack()
+#profiles_film_notebook_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0)
+global profiles_film_panedwindow
+profiles_film_panedwindow = PanedWindow(profiles_view_film_doseplan_ROI, orient='vertical')
+profiles_film_panedwindow.pack(side=TOP)
+profiles_film_panedwindow.configure(sashrelief = RAISED, showhandle=True)
+
+
+#global profiles_film_tab_parent
+#profiles_film_tab_parent = ttk.Notebook(profiles_film_notebook_canvas)
+#profiles_film_tab_parent.borderWidth=0
+#profiles_film_tab_parent.pack()
+
+#global profiles_film_tab_image
+#profiles_film_tab_image = ttk.Frame(profiles_film_tab_parent)
+#profiles_film_tab_image.config(relief=FLAT)
+
+
+
+#global profiles_film_tab_dose
+#profiles_film_tab_dose = ttk.Frame(profiles_film_tab_parent)
+#profiles_film_tab_dose.config(relief=FLAT,padding=[0,0,0,0])
+
+
+#profiles_film_tab_parent.add(profiles_film_tab_image, text='Scanned film')
+#profiles_film_tab_parent.add(profiles_film_tab_dose, text='Dose on film')
+
+global profiles_scanned_image_text_image
+global profiles_film_dose_map_text_image
+global profiles_doseplan_text_image
 ############################### Correction matrix ######################################
 
 global correction127_red

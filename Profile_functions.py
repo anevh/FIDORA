@@ -2,67 +2,687 @@ import Globals
 import tkinter as tk
 from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog,\
     PhotoImage, BOTH, Canvas, N, S, W, E, ALL, Frame, SUNKEN, Radiobutton, GROOVE, ACTIVE, \
-    FLAT, END, Scrollbar, HORIZONTAL, VERTICAL, ttk
+    FLAT, END, Scrollbar, HORIZONTAL, VERTICAL, ttk, TOP, RIGHT, LEFT
 import os
 from os.path import normpath, basename
 from PIL import Image, ImageTk
 import cv2
 from cv2 import imread, IMREAD_ANYCOLOR, IMREAD_ANYDEPTH, imwrite
 import pydicom
-import numpy as np
 from matplotlib.figure import Figure
 import matplotlib as mpl
 from matplotlib import cm
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
 
-"""
+
+def clearAll():
+    Globals.profiles_film_orientation.set('-')
+    Globals.profiles_film_orientation_menu.config(state=ACTIVE, bg = '#ffffff', width=15, relief=FLAT)
+    
+    Globals.profiles_depth.config(state=NORMAL, fg='black')
+    Globals.profiles_depth.delete('1.0', END)
+    Globals.profiles_depth.insert(INSERT, " ")
+
+    Globals.profiles_iscoenter_coords = []
+    Globals.profiles_film_isocenter = None
+    Globals.profiles_mark_isocenter_up_down_line = []
+    Globals.profiles_mark_isocenter_right_left_line = []
+    Globals.profiles_mark_isocenter_oval = []
+    Globals.profiles_mark_ROI_rectangle = []
+    Globals.profiles_ROI_coords = []
+
+    #if(Globals.profiles_isocenter_check and Globals.profiles_ROI_check):
+    #    Globals.profiles_done_button.config(state=DISABLED)
+    Globals.profiles_isocenter_check = False
+    Globals.profiles_ROI_check = False
+    
+    #if(Globals.profiles_film_window_open):
+    #    Globals.profiles_film_window.destroy()
+    #    Globals.profiles_film_window_open = False
+
+    Globals.profiles_upload_button_film.config(state=ACTIVE)
+    Globals.profiles_upload_button_doseplan.config(state=DISABLED)
+    Globals.profiles_upload_button_rtplan.config(state=DISABLED)
+
+    Globals.profiles_distance_isocenter_ROI = []
+
+    Globals.profiles_film_dataset = None
+    Globals.profiles_film_dataset_red_channel = None
+    Globals.profiles_film_dataset_ROI = None
+    Globals.profiles_film_dataset_ROI_red_channel = None
+
+    Globals.profiles_film_match_isocenter_dataset = np.zeros((7,7))
+
+    Globals.profiles_dataset_doseplan = None
+    Globals.profiles_dataset_rtplan = None
+    Globals.profiles_longitudinal_displacement_mm = None
+    Globals.profiles_lateral_displacement_mm = None
+    Globals.profiles_vertical_displacement_mm = None
+    Globals.profiles_isocenter_mm = None
+    Globals.profiles_test_if_added_rtplan = False
+    Globals.profiles_test_if_added_doseplan = False
+    return
+
+
+def pixel_to_dose(P,a,b,c):
+    ret = c + b/(P-a)
+    return ret
+
+def processDoseplan():
+
+    ################  RT Plan ######################
+
+    #Find each coordinate in mm to isocenter relative to first element in doseplan
+    iso_1 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[0] - Globals.profiles_isocenter_mm[0])
+    iso_2 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[1] - Globals.profiles_isocenter_mm[1])
+    iso_3 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[2] - Globals.profiles_isocenter_mm[2])
+    Globals.profiles_isocenter_mm = [iso_1, iso_2, iso_3]
+
+    #Isocenter in pixel relative to the first element in the doseplan
+    isocenter_px = np.zeros(3)
+    distance_in_doseplan_ROI_reference_point_px = []
+    if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+        isocenter_px[0] = np.round(Globals.profiles_isocenter_mm[0])
+        isocenter_px[1] = np.round(Globals.profiles_isocenter_mm[1])
+        isocenter_px[2] = np.round(Globals.profiles_isocenter_mm[2])
+        lateral_displacement_px = np.round(Globals.profiles_lateral_displacement_mm)
+        longitudinal_displacement_px = np.round(Globals.profiles_longitudinal_displacement_mm)
+        vertical_displacement_px = np.round(Globals.profiles_vertical_displacement_mm)
+        
+        #Change distance in film to pixel in doseplan
+        distance_in_doseplan_ROI_reference_point_px.append([np.round(Globals.profiles_distance_isocenter_ROI[0][0]),\
+            np.round(Globals.profiles_distance_isocenter_ROI[0][1])])
+        distance_in_doseplan_ROI_reference_point_px.append([np.round(Globals.profiles_distance_isocenter_ROI[1][0]),\
+            np.round(Globals.profiles_distance_isocenter_ROI[1][1])])
+        distance_in_doseplan_ROI_reference_point_px.append([np.round(Globals.profiles_distance_isocenter_ROI[2][0]),\
+            np.round(Globals.profiles_distance_isocenter_ROI[2][1])])
+        distance_in_doseplan_ROI_reference_point_px.append([np.round(Globals.profiles_distance_isocenter_ROI[3][0]),\
+            np.round(Globals.profiles_distance_isocenter_ROI[3][1])])
+    
+    elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+        isocenter_px[0] = np.round(Globals.profiles_isocenter_mm[0]/2)
+        isocenter_px[1] = np.round(Globals.profiles_isocenter_mm[1]/2)
+        isocenter_px[2] = np.round(Globals.profiles_isocenter_mm[2]/2)
+        lateral_displacement_px = np.round(Globals.profiles_lateral_displacement_mm/2)
+        longitudinal_displacement_px = np.round(Globals.profiles_longitudinal_displacement_mm/2)
+        vertical_displacement_px = np.round(Globals.profiles_vertical_displacement_mm/2)
+        
+        #Change distance in film to pixel in doseplan
+        distance_in_doseplan_ROI_reference_point_px.append([np.round((Globals.profiles_distance_isocenter_ROI[0][0])/2),\
+            np.round((Globals.profiles_distance_isocenter_ROI[0][1])/2)])
+        distance_in_doseplan_ROI_reference_point_px.append([np.round((Globals.profiles_distance_isocenter_ROI[1][0])/2),\
+            np.round((Globals.profiles_distance_isocenter_ROI[1][1])/2)])
+        distance_in_doseplan_ROI_reference_point_px.append([np.round((Globals.profiles_distance_isocenter_ROI[2][0])/2),\
+            np.round((Globals.profiles_distance_isocenter_ROI[2][1])/2)])
+        distance_in_doseplan_ROI_reference_point_px.append([np.round((Globals.profiles_distance_isocenter_ROI[3][0])/2),\
+            np.round((Globals.profiles_distance_isocenter_ROI[3][1])/2)])
+
     else:
-        file = filedialog.askopenfilename()
-        ext = os.path.splitext(file)[-1].lower()
-        if(ext=='.dcm'):
-            doseplan_dataset = pydicom.dcmread(file)
-            doseplan_dataset_pixelArray = doseplan_dataset.pixel_array
-
-            ############################ Her må vi senere legge inn posisjon på en eller annen måte! #########################
-            doseplan = doseplan_dataset_pixelArray[30,:,:]
-
-            Globals.profiles_doseplan_dataset = doseplan
-            doseplan=doseplan_dataset.DoseGridScaling*doseplan*100   #converts from pixel to cGy
-
-            canvas_doseplan = Canvas(Globals.profile_film_visual, bd=0)
-            canvas_doseplan.grid(row=1, column=0, sticky=N+S+E+W, pady=(5,0), padx=(100,30))
-            Globals.profile_film_visual.grid_columnconfigure(1, weight=0)
-            Globals.profile_film_visual.grid_rowconfigure(1, weight=0)
-            
-            doseplan = 255*doseplan/np.amax(doseplan)
-            doseplan = doseplan.astype('uint8')
-            img = Image.fromarray(doseplan, mode='P')
-
-
-            scale_horizontal = 8
-            scale_vertical = 10
-            img_scaled = img.resize((scale_horizontal*15, scale_vertical*15), Image.ANTIALIAS)
+        isocenter_px[0] = np.round(Globals.profiles_isocenter_mm[0]/3)
+        isocenter_px[1] = np.round(Globals.profiles_isocenter_mm[1]/3)
+        isocenter_px[2] = np.round(Globals.profiles_isocenter_mm[2]/3)
+        lateral_displacement_px = np.round(Globals.profiles_lateral_displacement_mm/3)
+        longitudinal_displacement_px = np.round(Globals.profiles_longitudinal_displacement_mm/3)
+        vertical_displacement_px = np.round(Globals.profiles_vertical_displacement_mm/3)
         
-            img_scaled = ImageTk.PhotoImage(image=img_scaled)
-        
+        #Change distance in film to pixel in doseplan
+        distance_in_doseplan_ROI_reference_point_px.append([np.round((Globals.profiles_distance_isocenter_ROI[0][0])/3),\
+            np.round((Globals.profiles_distance_isocenter_ROI[0][1])/3)])
+        distance_in_doseplan_ROI_reference_point_px.append([np.round((Globals.profiles_distance_isocenter_ROI[1][0])/3),\
+            np.round((Globals.profiles_distance_isocenter_ROI[1][1])/3)])
+        distance_in_doseplan_ROI_reference_point_px.append([np.round((Globals.profiles_distance_isocenter_ROI[2][0])/3),\
+            np.round((Globals.profiles_distance_isocenter_ROI[2][1])/3)])
+        distance_in_doseplan_ROI_reference_point_px.append([np.round((Globals.profiles_distance_isocenter_ROI[3][0])/3),\
+            np.round((Globals.profiles_distance_isocenter_ROI[3][1])/3)])
 
-            canvas_doseplan.create_image(0,0,image=img_scaled,anchor="nw")
-            canvas_doseplan.image = img_scaled
-            canvas_doseplan.config(scrollregion=canvas_doseplan.bbox(ALL), width=120, height=150)
+    reference_point = np.zeros(3)
 
-        elif(ext==""):
+    ######################## Doseplan ##################################
+    #dataset_swapped is now the dataset entered the same way as expected with film (slice, rows, columns)
+    #isocenter_px and reference_point is not turned according to the doseplan and film orientation.
+    if(Globals.profiles_dataset_doseplan.ImageOrientationPatient==[1, 0, 0, 0, 1, 0]):
+        reference_point[1] = isocenter_px[0] + longitudinal_displacement_px
+        reference_point[2] = isocenter_px[1] + vertical_displacement_px
+        reference_point[0] = isocenter_px[2] + lateral_displacement_px
+        if(Globals.profiles_film_orientation.get()=='Coronal'):
+            #number of frames -> rows
+            #rows -> number of frames
+            #columns -> columns
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,1)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[1]
+            isocenter_px[1] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[1]
+            reference_point[1] = temp_ref
+        elif(Globals.profiles_film_orientation.get()=='Sagittal'):
+            #column -> number of frames
+            #number of frames -> rows
+            #rows -> columns
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,2)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[2]
+            reference_point[2] = temp_ref
+            dataset_swapped = np.swapaxes(dataset_swapped, 0,1)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[1]
+            isocenter_px[1] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[1]
+            reference_point[1] = temp_ref
+        elif(Globals.profiles_film_orientation.get()=='Axial'):
+            dataset_swapped = Globals.profiles_dataset_doseplan.pixel_array
+        else:
+            messagebox.showerror("Error", "Something has gone wrong here.")
+            clearAll()
+            return
+    elif(Globals.profiles_dataset_doseplan.ImageOrientationPatient==[1, 0, 0, 0, 0, 1]):
+        reference_point[1] = isocenter_px[0] + vertical_displacement_px
+        reference_point[2] = isocenter_px[1] + longitudinal_displacement_px
+        reference_point[0] = isocenter_px[2] + lateral_displacement_px
+        if(Globals.profiles_film_orientation.get()=='Coronal'):
+            dataset_swapped = Globals.profiles_dataset_doseplan.pixel_array
+        elif(Globals.profiles_film_orientation.get()=='Sagittal'):
+            #columns -> number of frames
+            #number of frames -> columns
+            #rows -> rows
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,2)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[2]
+            reference_point[2] = temp_ref
+        elif(Globals.profiles_film_orientation.get()=='Axial'):
+            #rows -> number of frames
+            #number of frames -> rows
+            #columns -> columns
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,1)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[1]
+            isocenter_px[1] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[1]
+            reference_point[1] = temp_ref
+        else:
+            messagebox.showerror("Error", "Something has gone wrong.")
+            clearAll()
+            return
+    elif(Globals.profiles_dataset_doseplan.ImageOrientationPatient==[0, 1, 0, 1, 0, 0]):
+        reference_point[1] = isocenter_px[0] + longitudinal_displacement_px
+        reference_point[2] = isocenter_px[1] + lateral_displacement_px
+        reference_point[0] = isocenter_px[2] + vertical_displacement_px
+        if(Globals.profiles_film_orientation.get()=='Coronal'):
+            #rows -> columns
+            #columns -> number of frames
+            #number of frames -> rows
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,2)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[2]
+            reference_point[2] = temp_ref
+            dataset_swapped = np.swapaxes(dataset_swapped, 1,2)
+            temp_iso = isocenter_px[1]
+            isocenter_px[1] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[1]
+            reference_point[1] = reference_point[2]
+            reference_point[2] = temp_ref
+        elif(Globals.profiles_film_orientation.get()=='Sagittal'):
+            #number -> rows
+            #colums -> colums
+            #rows -> number of frames
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,1)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[1]
+            isocenter_px[1] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[1]
+            reference_point[1] = temp_ref
+        elif(Globals.profiles_film_orientation.get()=='Axial'):
+            #column -> rows
+            #rows -> column
+            #number of frames -> number of frames
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 1,2)
+            temp_iso = isocenter_px[1]
+            isocenter_px[1] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[1]
+            reference_point[1] = reference_point[2]
+            reference_point[2] = temp_ref
+        else:
+            messagebox.showerror("Error", "Something has gone wrong.")
+            clearAll()
+            return
+    elif(Globals.profiles_dataset_doseplan.ImageOrientationPatient==[0, 1, 0, 0, 0, 1]):
+        reference_point[1] = isocenter_px[0] + lateral_displacement_px
+        reference_point[2] = isocenter_px[1] + longitudinal_displacement_px
+        reference_point[0] = isocenter_px[2] + vertical_displacement_px
+        if(Globals.profiles_film_orientation.get()=='Coronal'):
+            #rows -> rows
+            #columns -> number of frames
+            #number of frames ->columns
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,2)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[2]
+            reference_point[2] = temp_ref
+        elif(Globals.profiles_film_orientation.get()=='Sagittal'):
+            dataset_swapped = Globals.profiles_dataset_doseplan.pixel_array
+        elif(Globals.profiles_film_orientation.get()=='Axial'):
+            #number of frames -> columns
+            #columns -> rows
+            #rows -> number of frames
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,1)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[1]
+            isocenter_px[1] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[1]
+            reference_point[1] = temp_ref
+            dataset_swapped = np.swapaxes(dataset_swapped, 1,2)
+            temp_iso = isocenter_px[1]
+            isocenter_px[1] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[1]
+            reference_point[1] = reference_point[2]
+            reference_point[2] = temp_ref
+        else:
+            messagebox.showerror("Error", "Something has gone wrong.")
+            clearAll()
+            return
+    elif(Globals.profiles_dataset_doseplan.ImageOrientationPatient==[0, 0, 1, 1, 0, 0]):
+        reference_point[1] = isocenter_px[0] + vertical_displacement_px
+        reference_point[2] = isocenter_px[1] + lateral_displacement_px
+        reference_point[0] = isocenter_px[2] + longitudinal_displacement_px
+        if(Globals.profiles_film_orientation.get()=='Coronal'):
+            #rows -> columns
+            #columns -> rows
+            #number of frames -> number of frames
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 1,2)
+            temp_iso = isocenter_px[1]
+            isocenter_px[1] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[1]
+            reference_point[1] = reference_point[2]
+            reference_point[2] = temp_ref
+        elif(Globals.profiles_film_orientation.get()=='Sagittal'):
+            #rows -> number of frames
+            #columns -> rows
+            #number of frames -> columns
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,1)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[1]
+            isocenter_px[1] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[1]
+            reference_point[1] = temp_ref
+            dataset_swapped = np.swapaxes(dataset_swapped, 1,2)
+            temp_iso = isocenter_px[1]
+            isocenter_px[1] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[1]
+            reference_point[1] = reference_point[2]
+            reference_point[2] = temp_ref
+        elif(Globals.profiles_film_orientation.get()=='Axial'):
+            #rows -> columns
+            #colums -> number of frames
+            #number of frames -> rows
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,1)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[1]
+            isocenter_px[1] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[1]
+            reference_point[1] = temp_ref
+            dataset_swapped = np.swapaxes(dataset_swapped, 0,2)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[2]
+            reference_point[2] = temp_ref
+        else:
+            messagebox.showerror("Error", "Something has gone wrong.")
+            clearAll()
+            return
+    elif(Globals.profiles_dataset_doseplan.ImageOrientationPatient==[0, 0, 1, 0, 1, 0]):
+        reference_point[1] = isocenter_px[0] + lateral_displacement_px
+        reference_point[2] = isocenter_px[1] + vertical_displacement_px
+        reference_point[0] = isocenter_px[2] + longitudinal_displacement_px
+        if(Globals.profiles_film_orientation.get()=='Coronal'):
+            #rows -> number of frames
+            #columns ->rows
+            #number of frames -> columns
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,2)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[2]
+            reference_point[2] = temp_ref
+            dataset_swapped = np.swapaxes(dataset_swapped, 0,1)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[1]
+            isocenter_px[1] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[1]
+            reference_point[1] = temp_ref
+        elif(Globals.profiles_film_orientation.get()=='Sagittal'):
+            #rows -> columns
+            #columns -> rows
+            #number of frames -> number of frames
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 1,2)
+            temp_iso = isocenter_px[1]
+            isocenter_px[1] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[1]
+            reference_point[1] = reference_point[2]
+            reference_point[2] = temp_ref
+        elif(Globals.profiles_film_orientation.get()=='Axial'):
+            #rows -> rows
+            #columns -> number of frames
+            #number of frames -> columns
+            dataset_swapped = np.swapaxes(Globals.profiles_dataset_doseplan.pixel_array, 0,2)
+            temp_iso = isocenter_px[0]
+            isocenter_px[0] = isocenter_px[2]
+            isocenter_px[2] = temp_iso
+            temp_ref = reference_point[0]
+            reference_point[0] = reference_point[2]
+            reference_point[2] = temp_ref
+        else:
+            messagebox.showerror("Error", "Something has gone wrong.")
+            clearAll()
+            return
+    else:
+        messagebox.showerror("Error", "Something has gone wrong.")
+        clearAll()
+        return
+    
+
+
+    ####################### Match film and doseplan ###############################
+
+    #Pick the slice where the reference point is (this is the slice-position of the film)
+    dose_slice = dataset_swapped[int(reference_point[0]), :, :]
+    
+    #calculate the coordinated of the Region of Interest in doseplan (marked on the film) 
+    #and checks if it actualy exists in dosematrix
+    
+    doseplan_ROI_coords = []
+    top_left_test_side = False; top_left_test_down = False
+    top_right_test_side = False; top_right_test_down = False
+    bottom_left_test_side = False; bottom_left_test_down = False
+    bottom_right_test_side = False; bottom_right_test_down = False
+    top_left_side_corr = 0; top_left_down_corr = 0
+    top_right_side_corr = 0; top_right_down_corr = 0
+    bottom_left_side_corr = 0; bottom_left_down_corr = 0
+    bottom_right_side_corr = 0; bottom_right_down_corr = 0
+
+
+    top_left_to_side = reference_point[2] - distance_in_doseplan_ROI_reference_point_px[0][0]
+    top_left_down = reference_point[1] - distance_in_doseplan_ROI_reference_point_px[0][1]
+    if(top_left_to_side < 0):
+        top_left_test_side = True
+        top_left_side_corr = abs(top_left_to_side)
+        top_left_to_side = 0
+    if(top_left_to_side > dose_slice.shape[1]):
+        messagebox.showerror("Fatal Error", "Fatal error: marked ROI is out of range in doseplan. Try again")
+        clearAll()
+        return
+    if(top_left_down < 0):
+        top_left_test_down = True
+        top_left_down_corr = abs(top_left_down)
+        top_left_down = 0
+    if(top_left_down > dose_slice.shape[0]):
+        messagebox.showerror("Fatal Error", "Fatal error: marked ROI is out of range in doseplan. Try again")
+        clearAll()
+        return
+    
+    top_right_to_side = reference_point[2] - distance_in_doseplan_ROI_reference_point_px[1][0]
+    top_right_down = reference_point[1] - distance_in_doseplan_ROI_reference_point_px[1][1]
+    if(top_right_to_side < 0):
+        messagebox.showerror("Fatal Error", "Fatal error: marked ROI is out of range in doseplan. Try again")
+        clearAll()
+        return
+    if(top_right_to_side > dose_slice.shape[1]):
+        top_right_test_side = True
+        top_right_side_corr = top_right_to_side - dose_slice.shape[1]
+        top_right_to_side = dose_slice.shape[1]
+    if(top_right_down < 0):
+        top_right_test_down = True
+        top_right_down_corr = abs(top_right_down)
+        top_right_down = 0
+    if(top_right_down > dose_slice.shape[0]):
+        messagebox.showerror("Fatal Error", "Fatal error: marked ROI is out of range in doseplan. Try again")
+        clearAll()
+        return
+
+    bottom_left_to_side = reference_point[2] - distance_in_doseplan_ROI_reference_point_px[2][0]
+    bottom_left_down = reference_point[1] - distance_in_doseplan_ROI_reference_point_px[2][1]
+    if(bottom_left_to_side < 0):
+        bottom_left_test_side = True
+        bottom_left_side_corr = abs(bottom_left_to_side)
+        bottom_left_to_side = 0
+    if(bottom_left_to_side > dose_slice.shape[1]):
+        messagebox.showerror("Fatal Error", "Fatal error: marked ROI is out of range in doseplan. Try again")
+        clearAll()
+        return
+    if(bottom_left_down < 0):
+        messagebox.showerror("Fatal Error", "Fatal error: marked ROI is out of range in doseplan. Try again")
+        clearAll()
+        return
+    if(bottom_left_down > dose_slice.shape[0]):
+        bottom_left_down_corr = bottom_left_down - dose_slice.shape[0]
+        bottom_left_down = dose_slice.shape[0]
+        bottom_left_test_down = True
+    
+    bottom_right_to_side = reference_point[2] - distance_in_doseplan_ROI_reference_point_px[3][0]
+    bottom_right_down = reference_point[1] - distance_in_doseplan_ROI_reference_point_px[3][1]
+    if(bottom_right_to_side < 0):
+        messagebox.showerror("Fatal Error", "Fatal error: marked ROI is out of range in doseplan. Try again")
+        clearAll()
+        return
+    if(bottom_right_to_side > dose_slice.shape[1]):
+        bottom_right_side_corr = bottom_right_to_side - dose_slice.shape[1]
+        bottom_right_to_side = dose_slice.shape[1]
+        bottom_right_test_side = True
+    if(bottom_right_down < 0):
+        messagebox.showerror("Fatal Error", "Fatal error: marked ROI is out of range in doseplan. Try again")
+        clearAll()
+        return
+    if(bottom_right_down > dose_slice.shape[0]):
+        bottom_right_down_corr = bottom_right_down - dose_slice.shape[0]
+        bottom_right_down = dose_slice.shape[0]
+        bottom_right_test_down = True
+    
+
+    if(top_right_test_side or top_right_test_down or top_left_test_side or top_left_test_down \
+        or bottom_right_test_side or bottom_right_test_down or bottom_left_test_side or bottom_left_test_down):
+        ROI_info = "Left side: " + str(max(top_left_side_corr, bottom_left_side_corr)) + " pixels.\n"\
+            + "Right side: " + str(max(top_right_side_corr, bottom_right_side_corr)) + " pixels.\n "\
+            + "Top side: " + str(max(top_left_down_corr, top_right_down_corr)) + " pixels.\n"\
+            + "Bottom side: " + str(max(bottom_left_down_corr, bottom_right_down_corr)) + " pixels."  
+        messagebox.showinfo("ROI info", "The ROI marked on the film did not fit with the size of the doseplan and had to \
+            be cut.\n" + ROI_info )
+
+    doseplan_ROI_coords.append([top_left_to_side, top_left_down])
+    doseplan_ROI_coords.append([top_right_to_side, top_right_down])
+    doseplan_ROI_coords.append([bottom_left_to_side, bottom_left_down])
+    doseplan_ROI_coords.append([bottom_right_to_side, bottom_right_down])
+
+    Globals.profiles_doseplan_dataset_ROI = dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+    
+    
+    img=Globals.profiles_doseplan_dataset_ROI
+    if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+        img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
+    elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+        img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+    else:
+        img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+    
+    #temp_img = np.zeros((img.shape[0], img.shape[1], 3))
+    #temp_img[:,:,0]=img;temp_img[:,:,1]=img;temp_img[:,:,2]=img
+    #img = temp_img
+    #PIL_img_doseplan_ROI = (img/256).astype('uint8')
+    #PIL_img_doseplan_ROI = Image.fromarray(PIL_img_doseplan_ROI)
+    #PIL_img_doseplan_ROI= PIL_img_doseplan_ROI.convert("P", palette=Image.ADAPTIVE, colors=255)
+    mx=np.max(img)
+    max_dose = mx*Globals.profiles_dose_scaling_doseplan
+    img = img/mx
+    PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
+
+
+    wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
+    doseplan_canvas = tk.Canvas(Globals.profiles_film_panedwindow)
+    doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
+    Globals.profiles_film_panedwindow.add(doseplan_canvas, \
+        height=max(heig, Globals.profiles_doseplan_text_image.height()), width=wid + Globals.profiles_doseplan_text_image.width())
+    doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+        height=max(heig, Globals.profiles_doseplan_text_image.height()), width=wid + Globals.profiles_doseplan_text_image.width())
+
+    doseplan_write_image = tk.Canvas(doseplan_canvas)
+    doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+    doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+
+    doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
+    doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
+    doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+        width=Globals.profiles_doseplan_text_image.width(), height=Globals.profiles_doseplan_text_image.height())
+
+    scaled_image_visual = PIL_img_doseplan_ROI
+    scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
+    doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
+    doseplan_write_image.image = scaled_image_visual
+    doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image)
+    doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
+
+
+
+
+def UploadRTplan():
+    file = filedialog.askopenfilename()
+    ext = os.path.splitext(file)[-1].lower()
+    if(not(ext == '.dcm')):
+        if(ext == ""):
             return
         else:
-            messagebox.showerror("Error", "The file must be a *.dmc file")
-"""
+            messagebox.showerror("Error", "The file must be a *.dcm file")
+            return
+    
+    current_folder = os.getcwd()
+    parent = os.path.dirname(file)
+    os.chdir(parent)
+    dataset = pydicom.dcmread(file)
+    os.chdir(current_folder)
+    Globals.profiles_dataset_rtplan = dataset
+
+    #Isocenter given in mm from origo in patient coordinate system
+    try:
+        isocenter_mm = dataset.BeamSequence[0].ControlPointSequence[0].IsocenterPosition
+        Globals.profiles_isocenter_mm = isocenter_mm
+    except:
+        messagebox.showerror("Error", "Could not read the RT plan file. Try again or try another file.")
+        return
+    
+    try:
+        lateral_displacement_mm = dataset.PatientSetupSequence[0].TableTopLateralSetupDisplacement
+        Globals.profiles_lateral_displacement_mm = lateral_displacement_mm
+    except:
+        messagebox.showerror("Error", "Could not read the RT plan file. Try again or try another file.")
+        return
+
+    try:
+        longitudinal_displacement_mm = dataset.PatientSetupSequence[0].TableTopLongitudinalSetupDisplacement
+        Globals.profiles_longitudinal_displacement_mm = longitudinal_displacement_mm
+    except:
+        messagebox.showerror("Error", "Could not read the RT plan file. Try again or try another file.")
+        return
+
+    try:
+        vertical_displacement_mm = dataset.PatientSetupSequence[0].TableTopVerticalSetupDisplacement
+        Globals.profiles_vertical_displacement_mm = vertical_displacement_mm
+    except:
+        messagebox.showerror("Error", "Could not read the RT plan file. Try again or try another file.")
+        return
+
+    Globals.profiles_test_if_added_rtplan = True
+    if(Globals.profiles_test_if_added_doseplan):
+        processDoseplan()
+
+    Globals.profiles_upload_button_rtplan.config(state=DISABLED)
+
+
+def UploadDoseplan():
+    file = filedialog.askopenfilename()
+    ext = os.path.splitext(file)[-1].lower()
+    if(not(ext == '.dcm')):
+        if(ext == ""):
+            return
+        else:
+            messagebox.showerror("Error", "The file must be a *.dcm file")
+            return
+    
+    current_folder = os.getcwd()
+    parent = os.path.dirname(file)
+    os.chdir(parent)
+    dataset = pydicom.dcmread(file)
+    os.chdir(current_folder)
+    doseplan_dataset = dataset.pixel_array
+
+    Globals.profiles_dataset_doseplan = dataset
+    Globals.profiles_dose_scaling_doseplan = dataset.DoseGridScaling
+    #Check that the resolution is either 1x1x1, 2x2x2 or 3x3x3
+    if(not((dataset.PixelSpacing==[1, 1] and dataset.SliceThickness==1) \
+        or (dataset.PixelSpacing==[2, 2] and dataset.SliceThickness==2) \
+        or (dataset.PixelSpacing==[3, 3] and dataset.SliceThickness==3))):
+            messagebox.showerror("Error", "The resolution in doseplan must be 1x1x1, 2x2x2 or 3x3x3")
+            return
+
+    #Check that the datamatrix is in right angles to the coordinate system
+    if(not(dataset.ImageOrientationPatient==[1, 0, 0, 0, 1, 0] or \
+        dataset.ImageOrientationPatient==[1, 0, 0, 0, 0, 1] or \
+        dataset.ImageOrientationPatient==[0, 1, 0, 1, 0, 0] or \
+        dataset.ImageOrientationPatient==[0, 1, 0, 0, 0, 1] or \
+        dataset.ImageOrientationPatient==[0, 0, 1, 1, 0, 0] or \
+        dataset.ImageOrientationPatient==[0, 0, 1, 0, 1, 0])):
+        messagebox.showerror("Error", "The Image Orientation (Patient) must be parallel to one of the main axis and perpendicular to the two others.")
+
+   
+    Globals.profiles_test_if_added_doseplan = True
+    if(Globals.profiles_test_if_added_rtplan):
+        processDoseplan()
+
+    Globals.profiles_upload_button_doseplan.config(state=DISABLED)
+
 
 def UploadFilm():
+    #if(Globals.profiles_film_window_open):
+    #    Globals.profiles_film_window.destroy()
+    #    Globals.profiles_film_window_open = False
     if(Globals.profiles_film_orientation.get() == '-'):
         messagebox.showerror("Missing parameter", "Film orientation missing")
         return
     if(Globals.profiles_depth.get("1.0",'end-1c') == " "):
         messagebox.showerror("Missing parameter", "Film depth missing")
         return
+    try:
+        Globals.profiles_depth_float = float(Globals.profiles_depth.get("1.0", 'end-1c'))
+    except:
+        messagebox.showerror("Error", "The depth must be a number")
+        return
+    Globals.profiles_depth.config(state=DISABLED, fg='gray')
+    Globals.profiles_film_orientation_menu.configure(state=DISABLED)
     file = filedialog.askopenfilename()
     ext = os.path.splitext(file)[-1].lower()
     if(ext == '.tif'):
@@ -78,6 +698,7 @@ def UploadFilm():
         if(cv2Img.shape[2] == 3):
             if(cv2Img.shape[0]==1270 and cv2Img.shape[1]==1016):
                 cv2Img = abs(cv2Img-Globals.correctionMatrix127)
+                cv2Img = np.clip(cv2Img, 0, 65535)
             else:
                 messagebox.showerror("Error","The resolution of the image is not consistent with dpi")
                 return
@@ -91,6 +712,7 @@ def UploadFilm():
         if(not (img.width == 1016)):
             messagebox.showerror("Error", "Dpi in image has to be 127")
             return
+        
         
         scale_horizontal = 2
         scale_vertical = 2
@@ -205,10 +827,44 @@ with the placement click the button again and repeat.")
             mark_isocenter_image_canvas.grid_propagate(0)
 
             def findCoords(event):
-                Globals.profiles_iscoenter_coords.append([event.x, event.y])
-                #print(event.x, event.y)
                 mark_isocenter_image_canvas.create_oval(event.x-2, event.y-2, event.x+2, event.y+2, fill='red')
-                if(len(Globals.profiles_iscoenter_coords)==1):
+                if(Globals.profiles_iscoenter_coords==[]):
+                    Globals.profiles_iscoenter_coords.append([event.x, event.y])
+                    mark_isocenter_image_canvas.config(cursor='right_side')
+
+                elif(len(Globals.profiles_iscoenter_coords)==1):
+                    Globals.profiles_iscoenter_coords.append([event.x, event.y])
+                    Globals.profiles_film_isocenter = [Globals.profiles_iscoenter_coords[0][0], Globals.profiles_iscoenter_coords[1][1]]
+                    #el1=0;el2=0
+                    #for i in range(-15,16,5):
+                    #    for j in range(-15,16,5):
+                    #        Globals.profiles_film_match_isocenter_dataset[el1,el2] = \
+                    #            Globals.profiles_film_dataset_red_channel[Globals.profiles_film_isocenter[1]+i, Globals.profiles_film_isocenter[0]+j]
+                    #        el2+=1
+                    #    el2=0;el1+=1
+                    x1,y1 = Globals.profiles_iscoenter_coords[0]
+                    x4,y4 = Globals.profiles_iscoenter_coords[1]
+                    x2 = x1;y3=y4
+                    y2=2*Globals.profiles_film_isocenter[1]-y1
+                    x3=2*Globals.profiles_film_isocenter[0]-x4
+                    up_down_line = image_canvas.create_line(int(x1/2),int(y1/2),int(x2/2),int(y2/2),fill='purple', smooth=1, width=2)
+                    right_left_line = image_canvas.create_line(int(x3/2),int(y3/2),int(x4/2),int(y4/2), fill='purple', smooth=1, width=2)
+                    oval = image_canvas.create_oval(int(Globals.profiles_film_isocenter[0]/2)-3, int(Globals.profiles_film_isocenter[1]/2)-3,\
+                         int(Globals.profiles_film_isocenter[0]/2)+3, int(Globals.profiles_film_isocenter[1]/2)+3, fill='red')
+
+                    Globals.profiles_mark_isocenter_up_down_line.append(up_down_line)
+                    Globals.profiles_mark_isocenter_right_left_line.append(right_left_line)
+                    Globals.profiles_mark_isocenter_oval.append(oval)
+                    mark_isocenter_window.after(500, lambda: mark_isocenter_window.destroy())
+                    Globals.profiles_isocenter_check = True
+                    if(Globals.profiles_ROI_check):
+                        Globals.profiles_done_button.config(state=ACTIVE)
+            """
+            #def findCoords(event):
+            #    Globals.profiles_iscoenter_coords.append([event.x, event.y])
+            #    print(event.x, event.y)
+            #    mark_isocenter_image_canvas.create_oval(event.x-2, event.y-2, event.x+2, event.y+2, fill='red')
+            #    if(len(Globals.profiles_iscoenter_coords)==1):
                     mark_isocenter_image_canvas.config(cursor='bottom_side')
                 elif(len(Globals.profiles_iscoenter_coords)==2):
                     mark_isocenter_image_canvas.config(cursor='right_side')
@@ -289,10 +945,9 @@ with the placement click the button again and repeat.")
                     Globals.profiles_isocenter_check = True
                     if(Globals.profiles_ROI_check):
                         Globals.profiles_done_button.config(state=ACTIVE)
-                
-
+            """    
             mark_isocenter_image_canvas.bind("<Button 1>",findCoords)
-
+            
         mark_isocenter_button_frame = tk.Frame(new_window_scroll_frame)
         mark_isocenter_button_frame.grid(row=3, column=3, padx=(10,10), pady=(0,10))
         mark_isocenter_button_frame.configure(bg='#ffffff')
@@ -381,7 +1036,7 @@ are not happy with the placement click the button again.")
                 mark_ROI_image_canvas.coords(rectangle, rectangle_top_corner[0][0], rectangle_top_corner[0][1],\
                     rectangle_bottom_corner[0][0], rectangle_bottom_corner[0][1])
                 mark_ROI_image_canvas.itemconfig(rectangle, outline='Blue')
-                ### Husk at koordinatene går bortover så nedover!
+                ### Husk at koordinatene går bortover så nedover! Top left - top right - bottom left - bottom right
                 Globals.profiles_ROI_coords.append([rectangle_top_corner[0][0], rectangle_top_corner[0][1]])
                 Globals.profiles_ROI_coords.append([rectangle_bottom_corner[0][0], rectangle_top_corner[0][1]])
                 Globals.profiles_ROI_coords.append([rectangle_top_corner[0][0], rectangle_bottom_corner[0][1]])
@@ -429,6 +1084,7 @@ are not happy with the placement click the button again.")
             weight_cnt = 0
             read = open('calibration.txt', 'r')
             lines = read.readlines()
+            read.close()
             row_cnt=0
             for l in lines:
                 words = l.split()
@@ -479,6 +1135,33 @@ are not happy with the placement click the button again.")
                 Globals.profiles_popt_red[2] = float(words[5])
                 f.close()
 
+                Globals.profiles_film_dataset_ROI_red_channel_dose = np.zeros((Globals.profiles_film_dataset_ROI_red_channel.shape[0],\
+                    Globals.profiles_film_dataset_ROI_red_channel.shape[1]))
+                for i in range(Globals.profiles_film_dataset_ROI_red_channel_dose.shape[0]):
+                    for j in range(Globals.profiles_film_dataset_ROI_red_channel_dose.shape[1]):
+                        Globals.profiles_film_dataset_ROI_red_channel_dose[i,j] = pixel_to_dose(Globals.profiles_film_dataset_ROI_red_channel[i,j], \
+                            Globals.profiles_popt_red[0], Globals.profiles_popt_red[1], Globals.profiles_popt_red[2])
+
+                film_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
+                film_write_image.image = scaled_image_visual
+
+                mx_film=np.max(Globals.profiles_film_dataset_ROI_red_channel_dose)
+                Globals.profiles_max_dose_film = mx_film
+                img_film = Globals.profiles_film_dataset_ROI_red_channel_dose
+                img_film = img_film/mx_film
+                PIL_img_film = Image.fromarray(np.uint8(cm.viridis(img_film)*255))
+
+                scaled_image_visual_film = ImageTk.PhotoImage(image=PIL_img_film)
+                film_dose_write_image.create_image(0,0,image=scaled_image_visual_film, anchor="nw")
+                film_dose_write_image.image = scaled_image_visual_film
+
+                film_scanned_image_text_canvas.create_image(0,0,image=Globals.profiles_scanned_image_text_image, anchor="nw")
+                film_scanned_image_text_canvas.image = Globals.profiles_scanned_image_text_image
+                film_dose_map_image_text_canvas.create_image(0,0, image=Globals.profiles_film_dose_map_text_image, anchor="nw")
+                film_dose_map_image_text_canvas.image=Globals.profiles_film_dose_map_text_image
+
+                new_window.destroy()
+
             set_batch_button_frame = tk.Frame(choose_batch_frame)
             set_batch_button_frame.grid(row=row_cnt, column=1, columnspan=3, padx=(10,0), pady=(5,5))
             set_batch_button_frame.configure(bg='#ffffff')
@@ -489,14 +1172,114 @@ are not happy with the placement click the button again.")
                 font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=set_batch)
             set_batch_button.pack(expand=True, fill=BOTH)
             set_batch_button.image=Globals.done_button_image
-            read.close()
             
-            scaled_image_visual = img.resize((8*25, 10*25), Image.ANTIALIAS)
-            scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
-            Globals.profile_film_visual.create_image(0,0,image=scaled_image_visual,anchor="nw")
-            Globals.profile_film_visual.image = scaled_image_visual
-            new_window.destroy()
+            #def callback_to_closing():
+            #    Globals.profiles_film_window.destroy()
+            #    Globals.profiles_film_window_open = False
+            
+            #Globals.profiles_film_window = tk.Toplevel(Globals.tab4_canvas)
+            #Globals.profiles_film_window.geometry("600x500+0+0")
+            #Globals.profiles_film_window_open = True
+            #Globals.profiles_film_window.protocol("WM_DELETE_WINDOW", callback_to_closing)
 
+            #film_window_over_all_frame = tk.Frame(Globals.profiles_film_window, bd=0, relief=FLAT)
+            #film_window_over_all_canvas = Canvas(film_window_over_all_frame)
+            #film_window_xscrollbar = Scrollbar(film_window_over_all_frame, orient=HORIZONTAL, command=film_window_over_all_canvas.xview)
+            #film_window_yscrollbar = Scrollbar(film_window_over_all_frame, command=film_window_over_all_canvas.yview)
+            #film_window_scroll_frame = ttk.Frame(film_window_over_all_canvas)
+            #film_window_scroll_frame.bind("<Configure>", lambda e: film_window_over_all_canvas.configure(scrollregion=film_window_over_all_canvas.bbox('all')))
+            #film_window_over_all_canvas.create_window((0,0), window=film_window_scroll_frame, anchor='nw')
+            #film_window_over_all_canvas.configure(xscrollcommand=film_window_xscrollbar.set, yscrollcommand=film_window_yscrollbar.set)
+
+            #film_window_over_all_frame.config(highlightthickness=0, bg='#ffffff')
+            #film_window_over_all_canvas.config(highlightthickness=0, bg='#ffffff')
+            #film_window_over_all_frame.pack(expand=True, fill=BOTH)
+            #film_window_over_all_canvas.grid(row=0, column=0, sticky=N+S+E+W)
+            #film_window_over_all_frame.grid_columnconfigure(0, weight=1)
+            #film_window_over_all_frame.grid_rowconfigure(0, weight=1)
+            #film_window_xscrollbar.grid(row=1, column=0, sticky=E+W)
+            #film_window_over_all_frame.grid_columnconfigure(1, weight=0)
+            #film_window_over_all_frame.grid_rowconfigure(1, weight=0)
+            #film_window_yscrollbar.grid(row=0, column=1, sticky=N+S)
+            #film_window_over_all_frame.grid_columnconfigure(2, weight=0)
+            #film_window_over_all_frame.grid_rowconfigure(2, weight=0)
+
+            
+
+            img_ROI = Globals.profiles_film_dataset[Globals.profiles_ROI_coords[0][1]:Globals.profiles_ROI_coords[2][1],\
+                Globals.profiles_ROI_coords[0][0]:Globals.profiles_ROI_coords[1][0], :]
+            img_ROI_red_channel = img_ROI[:,:,2]
+            Globals.profiles_film_dataset_ROI = img_ROI
+            Globals.profiles_film_dataset_ROI_red_channel = img_ROI_red_channel
+            R = img_ROI[:,:,2];B = img_ROI[:,:,0]; G = img_ROI[:,:,1]
+            img_ROI_RGB = np.zeros(img_ROI.shape)
+            img_ROI_RGB[:,:,0]=R; img_ROI_RGB[:,:,1]=G; img_ROI_RGB[:,:,2]=B 
+            PIL_img_ROI = (img_ROI_RGB/256).astype('uint8')
+            PIL_img_ROI = Image.fromarray(PIL_img_ROI, 'RGB')
+            #PIL_img_ROI = Image.fromarray((img_ROI_RGB * 255).astype(np.uint8), 'RGB')
+            wid = PIL_img_ROI.width;heig = PIL_img_ROI.height
+            #film_window_write_image = tk.Canvas(film_window_scroll_frame)
+            
+            film_image_canvas = tk.Canvas(Globals.profiles_film_panedwindow)
+            film_image_canvas.grid(row=0,column=0, sticky=N+S+W+E)
+            Globals.profiles_film_panedwindow.add(film_image_canvas, \
+                height=max(heig,Globals.profiles_scanned_image_text_image.height()), \
+                    width=wid + Globals.profiles_scanned_image_text_image.width())
+            film_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+                height=max(heig,Globals.profiles_scanned_image_text_image.height()), \
+                    width=wid + Globals.profiles_scanned_image_text_image.width())
+
+            film_write_image = tk.Canvas(film_image_canvas)
+            film_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+            film_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+            #film_window_write_image.pack(expand=True, fill=BOTH)
+            #film_window_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+
+            film_dose_canvas = tk.Canvas(Globals.profiles_film_panedwindow)
+            film_dose_canvas.grid(row=1,column=0, sticky=N+S+W+E)
+            Globals.profiles_film_panedwindow.add(film_dose_canvas, \
+                height=max(heig,Globals.profiles_film_dose_map_text_image.height()), \
+                    width=wid + Globals.profiles_film_dose_map_text_image.width())
+            film_dose_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+                height=max(heig,Globals.profiles_film_dose_map_text_image.height()), \
+                    width=wid + Globals.profiles_film_dose_map_text_image.width())
+            
+            film_dose_write_image = tk.Canvas(film_dose_canvas)
+            film_dose_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+            film_dose_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+
+            film_scanned_image_text_canvas=tk.Canvas(film_image_canvas)
+            film_scanned_image_text_canvas.grid(row=0,column=0,sticky=N+S+W+E)
+            film_scanned_image_text_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+                height=Globals.profiles_scanned_image_text_image.height(), width=Globals.profiles_scanned_image_text_image.width())
+
+            film_dose_map_image_text_canvas=tk.Canvas(film_dose_canvas)
+            film_dose_map_image_text_canvas.grid(row=0,column=0,sticky=N+S+W+E)
+            film_dose_map_image_text_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+                height=Globals.profiles_film_dose_map_text_image.height(), width=Globals.profiles_film_dose_map_text_image.width())
+
+            scaled_image_visual = PIL_img_ROI
+            scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
+            
+            #film_window_write_image.create_image(0,0,image=scaled_image_visual,anchor="nw")
+            #film_window_write_image.image = scaled_image_visual
+
+            Globals.profiles_upload_button_doseplan.config(state=ACTIVE)
+            Globals.profiles_upload_button_rtplan.config(state=ACTIVE)
+            Globals.profiles_upload_button_film.config(state=DISABLED)
+
+            #Beregne avstand mellom ROI og isocenter gitt i mm 
+            # [top left[mot venstre, oppover], top right[mot venstre (høyre blir negativ), oppover], bottom left, bottom right]
+            Globals.profiles_distance_isocenter_ROI.append([(Globals.profiles_film_isocenter[0]-Globals.profiles_ROI_coords[0][0])*0.2, \
+                (Globals.profiles_film_isocenter[1] -Globals.profiles_ROI_coords[0][1])*0.2])
+            Globals.profiles_distance_isocenter_ROI.append([(Globals.profiles_film_isocenter[0] - Globals.profiles_ROI_coords[1][0])*0.2,\
+                (Globals.profiles_film_isocenter[1] - Globals.profiles_ROI_coords[1][1])*0.2])
+            Globals.profiles_distance_isocenter_ROI.append([(Globals.profiles_film_isocenter[0] - Globals.profiles_ROI_coords[2][0])*0.2,\
+                (Globals.profiles_film_isocenter[1] - Globals.profiles_ROI_coords[2][1])*0.2])
+            Globals.profiles_distance_isocenter_ROI.append([(Globals.profiles_film_isocenter[0] - Globals.profiles_ROI_coords[3][0])*0.2,\
+                (Globals.profiles_film_isocenter[1] - Globals.profiles_ROI_coords[3][1])*0.2])
+
+            
         done_button_frame = tk.Frame(new_window_scroll_frame)
         done_button_frame.grid(row=9, column=3, padx=(10,10), pady=(5,5))
         done_button_frame.configure(bg='#ffffff')
@@ -516,30 +1299,9 @@ are not happy with the placement click the button again.")
         messagebox.showerror("Error", "The file must be a *.tif file")
 
 def plot_profiles():
-    print(Globals.profiles_film_orientation.get())
+    #print(Globals.profiles_film_orientation.get())
     return
 
-def clearAll():
-    Globals.profiles_film_orientation.set('-')
-    Globals.profiles_film_orientation_menu.config(state=ACTIVE, bg = '#ffffff', width=15, relief=FLAT)
-    
-    Globals.profiles_depth.config(state=NORMAL, fg='black')
-    Globals.profiles_depth.delete('1.0', END)
-    Globals.profiles_depth.insert(INSERT, " ")
-
-    Globals.profiles_iscoenter_coords = []
-    Globals.profiles_film_isocenter = None
-    Globals.profiles_mark_isocenter_up_down_line = []
-    Globals.profiles_mark_isocenter_right_left_line = []
-    Globals.profiles_mark_isocenter_oval = []
-    Globals.profiles_mark_ROI_rectangle = []
-    Globals.profiles_ROI_coords = []
-
-    Globals.profiles_done_button.config(state=DISABLED)
-    Globals.profiles_isocenter_check = False
-    Globals.profiles_ROI_check = False
-    
-    return
 
 def help_showPlanes():
     new_window = tk.Toplevel(Globals.tab4)

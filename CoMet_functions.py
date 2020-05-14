@@ -21,7 +21,7 @@ def UploadAction(event=None):
     ext = os.path.splitext(Globals.CoMet_uploaded_filename.get())[-1].lower()
     if(ext==".tif"):
         Globals.CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label,  height=1, width=32)
-        Globals.CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+        Globals.CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=2, sticky=E+W, pady=(20,20), padx=(80,0))
         Globals.CoMet_uploaded_file_text.insert(INSERT, basename(normpath(Globals.CoMet_uploaded_filename.get())))
         Globals.CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
 
@@ -30,7 +30,7 @@ def UploadAction(event=None):
             Globals.CoMet_progressbar_check_file = False
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height = 1, width=5)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
+        Globals.CoMet_progressbar_text.grid(row=5, column=0, columnspan=1, sticky=E, padx=(0,158), pady=(27,0))
         Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25)+"%")
         if(Globals.CoMet_progressbar_counter*25 == 100):
             Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
@@ -69,7 +69,7 @@ def setCoMet_export_folder():
             Globals.CoMet_progressbar_check_folder = False
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
+        Globals.CoMet_progressbar_text.grid(row=5, column=0, columnspan=1, sticky=E, padx=(0,158), pady=(27,0))
         Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
         if(Globals.CoMet_progressbar_counter*25 == 100):
             Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
@@ -101,9 +101,11 @@ def correctionMatrix():
     
     if(dataset.shape[2] == 3):
         if(dataset.shape[0]==1270 and dataset.shape[1]==1016):
-            Globals.CoMet_correctedImage = abs(dataset-Globals.correctionMatrix127)
+            temp = abs(dataset-Globals.correctionMatrix127)
+            Globals.CoMet_correctedImage = np.clip(temp, 0, 65535)
         elif(dataset.shape[0]==720 and dataset.shape[1]==576):
-            Globals.CoMet_correctedImage = abs(dataset - Globals.correctionMatrix72)
+            temp = abs(dataset - Globals.correctionMatrix72)
+            Globals.CoMet_correctedImage = np.clip(temp, 0, 65535)
         else:
             messagebox.showerror("Error","The resolution of the image is not consistent with dpi. Must be either 72 or 127")
 
@@ -124,7 +126,7 @@ def Correct():
         Globals.CoMet_progressbar_counter -= 1
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, width = 5, height=1)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
+        Globals.CoMet_progressbar_text.grid(row=5, column=0, columnspan=1, sticky=E, padx=(0,158), pady=(27,0))
         Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
         if(Globals.CoMet_progressbar_counter*25 == 100):
             Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
@@ -143,14 +145,14 @@ def Correct():
         messagebox.showerror("Error", "The image could not be corrected. Please check all the specifications and try again.")
         Globals.CoMet_progressbar["value"]=0
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
+        Globals.CoMet_progressbar_text.grid(row=5, column=0, columnspan=1, sticky=E, padx=(0,158), pady=(27,0))
         Globals.CoMet_progressbar_text.insert(INSERT, "0%")
         Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff', font=('calibri', '10', 'bold'))
     else:
         Globals.CoMet_progressbar_counter +=1
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
+        Globals.CoMet_progressbar_text.grid(row=5, column=0, columnspan=1, sticky=E, padx=(0,158), pady=(27,0))
         Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
         if(Globals.CoMet_progressbar_counter*25 == 100):
             Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
