@@ -1,8 +1,13 @@
 import Globals
 import tkinter as tk
+import tkinter.ttk 
 from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, \
     PhotoImage, BOTH, Toplevel, GROOVE, ACTIVE, FLAT, N, S, W, E, ALL, ttk, LEFT, RIGHT, Y,\
-    Label, X, END
+    Label, X, END, Button, StringVar 
+
+#import sympy as sp
+#from io import BytesIO
+
 import cv2
 import numpy as np
 import os
@@ -11,6 +16,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+#matplotlib.rcParams['text.usetex'] = True #lagt til for å kunne skrive latex i string
+from scipy.optimize import curve_fit
 from scipy.optimize import curve_fit, OptimizeWarning
 from PIL import Image, ImageTk
 import sys
@@ -165,6 +172,7 @@ def readImage(filename):
 
 
 def plot_dose_response():
+    print("sjekk*************************************************************")
     sd_red_arr=[];sd_green_arr=[];sd_blue_arr=[]
     temp_dose = [item[0] for item in Globals.avg_red_vector]
     temp_avg_red = [item[1] for item in Globals.avg_red_vector]
@@ -212,7 +220,7 @@ def plot_dose_response():
         Globals.dose_response_sd_min_blue.set(0)
         Globals.dose_response_sd_min_blue_dose.set('-')
 
-
+    print("sjekk2 **********************************************************")
     fig = Figure(figsize=(5,3))
     a = fig.add_subplot(111)
     canvas = FigureCanvasTkAgg(fig, master=Globals.dose_response_plot_frame)
@@ -252,12 +260,65 @@ def plot_dose_response():
                 a.plot(sorted_temp_dose, sorted_temp_avg_blue , color='blue')
 
             out_text_function = "Pixel value = " + str(round(Globals.popt_red[0])) + " + " + str(round(Globals.popt_red[1])) + "/(dose - (" + str(round(Globals.popt_red[2])) + "))"
-            write_out_respons_function = tk.Text(Globals.dose_response_equation_frame, height=2, width=20)
-            write_out_respons_function.insert(INSERT, out_text_function )
-            write_out_respons_function.grid(row=0, column=0, sticky=N+S+W+E, pady=(5,5), padx=(5,5))
-            Globals.dose_response_equation_frame.grid_columnconfigure(0, weight=0)
-            Globals.dose_response_equation_frame.grid_rowconfigure(0, weight=0)
-            write_out_respons_function.config(state=DISABLED, bd=0, font=('calibri', '12'), bg='#ffffff') 
+            standardavvik_rgb = "Standard deviation red = " + str(round(Globals.dose_response_sd_avg_red.get()))
+            #write_out_respons_function = tk.Text(Globals.dose_response_equation_frame)#, height=1, width=10)
+            #write_out_respons_function.insert(INSERT, out_text_function )
+            ##ekstra linje med standardavvik, prøver å inserte de også
+            #write_out_respons_function.insert(INSERT,standardavvik_rgb)
+            def clickFunction(a,b,c):
+                tmptext = StringVar()
+                text = "Pixel value(PV) as function of dose(D): "
+                a=str(a)   #str(round(Globals.popt_red[0]))
+                b=str(b) #str(round(Globals.popt_red[1]))
+                c=str(c) #str(round(Globals.popt_red[2]))
+                latex= a   + "+ " "\\frac {" + f"{b}" + "}{"+ "D" + "-" + f"{c}" + "}"
+                avgR=str(round(Globals.dose_response_sd_avg_red.get())); minR=str(round(Globals.dose_response_sd_min_red.get())); maxR=str(round(Globals.dose_response_sd_max_red.get()))
+                latexR="("+avgR+","+minR+","+maxR+")"; textR="\n\nStandard deviations (SD): \nSD for red color channel: (avg, max,min)="
+                avgG=str(round(Globals.dose_response_sd_avg_green.get())); minG=str(round(Globals.dose_response_sd_min_green.get())); maxG=str(round(Globals.dose_response_sd_max_green.get()))
+                latexG="("+avgG+","+minG+","+maxG+")"; textG="\n\nSD for green color channel: (avg, max,min)="
+                avgB=str(round(Globals.dose_response_sd_avg_blue.get())); minB=str(round(Globals.dose_response_sd_min_blue.get())); maxB=str(round(Globals.dose_response_sd_max_blue.get()))
+                latexB="("+avgB+","+minB+","+maxB+")"; textB="\n\nSD for blue color channel: (avg, max,min)="
+                
+                tmptext.set(latex)
+
+                #tmptext = entry.get()
+                tmptext = "$"+tmptext.get()+"$"
+
+                axLatex.clear()
+                axLatex.text(0.01, 0.3, text+"PV = "+tmptext+textR+latexR+textG+latexG+textB+latexB, fontsize = 4)  #this is where the text is added to the axis
+                canvasLatex.draw()
+
+            #root = tk.Tk()
+            #make a frame and place it with grid
+            #mainframe = Frame(root)
+            #mainframe.grid(row=0,column=0)
+
+            #make a label and place it with grid
+            labelLatex = Label(Globals.dose_response_equation_frame)
+            labelLatex.grid(row=0,column=0)
+
+            figLatex = matplotlib.figure.Figure(figsize=(2.4, 1), dpi=250)
+            figLatex.subplots_adjust(bottom=-0.01, top=1.2, left=-0.01, right=2)
+            axLatex = figLatex.add_subplot(111)
+
+            canvasLatex = FigureCanvasTkAgg(figLatex, master=labelLatex)
+            canvasLatex.get_tk_widget().grid(row=0, column=0, sticky="N")
+            canvasLatex._tkcanvas.grid(row=0, column=0,sticky="N")   # (side=TOP, fill=BOTH, expand=1)
+
+            axLatex.get_xaxis().set_visible(False)
+            axLatex.get_yaxis().set_visible(False)
+            a=round(Globals.popt_red[0])
+            b=round(Globals.popt_red[1])
+            c=round(Globals.popt_red[2])
+            clickFunction(a,b,c)
+
+            #displayButton = Button(Globals.dose_response_equation_frame,text="display equation",width=15,command=lambda: clickFunction(12,3,4))
+            #displayButton.grid(row=1,column=0,sticky="N")
+
+            #write_out_respons_function.grid(row=0, column=0, sticky=N+S+W+E, pady=(5,5), padx=(5,5))
+            #Globals.dose_response_equation_frame.grid_columnconfigure(0, weight=0)
+            #Globals.dose_response_equation_frame.grid_rowconfigure(0, weight=0)
+            #write_out_respons_function.config(state=DISABLED, bd=0, font=('calibri', '12'), bg='#ffffff') 
             Globals.dose_response_save_calibration_button.config(state=ACTIVE)   
         except OptimizeWarning:
             messagebox.showwarning("Warning", "It appears that you have optimization problems. \
@@ -271,7 +332,9 @@ Or, check that your specified dose matches your uploaded files.")
     a.set_title ("Dose-response", fontsize=12)
     a.set_ylabel("Pixel value", fontsize=12)
     a.set_xlabel("Dose", fontsize=12)
+    print("sjekk3 ************************************************")
     fig.tight_layout()
+    print("sjekk4*************************************************")
 
 
     return

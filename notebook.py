@@ -89,6 +89,13 @@ helpmenu = Menu(menubar, tearoff=0)
 helpmenu.add_command(label="Help", command=CoMet_functions.nothingButton)
 helpmenu.add_command(label="About", command=CoMet_functions.nothingButton)
 menubar.add_cascade(label="Help", menu=helpmenu)
+
+scannermenu=Menu(menubar, tearoff=0)
+scannermenu.add_command(label="Scanner settings", command=intro_tab_functions.createScannerSettingsWindow)
+scannermenu.add_command(label="Calibration", command=intro_tab_functions.createCalibrationWindow)
+scannermenu.add_command(label="Raystation", command=intro_tab_functions.createRaystationWindow)
+menubar.add_cascade(label="Specifications", menu=scannermenu)
+
 Globals.form.config(menu=menubar)
 
 upload_button_file = "uploadbutton3.png" 
