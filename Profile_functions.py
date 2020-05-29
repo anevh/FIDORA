@@ -17,6 +17,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 
 
+#Bresenham's line algorithm
+
 def clearAll():
     Globals.profiles_film_orientation.set('-')
     Globals.profiles_film_orientation_menu.config(state=ACTIVE, bg = '#ffffff', width=15, relief=FLAT)
@@ -138,7 +140,7 @@ def processDoseplan():
             np.round((Globals.profiles_distance_isocenter_ROI[3][1])/3)])
 
     reference_point = np.zeros(3)
-
+    
     ######################## Doseplan ##################################
     #dataset_swapped is now the dataset entered the same way as expected with film (slice, rows, columns)
     #isocenter_px and reference_point is not turned according to the doseplan and film orientation.
@@ -408,6 +410,7 @@ def processDoseplan():
         clearAll()
         return
     
+    print(isocenter_px)
 
 
     ####################### Match film and doseplan ###############################
@@ -543,17 +546,25 @@ def processDoseplan():
     PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
 
 
+
+
+
     wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
     doseplan_canvas = tk.Canvas(Globals.profiles_film_panedwindow)
     doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
     Globals.profiles_film_panedwindow.add(doseplan_canvas, \
-        height=max(heig, Globals.profiles_doseplan_text_image.height()), width=wid + Globals.profiles_doseplan_text_image.width())
+        height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+            width=wid + Globals.profiles_doseplan_text_image.width())
     doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-        height=max(heig, Globals.profiles_doseplan_text_image.height()), width=wid + Globals.profiles_doseplan_text_image.width())
+        height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+            width=wid + Globals.profiles_doseplan_text_image.width())
+
 
     doseplan_write_image = tk.Canvas(doseplan_canvas)
     doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
     doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+
+
 
     doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
     doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
@@ -564,7 +575,7 @@ def processDoseplan():
     scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
     doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
     doseplan_write_image.image = scaled_image_visual
-    doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image)
+    doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
     doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
 
 
@@ -835,6 +846,7 @@ with the placement click the button again and repeat.")
                 elif(len(Globals.profiles_iscoenter_coords)==1):
                     Globals.profiles_iscoenter_coords.append([event.x, event.y])
                     Globals.profiles_film_isocenter = [Globals.profiles_iscoenter_coords[0][0], Globals.profiles_iscoenter_coords[1][1]]
+                    print(Globals.profiles_film_isocenter)
                     #el1=0;el2=0
                     #for i in range(-15,16,5):
                     #    for j in range(-15,16,5):
@@ -1133,6 +1145,7 @@ are not happy with the placement click the button again.")
                 Globals.profiles_popt_red[0] = float(words[3])
                 Globals.profiles_popt_red[1] = float(words[4])
                 Globals.profiles_popt_red[2] = float(words[5])
+                print(Globals.profiles_popt_red)
                 f.close()
 
                 Globals.profiles_film_dataset_ROI_red_channel_dose = np.zeros((Globals.profiles_film_dataset_ROI_red_channel.shape[0],\
@@ -1141,7 +1154,7 @@ are not happy with the placement click the button again.")
                     for j in range(Globals.profiles_film_dataset_ROI_red_channel_dose.shape[1]):
                         Globals.profiles_film_dataset_ROI_red_channel_dose[i,j] = pixel_to_dose(Globals.profiles_film_dataset_ROI_red_channel[i,j], \
                             Globals.profiles_popt_red[0], Globals.profiles_popt_red[1], Globals.profiles_popt_red[2])
-
+                print(np.max(Globals.profiles_film_dataset_ROI_red_channel_dose))
                 film_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
                 film_write_image.image = scaled_image_visual
 
@@ -1229,12 +1242,6 @@ are not happy with the placement click the button again.")
                 height=max(heig,Globals.profiles_scanned_image_text_image.height()), \
                     width=wid + Globals.profiles_scanned_image_text_image.width())
 
-            film_write_image = tk.Canvas(film_image_canvas)
-            film_write_image.grid(row=0,column=1,sticky=N+S+W+E)
-            film_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
-            #film_window_write_image.pack(expand=True, fill=BOTH)
-            #film_window_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
-
             film_dose_canvas = tk.Canvas(Globals.profiles_film_panedwindow)
             film_dose_canvas.grid(row=1,column=0, sticky=N+S+W+E)
             Globals.profiles_film_panedwindow.add(film_dose_canvas, \
@@ -1243,10 +1250,14 @@ are not happy with the placement click the button again.")
             film_dose_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
                 height=max(heig,Globals.profiles_film_dose_map_text_image.height()), \
                     width=wid + Globals.profiles_film_dose_map_text_image.width())
+
+            film_write_image = tk.Canvas(film_image_canvas)
+            film_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+            film_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
             
             film_dose_write_image = tk.Canvas(film_dose_canvas)
             film_dose_write_image.grid(row=0,column=1,sticky=N+S+W+E)
-            film_dose_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+            film_dose_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)           
 
             film_scanned_image_text_canvas=tk.Canvas(film_image_canvas)
             film_scanned_image_text_canvas.grid(row=0,column=0,sticky=N+S+W+E)

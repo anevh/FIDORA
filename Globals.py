@@ -408,7 +408,7 @@ global profiles_film_dataset_ROI_red_channel_dose
 
 global profiles_view_film_doseplan_ROI
 profiles_view_film_doseplan_ROI = tk.Canvas(tab4_canvas)
-profiles_view_film_doseplan_ROI.grid(row=2, column=3, rowspan=10, sticky=E+W+N, pady=(0,5), padx=(5,10))
+profiles_view_film_doseplan_ROI.grid(row=2, column=3, rowspan=25, sticky=E+W+N, pady=(0,5), padx=(5,10))
 tab4_canvas.grid_columnconfigure(11, weight=0)
 tab4_canvas.grid_rowconfigure(11, weight=0)
 profiles_view_film_doseplan_ROI.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
@@ -537,16 +537,16 @@ global profiles_doseplan_text_image
 ############################### Correction matrix ######################################
 
 global correction127_red
-with open('output_red_127.txt', 'r') as f:
+with open('red_127.txt', 'r') as f:
     correction127_red = [[float(num) for num in line.split(',')] for line in f]
 correction127_red = np.matrix(correction127_red)
 global correction127_green
-with open('output_green_127.txt', 'r') as f:
+with open('green_127.txt', 'r') as f:
     correction127_green = [[float(num) for num in line.split(',')] for line in f]
 correction127_green = np.matrix(correction127_green)
 
 global correction127_blue
-with open('output_blue_127.txt', 'r') as f:
+with open('blue_127.txt', 'r') as f:
     correction127_blue = [[float(num) for num in line.split(',')] for line in f]
 correction127_blue = np.matrix(correction127_blue)
 

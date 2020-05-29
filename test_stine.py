@@ -99,4 +99,50 @@ except:
 """
 #print(dataset)
 
-print(dataset2)
+#print(dataset)
+
+#[507,640]
+#slice 94, [93,88]
+
+def pixel_to_dose(P,a,b,c):
+    ret = c + b/(P-a)
+    return ret
+
+doseplan = dataset2.pixel_array
+import Globals
+import cv2
+cv2Img = cv2.imread("img10x10_001.tif", cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+cv2Img = cv2.medianBlur(cv2Img, 5)
+cv2Img = abs(cv2Img-Globals.correctionMatrix127)
+cv2Img = np.clip(cv2Img, 0, 65535)
+
+image = cv2Img[365:915,233:783,2]
+film_dose = np.zeros((int(image.shape[0]/5), int(image.shape[1]/5)))
+for i in range(film_dose.shape[0]):
+    for j in range(film_dose.shape[1]):
+        film_dose[i,j] = pixel_to_dose(image[i*5,j*5], 1686.5, 16705877.4, -415.541)
+
+film_dose = np.flip(film_dose,1)
+isocenter_film = [int((640-365)/5), int((508-233)/5)]
+
+doseplan_slice = doseplan[:,93,:]
+
+profile_film = film_dose[:,isocenter_film[1]]
+
+
+profile_doseplan = doseplan_slice[33:143,88]
+
+print(len(profile_film))
+print(len(profile_doseplan))
+x = np.linspace(-5,5,len(profile_doseplan))
+profile_doseplan = profile_doseplan*dataset2.DoseGridScaling*100
+print(len(x))
+plt.figure()
+plt.plot(x,profile_film, 'r')
+plt.plot(x, profile_doseplan, 'b')
+plt.legend(['film', 'doseplan'])
+plt.xlabel("lateral displacement")
+plt.ylabel("Dose")
+plt.title("Profiles, lateral direction across isocenter")
+plt.show()
+
