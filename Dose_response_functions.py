@@ -3,7 +3,7 @@ import tkinter as tk
 import tkinter.ttk 
 from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog, \
     PhotoImage, BOTH, Toplevel, GROOVE, ACTIVE, FLAT, N, S, W, E, ALL, ttk, LEFT, RIGHT, Y,\
-    Label, X, END
+    Label, X, END, Button, StringVar 
 
 #import sympy as sp
 #from io import BytesIO
@@ -265,18 +265,25 @@ def plot_dose_response():
             #write_out_respons_function.insert(INSERT,standardavvik_rgb)
             def clickFunction(a,b,c):
                 tmptext = StringVar()
-                text = "Pixel value = "
-                a=str(10)   #str(round(Globals.popt_red[0]))
-                b=str(15) #str(round(Globals.popt_red[1]))
-                c=str(20) #str(round(Globals.popt_red[2]))
-                latex= a   + "+ " "\\frac {" + f"{b}" + "}{"+ "Dose" + "-" + f"{c}" + "}"
+                text = "Pixel value(PV) as function of dose(D): "
+                a=str(a)   #str(round(Globals.popt_red[0]))
+                b=str(b) #str(round(Globals.popt_red[1]))
+                c=str(c) #str(round(Globals.popt_red[2]))
+                latex= a   + "+ " "\\frac {" + f"{b}" + "}{"+ "D" + "-" + f"{c}" + "}"
+                avgR=str(round(Globals.dose_response_sd_avg_red.get())); minR=str(round(Globals.dose_response_sd_min_red.get())); maxR=str(round(Globals.dose_response_sd_max_red.get()))
+                latexR="("+avgR+","+minR+","+maxR+")"; textR="\n\nStandard deviations (SD): \nSD for red color channel: (avg, max,min)="
+                avgG=str(round(Globals.dose_response_sd_avg_green.get())); minG=str(round(Globals.dose_response_sd_min_green.get())); maxG=str(round(Globals.dose_response_sd_max_green.get()))
+                latexG="("+avgG+","+minG+","+maxG+")"; textG="\n\nSD for green color channel: (avg, max,min)="
+                avgB=str(round(Globals.dose_response_sd_avg_blue.get())); minB=str(round(Globals.dose_response_sd_min_blue.get())); maxB=str(round(Globals.dose_response_sd_max_blue.get()))
+                latexB="("+avgB+","+minB+","+maxB+")"; textB="\n\nSD for blue color channel: (avg, max,min)="
+                
                 tmptext.set(latex)
 
                 #tmptext = entry.get()
                 tmptext = "$"+tmptext.get()+"$"
 
                 axLatex.clear()
-                axLatex.text(0.1, 0.5, text+tmptext, fontsize = 3)  #this is where the text is added to the axis
+                axLatex.text(0.01, 0.3, text+"PV = "+tmptext+textR+latexR+textG+latexG+textB+latexB, fontsize = 4)  #this is where the text is added to the axis
                 canvasLatex.draw()
 
             #root = tk.Tk()
@@ -288,18 +295,23 @@ def plot_dose_response():
             labelLatex = Label(Globals.dose_response_equation_frame)
             labelLatex.grid(row=0,column=0)
 
-            figLatex = matplotlib.figure.Figure(figsize=(1, 1), dpi=300)
+            figLatex = matplotlib.figure.Figure(figsize=(2.4, 1), dpi=250)
+            figLatex.subplots_adjust(bottom=-0.01, top=1.2, left=-0.01, right=2)
             axLatex = figLatex.add_subplot(111)
 
             canvasLatex = FigureCanvasTkAgg(figLatex, master=labelLatex)
             canvasLatex.get_tk_widget().grid(row=0, column=0, sticky="N")
-            canvasLatex._tkcanvas.grid(row=0, column=0, sticky="N")   # (side=TOP, fill=BOTH, expand=1)
+            canvasLatex._tkcanvas.grid(row=0, column=0,sticky="N")   # (side=TOP, fill=BOTH, expand=1)
 
             axLatex.get_xaxis().set_visible(False)
             axLatex.get_yaxis().set_visible(False)
+            a=round(Globals.popt_red[0])
+            b=round(Globals.popt_red[1])
+            c=round(Globals.popt_red[2])
+            clickFunction(a,b,c)
 
-            displayButton = Button(Globals.dose_response_equation_frame,text="display equation",width=15,command=lambda: clickFunction(12,3,4))
-            displayButton.grid(row=0,column=0,sticky="NS")
+            #displayButton = Button(Globals.dose_response_equation_frame,text="display equation",width=15,command=lambda: clickFunction(12,3,4))
+            #displayButton.grid(row=1,column=0,sticky="N")
 
             #write_out_respons_function.grid(row=0, column=0, sticky=N+S+W+E, pady=(5,5), padx=(5,5))
             #Globals.dose_response_equation_frame.grid_columnconfigure(0, weight=0)
