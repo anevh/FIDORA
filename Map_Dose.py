@@ -63,8 +63,10 @@ def prepare_Image():
     if(cv2Img.shape[2] == 3):
         if(cv2Img.shape[0]==1270 and cv2Img.shape[1]==1016):
             cv2Img = abs(cv2Img-Globals.correctionMatrix127)
+            cv2Img = np.clip(cv2Img, 0, 65535)
         elif(cv2Img.shape[0]==720 and cv2Img.shape[1]==576):
             cv2Img = abs(cv2Img - Globals.correctionMatrix72)
+            cv2Img = np.clip(cv2Img, 0, 65535)
         else:
             messagebox.showerror("Error","The resolution of the image is not consistent with dpi")
 

@@ -12,7 +12,6 @@ import os
 import sys
 
 
-
 Globals.form.title("FIDORA")
 #lobals.form.geometry("1250x600")
 Globals.form.configure(bg='#ffffff')
@@ -145,6 +144,9 @@ profiles_add_doseplan_button_image = ImageTk.PhotoImage(file=profiles_add_dosepl
 profiles_add_film_button_file = "add_film_button.png"
 profiles_add_film_button_image = ImageTk.PhotoImage(file=profiles_add_film_button_file)
 
+profiles_add_rtplan_button_file = "add_rtplan_button.png"
+profiles_add_rtplan_button_image = ImageTk.PhotoImage(file=profiles_add_rtplan_button_file)
+
 profiles_showPlanes_file = "planes.png"
 Globals.profiles_showPlanes_image = ImageTk.PhotoImage(file=profiles_showPlanes_file)
 
@@ -156,6 +158,15 @@ Globals.profiles_mark_isocenter_button_image = ImageTk.PhotoImage(file=profiles_
 
 profiles_mark_ROI_button_file = "mark_ROI_button.png"
 Globals.profiles_mark_ROI_button_image = ImageTk.PhotoImage(file=profiles_mark_ROI_button_file)
+
+profiles_scanned_image_text_image_file = "scanned_image_text_image.png"
+Globals.profiles_scanned_image_text_image = ImageTk.PhotoImage(file=profiles_scanned_image_text_image_file)
+
+profiles_film_dose_map_text_image_file = "film_dose_map_text_image.png"
+Globals.profiles_film_dose_map_text_image = ImageTk.PhotoImage(file=profiles_film_dose_map_text_image_file)
+
+profiles_doseplan_text_image_file = "doseplan_text_image.png"
+Globals.profiles_doseplan_text_image = ImageTk.PhotoImage(file=profiles_doseplan_text_image_file)
 ###################################### INTRO TAB #################################################
 
 
@@ -326,24 +337,25 @@ Globals.tab1_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness
 
 CoMet_explained = tk.Text(Globals.tab1_canvas, height=4, width=105)
 CoMet_explained.insert(INSERT, \
-"Start the correction by choosing the correct *.tif file containing the scanned image of the GafChromic film. \
-The film \nshould be scanned using Epson Perfection v750 Pro with dpi setting 72 or 127. Then pick which \
-folder the corrected file \nshould be uploaded to. The corrected file will be saved as a DICOM. Write filename \
-and patient name (optional) before \ndoing the correction. An illustration of the corrected image will appear.")
-CoMet_explained.grid(row=0, column = 0, columnspan=4, sticky=N+S+E+W, padx=(20,40), pady=(10,10))
+"Start the correction by choosing the correct *.tif file containing the scanned image of the \n\
+GafChromic film. The film should be scanned using Epson Perfection v750 Pro with dpi setting \n\
+72 or 127. Then pick which folder the corrected file should be uploaded to. The corrected file\n\
+will be saved as a DICOM. Write filename and patient name (optional) before doing the correction.\n\
+An illustration of the corrected image will appear.")
+CoMet_explained.grid(row=0, column = 0, columnspan=1, sticky=N+S+E+W, padx=(20,0), pady=(10,10))
 Globals.tab1_canvas.grid_columnconfigure(0, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(0, weight=0)
 CoMet_explained.config(state=DISABLED, bg='#ffffff', font=('calibri', '11'), relief=FLAT)
 
 Globals.CoMet_border_1_label = Label(Globals.tab1_canvas, image = CoMet_border_dark,width=50)
 Globals.CoMet_border_1_label.image=CoMet_border_dark
-Globals.CoMet_border_1_label.grid(row=1, column=0, columnspan=3, sticky = W+E, padx = (0, 50), pady=(10,5))
+Globals.CoMet_border_1_label.grid(row=1, column=0, columnspan=2, sticky = W+E, padx = (0, 190), pady=(10,5))
 Globals.tab1_canvas.grid_columnconfigure(1, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(1, weight=0)
 Globals.CoMet_border_1_label.config(bg='#ffffff', borderwidth=0)
 
 CoMet_upload_button_frame = tk.Frame(Globals.tab1_canvas)
-CoMet_upload_button_frame.grid(row=1, column = 2, padx = (60, 0), pady=(10,5))
+CoMet_upload_button_frame.grid(row=1, column = 0, padx = (200, 0), pady=(10,5))
 Globals.tab1_canvas.grid_columnconfigure(2, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(2, weight=0)
 CoMet_upload_button_frame.config(bg = '#ffffff')
@@ -355,19 +367,19 @@ CoMet_upload_button.config(bg='#ffffff', activebackground='#ffffff', activeforeg
 CoMet_upload_button.image = Globals.upload_button_image
 
 Globals.CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label, height=1, width=31)
-Globals.CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+Globals.CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=2, sticky=E+W, pady=(20,20), padx=(80,0))
 Globals.CoMet_uploaded_file_text.insert(INSERT, "Upload the image you want to correct")
 Globals.CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
 
-Globals.CoMet_border_2_label = Label(Globals.tab1_canvas, image = CoMet_border_dark)
+Globals.CoMet_border_2_label = Label(Globals.tab1_canvas, image = CoMet_border_dark,width=50)
 Globals.CoMet_border_2_label.image=CoMet_border_dark
-Globals.CoMet_border_2_label.grid(row=2, column=0, columnspan=3, sticky=N+S+E+W, padx = (0, 50), pady=(0,15))
+Globals.CoMet_border_2_label.grid(row=2, column=0, columnspan=2, sticky = N+S+W+E, padx = (0, 190), pady=(0,15))
 Globals.tab1_canvas.grid_columnconfigure(3, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(3, weight=0)
 Globals.CoMet_border_2_label.config(bg='#ffffff', borderwidth=0)
 
 CoMet_folder_button_frame = tk.Frame(Globals.tab1_canvas)
-CoMet_folder_button_frame.grid(row=2, column = 2, padx = (60, 0), pady=(0,15))
+CoMet_folder_button_frame.grid(row=2, column = 0, padx = (200, 0), pady=(0,15))
 Globals.tab1_canvas.grid_columnconfigure(4, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(4, weight=0)
 CoMet_folder_button_frame.config(bg = '#ffffff')
@@ -379,7 +391,7 @@ CoMet_folder_button.config(bg='#ffffff', activebackground='#ffffff', activeforeg
 CoMet_folder_button.image=select_folder_image
 
 CoMet_save_to_folder = tk.Text(Globals.CoMet_border_2_label, height=1, width=31)
-CoMet_save_to_folder.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(25,0), padx=(80,0))
+CoMet_save_to_folder.grid(row=0, column=0, columnspan=2, sticky=E+W, pady=(25,0), padx=(80,0))
 CoMet_save_to_folder.insert(INSERT,"Folder to save the corrected image")
 CoMet_save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff') 
 
@@ -400,7 +412,7 @@ def testFilename():
         Globals.CoMet_progressbar_counter += 1
         Globals.CoMet_progressbar["value"] = Globals.CoMet_progressbar_counter*25
         Globals.CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, width = 5, height=1)
-        Globals.CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
+        Globals.CoMet_progressbar_text.grid(row=5, column=0, columnspan=1, sticky=E, padx=(0,158), pady=(27,0))
         Globals.CoMet_progressbar_text.insert(INSERT, str(Globals.CoMet_progressbar_counter*25) + "%")
         if(Globals.CoMet_progressbar_counter*25 == 100):
             Globals.CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#2C8EAD', font=('calibri', '10', 'bold'))
@@ -410,13 +422,13 @@ def testFilename():
 
 Globals.CoMet_border_3_label = Label(Globals.tab1_canvas, image = CoMet_border_dark)
 Globals.CoMet_border_3_label.image=CoMet_border_dark
-Globals.CoMet_border_3_label.grid(row=3, column=0, columnspan=3, sticky=N+S+E+W, padx = (0, 50), pady=(0,0))
+Globals.CoMet_border_3_label.grid(row=3, column=0, columnspan=2, sticky = W+E, padx = (0,190), pady=(0,15))
 Globals.tab1_canvas.grid_columnconfigure(5, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(5, weight=0)
 Globals.CoMet_border_3_label.config(bg='#ffffff', borderwidth=0)
 
 Globals.CoMet_save_button_frame_1 = tk.Frame(Globals.tab1_canvas)
-Globals.CoMet_save_button_frame_1.grid(row=3, column = 2, padx = (60, 0), pady=(0,0))
+Globals.CoMet_save_button_frame_1.grid(row=3, column = 0, padx = (200, 0), pady=(0,15))
 Globals.tab1_canvas.grid_columnconfigure(6, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(6, weight=0)
 Globals.CoMet_save_button_frame_1.config(bg = '#ffffff')
@@ -430,7 +442,7 @@ Globals.CoMet_save_button_1.image = CoMet_save_button
 
 
 Globals.CoMet_save_filename = tk.Text(Globals.CoMet_border_3_label, height=1, width=30)
-Globals.CoMet_save_filename.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+Globals.CoMet_save_filename.grid(row=0, column=0, columnspan=2, sticky=E+W, pady=(20,20), padx=(80,0))
 Globals.CoMet_save_filename.insert(END,"Filename (will be saved as *.dcm)")
 Globals.CoMet_save_filename.config(state=NORMAL, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
 
@@ -464,13 +476,13 @@ def testName():
 
 Globals.CoMet_border_4_label = Label(Globals.tab1_canvas, image = CoMet_border_dark)
 Globals.CoMet_border_4_label.image=CoMet_border_dark
-Globals.CoMet_border_4_label.grid(row=4, column=0, columnspan=3, sticky=E+W, padx = (0, 50), pady=(25,0))
+Globals.CoMet_border_4_label.grid(row=4, column=0, columnspan=2, sticky = W+E, padx = (0, 190), pady=(5,0))
 Globals.tab1_canvas.grid_columnconfigure(7, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(7, weight=0)
 Globals.CoMet_border_4_label.config(bg='#ffffff', borderwidth=0)
 
 CoMet_save_button_frame_2 = tk.Frame(Globals.tab1_canvas)
-CoMet_save_button_frame_2.grid(row=4, column = 2, padx = (60, 0), pady=(20,0))
+CoMet_save_button_frame_2.grid(row=4, column = 0, padx = (200, 0), pady=(5,0))
 Globals.tab1_canvas.grid_columnconfigure(8, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(8, weight=0)
 CoMet_save_button_frame_2.config(bg = '#ffffff')
@@ -482,7 +494,7 @@ CoMet_save_button_2.config(bg='#ffffff', activebackground='#ffffff', activeforeg
 CoMet_save_button_2.image = CoMet_save_button
 
 CoMet_save_patientName = tk.Text(Globals.CoMet_border_4_label, height=1, width=30)
-CoMet_save_patientName.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+CoMet_save_patientName.grid(row=0, column=0, columnspan=2, sticky=E+W, pady=(20,20), padx=(80,0))
 CoMet_save_patientName.insert(END,"Patient name (Optional)")
 CoMet_save_patientName.config(state=NORMAL, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
 
@@ -497,7 +509,7 @@ CoMet_save_patientName.bind("<FocusIn>", writePname)
 CoMet_save_patientName.bind("<FocusOut>", writePname)
 
 CoMet_correct_button_frame = tk.Frame(Globals.tab1_canvas)
-CoMet_correct_button_frame.grid(row=4, column = 4,rowspan=2, padx = (0, 0), pady=(0,0), sticky=W)
+CoMet_correct_button_frame.grid(row=4, column=2,rowspan=2, padx = (0, 0), pady=(0,0), sticky=W)
 Globals.tab1_canvas.grid_columnconfigure(9, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(9, weight=0)
 CoMet_correct_button_frame.config(bg = '#ffffff')
@@ -509,7 +521,7 @@ CoMet_correct_button.config(bg='#ffffff', activebackground='#ffffff', activefore
 CoMet_correct_button.image = CoMet_correct_button_image
 
 Globals.CoMet_print_corrected_image = tk.Canvas(Globals.tab1_canvas , width=240, height=290)
-Globals.CoMet_print_corrected_image.grid(row=0, column=4, rowspan=3, sticky=N+W+S+E, pady=(20,0))
+Globals.CoMet_print_corrected_image.grid(row=0, column=2, rowspan=3, sticky=N+W+S+E, pady=(20,0), padx=(0,0))
 Globals.CoMet_print_corrected_image.config(bg='#ffffff', bd = 0, relief=FLAT)
 Globals.tab1_canvas.grid_columnconfigure(11,weight=0)
 Globals.tab1_canvas.grid_rowconfigure(11, weight=0)
@@ -520,21 +532,21 @@ Globals.CoMet_print_corrected_image.image = CoMet_empty_image_image
 def clearAll():
     #Clear out the filename
     Globals.CoMet_uploaded_file_text = tk.Text(Globals.CoMet_border_1_label, height=1, width=31)
-    Globals.CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+    Globals.CoMet_uploaded_file_text.grid(row=0, column=0, columnspan=2, sticky=E+W, pady=(20,20), padx=(80,0))
     Globals.CoMet_uploaded_file_text.insert(INSERT, "Upload the image you want to correct")
     Globals.CoMet_uploaded_file_text.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
     Globals.CoMet_uploaded_filename.set("Error!")
 
     #Clear out folder
     CoMet_save_to_folder = tk.Text(Globals.CoMet_border_2_label, height=1, width=32)
-    CoMet_save_to_folder.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(25,0), padx=(80,0))
+    CoMet_save_to_folder.grid(row=0, column=0, columnspan=2, sticky=E+W, pady=(25,0), padx=(80,0))
     CoMet_save_to_folder.insert(INSERT,"Folder to save the corrected image")
     CoMet_save_to_folder.config(state=DISABLED, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
     Globals.CoMet_export_folder.set("Error!")
 
     #Clear filename of corrected file
     Globals.CoMet_save_filename = tk.Text(Globals.CoMet_border_3_label, height=1, width=30)
-    Globals.CoMet_save_filename.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+    Globals.CoMet_save_filename.grid(row=0, column=0, columnspan=2, sticky=E+W, pady=(20,20), padx=(80,0))
     Globals.CoMet_save_filename.insert(END,"Filename (will be saved as *.dcm)")
     Globals.CoMet_save_filename.config(state=NORMAL, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
     Globals.CoMet_corrected_image_filename.set("Error!")
@@ -552,7 +564,7 @@ def clearAll():
 
     #Clear patientname
     CoMet_save_patientName = tk.Text(Globals.CoMet_border_4_label, height=1, width=30)
-    CoMet_save_patientName.grid(row=0, column=0, columnspan=3, sticky=E+W, pady=(20,20), padx=(80,0))
+    CoMet_save_patientName.grid(row=0, column=0, columnspan=2, sticky=E+W, pady=(20,20), padx=(80,0))
     CoMet_save_patientName.insert(END,"Patient name (Optional)")
     CoMet_save_patientName.config(state=NORMAL, bd=0, font=('calibri', '12'), fg='gray', bg='#ffffff')
     Globals.CoMet_patientName.set("Error!")
@@ -580,7 +592,7 @@ def clearAll():
     Globals.CoMet_progressbar_check_file = True
     Globals.CoMet_progressbar_check_folder = True
     CoMet_progressbar_text = tk.Text(Globals.tab1_canvas, height=1, width=5)
-    CoMet_progressbar_text.grid(row=5, column=2, columnspan=1, sticky=E, padx=(0,70), pady=(40,0))
+    CoMet_progressbar_text.grid(row=5, column=0, columnspan=1, sticky=E, padx=(0,158), pady=(27,0))
     CoMet_progressbar_text.insert(INSERT, "0%")
     CoMet_progressbar_text.config(state=DISABLED, bd=0, relief=FLAT, bg='#ffffff',font=('calibri', '10', 'bold'))
 
@@ -588,7 +600,7 @@ def clearAll():
 
 
 CoMet_clear_all_button_frame = tk.Frame(Globals.tab1_canvas)
-CoMet_clear_all_button_frame.grid(row=4, column=4, rowspan=2, padx=(0,0), pady=(0,0), sticky=E)
+CoMet_clear_all_button_frame.grid(row=4, column=2, rowspan=2, padx=(100,0), pady=(0,0), sticky=E)
 Globals.tab1_canvas.grid_columnconfigure(13, weight=0)
 Globals.tab1_canvas.grid_rowconfigure(13, weight=0)
 CoMet_clear_all_button_frame.config(bg='#ffffff')
@@ -744,7 +756,8 @@ Globals.tab4_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness
 profiles_explain_text = tk.Text(Globals.tab4_canvas, height=4, width=140)
 profiles_explain_text.insert(INSERT, "\
 SliceThickness i plan må være ['1','1'], ['2','2'] eller ['3','3'], Filmen må legges i xy, xz eller yz planet (lage figur?), Filmen må scannes  \n\
-parallelt med retningene i skanneren (programmet vil anta dette), \n\
+parallelt med retningene i skanneren (programmet vil anta dette), man må markere \"opp\" og \"bort\" på filmen. Når man skanner må man legge \n\
+oppmerket oppover og bort merket mot høyre (kan man kreve dette i alle plan?). \
 Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det, \n\
 Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det, " )
 profiles_explain_text.grid(row=0, column=0, columnspan=5, sticky=N+S+E+W, pady=(20,20), padx=(20,10))
@@ -753,40 +766,40 @@ Globals.tab4_canvas.grid_rowconfigure(0, weight=0)
 profiles_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
 
 profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_film_frame.grid(row=3, column = 0, padx = (20, 0), pady=(10,0))
+profiles_upload_film_frame.grid(row=3, column = 0, padx = (0, 240), pady=(10,0))
 Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
 profiles_upload_film_frame.config(bg = '#ffffff')
 
-profiles_upload_button_film = tk.Button(profiles_upload_film_frame, text='Browse', image = profiles_add_film_button_image, \
+Globals.profiles_upload_button_film = tk.Button(profiles_upload_film_frame, text='Browse', image = profiles_add_film_button_image, \
     cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.UploadFilm)
-profiles_upload_button_film.pack(expand=True, fill=BOTH)
-profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-profiles_upload_button_film.image = profiles_add_film_button_image
+Globals.profiles_upload_button_film.pack(expand=True, fill=BOTH)
+Globals.profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.profiles_upload_button_film.image = profiles_add_film_button_image
 
-#profiles_upload_doseplan_frame = tk.Frame(Globals.tab4_canvas)
-#profiles_upload_doseplan_frame.grid(row=2, column = 0, padx = (0,0), pady=(10,0), sticky=N+S+E)
-#Globals.tab4_canvas.grid_columnconfigure(2, weight=0)
-#Globals.tab4_canvas.grid_rowconfigure(2, weight=0)
-#profiles_upload_film_frame.config(bg = '#ffffff')
+profiles_upload_doseplan_frame = tk.Frame(Globals.tab4_canvas)
+profiles_upload_doseplan_frame.grid(row=3, column = 0, padx = (0,40), pady=(10,0))
+Globals.tab4_canvas.grid_columnconfigure(3, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(3, weight=0)
+profiles_upload_film_frame.config(bg = '#ffffff')
 
-#profiles_upload_button_doseplan = tk.Button(profiles_upload_doseplan_frame, text='Browse', image=profiles_add_doseplan_button_image,\
-#    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: Profile_functions.UploadAction(False))
-#profiles_upload_button_doseplan.pack(expand=True, fill=BOTH)
-#profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-#profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
+Globals.profiles_upload_button_doseplan = tk.Button(profiles_upload_doseplan_frame, text='Browse', image=profiles_add_doseplan_button_image,\
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=DISABLED, command=Profile_functions.UploadDoseplan)
+Globals.profiles_upload_button_doseplan.pack(expand=True, fill=BOTH)
+Globals.profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
 
-#profiles_getData_frame = tk.Frame(Globals.tab4_canvas)
-#profiles_getData_frame.grid(row = 4, column=0, padx = (0,0), pady=(0,0))
-#Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
-#Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
-#profiles_getData_frame.config(bg='#ffffff')
+profiles_upload_rtplan_frame = tk.Frame(Globals.tab4_canvas)
+profiles_upload_rtplan_frame.grid(row=3, column=0, padx=(160,0), pady=(10,0))
+Globals.tab4_canvas.grid_columnconfigure(10, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(10, weight=0)
+profiles_upload_rtplan_frame.config(bg='#ffffff')
 
-#profiles_getData_button = tk.Button(profiles_getData_frame, text='Upload data', image=Globals.upload_button_image, \
-#    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.uploadData)
-#profiles_getData_button.pack(expand=True, fill=BOTH)
-#profiles_getData_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-#profiles_getData_button.image = Globals.upload_button_image
+Globals.profiles_upload_button_rtplan = tk.Button(profiles_upload_rtplan_frame, text='Browse', image=profiles_add_rtplan_button_image,\
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=DISABLED, command=Profile_functions.UploadRTplan)
+Globals.profiles_upload_button_rtplan.pack(expand=True, fill=BOTH)
+Globals.profiles_upload_button_rtplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.profiles_upload_button_rtplan.image=profiles_add_rtplan_button_image
 
 Globals.profiles_film_orientation_menu = OptionMenu(Globals.tab4_canvas, Globals.profiles_film_orientation, 'Axial', 'Coronal', 'Sagittal')
 Globals.profiles_film_orientation_menu.grid(row=1, column=0, sticky=N+S, padx=(60,0))
@@ -826,7 +839,7 @@ profiles_resetAll_button.configure(bg='#ffffff', activebackground='#ffffff', act
 profiles_resetAll_button.image = dose_response_clear_all_button_image
 
 film_depth_text = tk.Text(Globals.tab4_canvas, width=14, height=1)
-film_depth_text.insert(INSERT, "Film depth:")
+film_depth_text.insert(INSERT, "Film depth (cm):")
 film_depth_text.config(state=DISABLED, font=('calibri', '10'), bd = 0, relief=FLAT)
 film_depth_text.grid(row=2, column=0, sticky=N+S+W, padx=(30,0), pady=(5,0))
 Globals.tab4_canvas.grid_columnconfigure(7, weight=0)

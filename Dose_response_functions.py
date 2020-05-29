@@ -134,9 +134,11 @@ def readImage(filename):
         if(image.shape[0]==1270 and image.shape[1]==1016):
             Globals.doseResponse_dpi.set("127")
             image = abs(image-Globals.correctionMatrix127)
+            image = np.clip(image, 0, 65535)
         elif(image.shape[0]==720 and image.shape[1]==576):
             Globals.doseResponse_dpi.set("72")
             image = abs(image - Globals.correctionMatrix72)
+            image = np.clip(image, 0, 65535)
         else:
             messagebox.showerror("Error","The resolution of the image is not consistent with dpi")
 
