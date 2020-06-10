@@ -489,7 +489,7 @@ def avgAllFiles(write_dose_box, new_window):
         Globals.dose_response_files_weightcount+=1
 
         path = os.path.dirname(sys.argv[0])
-        path = path + "\delete.png"
+        path = path + r"\delete.png"
         img = ImageTk.PhotoImage(file=path)
 
         delete_button = tk.Button(Globals.tab2_canvas_files, text='Remove', image=img, cursor='hand2',font=('calibri', '18'),\
