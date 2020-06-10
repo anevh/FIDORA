@@ -142,30 +142,31 @@ def processDoseplan_usingReferencePoint():
     Globals.profiles_isocenter_mm = [iso_1, iso_2, iso_3]
     
     #Reads input displacement from phantom on reference point in film
-    vertical = Globals.profiles_input_vertical_displacement.get("1.0",'end')
-    lateral = Globals.profiles_input_lateral_displacement.get("1.0",'end')
-    longit = Globals.profiles_input_longitudinal_displacement.get("1.0",'end')
-    if(lateral==" "):lateral=0
-    if(vertical==" "):vertical=0
-    if(longit==" "):longit=0
+    #lateral = Globals.profiles_input_lateral_displacement.get("1.0",'end-1c')
+    #vertical = Globals.profiles_input_vertical_displacement.get("1.0", 'end-1c')
+    #longit = Globals.profiles_input_longitudinal_displacement.get("1.0", 'end-1c')
+    #if(lateral==" "):lateral=0
+    #if(vertical==" "):vertical=0
+    #if(longit==" "):longit=0
     try:
-        vertical = float(vertical)
-        vertical = int(vertical)
+        Globals.profile_plot_canvasvertical = int(Globals.profiles_vertical)
     except:
         messagebox.showerror("Error", "Could not read the vertical displacements\n (Code: displacements to integer)")
         return
     try:
-        lateral = float(lateral)
-        lateral = int(lateral)
+        Globals.profiles_lateral = int(Globals.profiles_lateral)
     except:
         messagebox.showerror("Error", "Could not read the lateral displacements\n (Code: displacements to integer)")
         return
     try:
-        longit = float(longit)
-        longit = int(longit)
+        Globals.profiles_longitudinal = int(Globals.profiles_longitudinal)
     except:
         messagebox.showerror("Error", "Could not read the longitudinal displacements\n (Code: displacements to integer)")
         return
+
+    lateral = Globals.profiles_lateral
+    longit = Globals.profiles_longitudinal
+    vertical = Globals.profiles_vertical
     isocenter_px = np.zeros(3)
     distance_in_doseplan_ROI_reference_point_px = []
     if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
@@ -189,7 +190,7 @@ def processDoseplan_usingReferencePoint():
         vertical_px = np.round(vertical)
         longit_px = np.round(longit)
 
-        #displacment to pc
+        #displacment to px
         doseplan_lateral_displacement_px = np.round(Globals.profiles_doseplan_lateral_displacement)
         doseplan_vertical_displacement_px = np.round(Globals.profiles_doseplan_vertical_displacement)
         doseplan_longitudinal_displacement_px = np.round(Globals.profiles_doseplan_longitudianl_displacement)
@@ -242,8 +243,8 @@ def processDoseplan_usingReferencePoint():
         longit_px = np.round(longit/3)
 
         #displacment to pc
-        doseplan_lateral_displacement_px = np.round((Globals.profiles_doseplan_lateral_displacement)/2)
-        doseplan_vertical_displacement_px = np.round((Globals.profiles_doseplan_vertical_displacement)/2)
+        doseplan_lateral_displacement_px = np.round((Globals.profiles_doseplan_lateral_displacement)/3)
+        doseplan_vertical_displacement_px = np.round((Globals.profiles_doseplan_vertical_displacement)/3)
         doseplan_longitudinal_displacement_px = np.round((Globals.profiles_doseplan_longitudianl_displacement)/3)
 
     temp_ref_point_doseplan = np.zeros(3)
@@ -479,6 +480,7 @@ def processDoseplan_usingReferencePoint():
         return
 
     dose_slice = dataset_swapped[int(reference_point[0]),:,:]
+    
     
  
     #calculate the coordinates of the Region of Interest in doseplan (marked on the film) 
@@ -1183,7 +1185,7 @@ def UploadRTplan():
             (Code: lateral table displacement)")
 
     try:
-        Globals.profiles_doseplan_longitudinal_displacement = dataset.PatientSetupSequence[0].TableTopLongitudinalSetupDisplacement
+        Globals.profiles_doseplan_longitudianl_displacement = dataset.PatientSetupSequence[0].TableTopLongitudinalSetupDisplacement
     except:
         messagebox.showerror("Error", "Could not read the RT plan file. Try again or try another file\n\
             (Code: longitudinal table displacement)")
@@ -1214,9 +1216,57 @@ def UploadRTplan():
 
     Globals.profiles_upload_button_rtplan.config(state=DISABLED)
 
+def UploadDoseplan_button_function():
+    yes = messagebox.askyesno("Question", "Are you going to upload several doseplans and/or use a factor on a plan?")
+    if not yes:
+        UploadDoseplan()
+        return
+    
+    several_doseplans_window = tk.Toplevel(Globals.tab4_canvas)
+    several_doseplans_window.geometry("700x700+10+10")
+    several_doseplans_window.grab_set()
+    
+    doseplans_over_all_frame = tk.Frame(several_doseplans_window, bd=0, relief=FLAT)
+    doseplans_over_all_canvas = Canvas(doseplans_over_all_frame)
+
+    doseplans_xscrollbar = Scrollbar(doseplans_over_all_frame, orient=HORIZONTAL, command=doseplans_over_all_canvas.xview)
+    doseplans_yscrollbar = Scrollbar(doseplans_over_all_frame, command=doseplans_over_all_canvas.yview)
+
+    doseplans_scroll_frame = ttk.Frame(doseplans_over_all_canvas)
+    doseplans_scroll_frame.bind("<Configure>", lambda e: doseplans_over_all_canvas.configure(scrollregion=doseplans_over_all_canvas.bbox('all')))
+
+    doseplans_over_all_canvas.create_window((0,0), window=doseplans_scroll_frame, anchor='nw')
+    doseplans_over_all_canvas.configure(xscrollcommand=doseplans_xscrollbar.set, yscrollcommand=doseplans_yscrollbar.set)
+
+    doseplans_over_all_frame.config(highlightthickness=0, bg='#ffffff')
+    doseplans_over_all_canvas.config(highlightthickness=0, bg='#ffffff')
+    doseplans_over_all_frame.pack(expand=True, fill=BOTH)
+    doseplans_over_all_canvas.grid(row=0, column=0, sticky=N+S+E+W)
+    doseplans_over_all_frame.grid_columnconfigure(0, weight=1)
+    doseplans_over_all_frame.grid_rowconfigure(0, weight=1)
+    doseplans_xscrollbar.grid(row=1, column=0, sticky=E+W)
+    doseplans_over_all_frame.grid_columnconfigure(1, weight=0)
+    doseplans_over_all_frame.grid_rowconfigure(1, weight=0)
+    doseplans_yscrollbar.grid(row=0, column=1, sticky=N+S)
+    doseplans_over_all_frame.grid_columnconfigure(2, weight=0)
+    doseplans_over_all_frame.grid_rowconfigure(2, weight=0)
+
+    upload_doseplan_frame = tk.Frame(doseplans_scroll_frame)
+    upload_doseplan_frame.grid(row=2, column = 0, padx = (0,40), pady=(10,0), sticky=N)
+    doseplans_scroll_frame.grid_columnconfigure(0, weight=0)
+    doseplans_scroll_frame.grid_rowconfigure(0, weight=0)
+    upload_film_frame.config(bg = '#ffffff')
+
+    upload_button_doseplan = tk.Button(upload_doseplan_frame, text='Browse', image=profiles_add_doseplan_button_image,\
+        cursor='hand2', font=('calibri', '14'), relief=FLAT, state=DISABLED, command=UploadDoseplan)
+    Globals.profiles_upload_button_doseplan.pack(expand=True, fill=BOTH)
+    Globals.profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+    Globals.profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
+
+
+
 
 def UploadDoseplan():
-    messagebox.askyesno("Question", "Are you going to upload several doseplans and/or use a factor on a plan?")
     file = filedialog.askopenfilename()
     ext = os.path.splitext(file)[-1].lower()
     if(not(ext == '.dcm')):
@@ -1242,16 +1292,12 @@ def UploadDoseplan():
             return
     os.chdir(current_folder)
     doseplan_dataset = dataset.pixel_array
-
-    Globals.profiles_dataset_doseplan = dataset
-    Globals.profiles_dose_scaling_doseplan = dataset.DoseGridScaling
     #Check that the resolution is either 1x1x1, 2x2x2 or 3x3x3
     if(not((dataset.PixelSpacing==[1, 1] and dataset.SliceThickness==1) \
         or (dataset.PixelSpacing==[2, 2] and dataset.SliceThickness==2) \
         or (dataset.PixelSpacing==[3, 3] and dataset.SliceThickness==3))):
-            messagebox.showerror("Error", "The resolution in doseplan must be 1x1x1, 2x2x2 or 3x3x3")
-            return
-
+        messagebox.showerror("Error", "The resolution in doseplan must be 1x1x1, 2x2x2 or 3x3x3")
+        return
     #Check that the datamatrix is in right angles to the coordinate system
     if(not(dataset.ImageOrientationPatient==[1, 0, 0, 0, 1, 0] or \
         dataset.ImageOrientationPatient==[1, 0, 0, 0, 0, 1] or \
@@ -1260,8 +1306,10 @@ def UploadDoseplan():
         dataset.ImageOrientationPatient==[0, 0, 1, 1, 0, 0] or \
         dataset.ImageOrientationPatient==[0, 0, 1, 0, 1, 0])):
         messagebox.showerror("Error", "The Image Orientation (Patient) must be parallel to one of the main axis and perpendicular to the two others.")
+        return
 
-   
+    Globals.profiles_dataset_doseplan = dataset
+    Globals.profiles_dose_scaling_doseplan = dataset.DoseGridScaling
     Globals.profiles_test_if_added_doseplan = True
     if(Globals.profiles_test_if_added_rtplan):
         if(Globals.profiles_isocenter_or_reference_point == "Isocenter"):
@@ -1269,12 +1317,10 @@ def UploadDoseplan():
         elif(Globals.profiles_isocenter_or_reference_point == "Ref_point"):
             processDoseplan_usingReferencePoint()
         else:
-            messagebox.showerror("Error", "Something went wrong. Try again.\n\
-                (Code: processDoseplan)")
+            messagebox.showerror("Error", "Something went wrong. Try again.\n (Code: processDoseplan)")
             return
 
     Globals.profiles_upload_button_doseplan.config(state=DISABLED)
-
 
 
 ######################################################## F I L M ########################################################
@@ -1537,7 +1583,9 @@ def UploadFilm():
         parent = os.path.dirname(file)
         os.chdir(parent)
         img = Image.open(file)
+        img = img.transpose(Image.FLIP_LEFT_RIGHT)
         cv2Img = cv2.imread(basename(normpath(file)), cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+        #cv2Img = cv2.flip(cv2Img, 0)
         cv2Img = cv2.medianBlur(cv2Img, 5)
         if(cv2Img is None):
             messagebox.showerror("Error", "Something has gone wrong. Check that the filename does not contain Æ,Ø,Å")
@@ -1804,25 +1852,33 @@ are not happy with the placement click the button again.")
 
         def finishFilmMarkers(ref_test):
             if(ref_test):
-                if(not(Globals.profiles_input_lateral_displacement.get("1.0",'end')==" ")):
+                if(not(Globals.profiles_input_lateral_displacement.get("1.0",'end-1c')==" ")):
                     try:
-                        test = float(Globals.profiles_input_lateral_displacement.get("1.0",'end'))
+                        test = float(Globals.profiles_input_lateral_displacement.get("1.0",'end-1c'))
+                        Globals.profiles_lateral = test
                     except:
                         messagebox.showerror("Error", "The displacements must be numbers\n (Code: lateral displacement)")
                         return
-                if(not(Globals.profiles_input_longitudinal_displacement.get("1.0",'end')==" ")):
+                else:
+                    Globals.profiles_lateral = 0
+                if(not(Globals.profiles_input_longitudinal_displacement.get("1.0",'end-1c')==" ")):
                     try:
-                        test = float(Globals.profiles_input_longitudinal_displacement.get("1.0", 'end'))
+                        test = float(Globals.profiles_input_longitudinal_displacement.get("1.0", 'end-1c'))
+                        Globals.profiles_longitudinal = test
                     except:
                         messagebox.showerror("Error", "The displacements must be numbers\n (Code: longitudinal displacement)")
                         return
-                if(not(Globals.profiles_input_vertical_displacement.get("1.0",'end')==" ")):
+                else:
+                    Globals.profiles_longitudinal = 0
+                if(not(Globals.profiles_input_vertical_displacement.get("1.0",'end-1c')==" ")):
                     try:
-                        test = float(Globals.profiles_input_vertical_displacement.get("1.0", 'end'))
+                        test = float(Globals.profiles_input_vertical_displacement.get("1.0", 'end-1c'))
+                        Globals.profiles_vertical = test
                     except:
                         messagebox.showerror("Error", "The displacements must be numbers\n (Code: vertical displacement)")
                         return
-
+                else:
+                    Globals.profiles_vertical = 0
                 Globals.profiles_input_vertical_displacement.config(state=DISABLED)
                 Globals.profiles_input_longitudinal_displacement.config(state=DISABLED)
                 Globals.profiles_input_lateral_displacement.config(state=DISABLED)

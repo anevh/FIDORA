@@ -187,5 +187,11 @@ print(cs.collections[0].get_paths())
 
 dataset = pydicom.dcmread("RD1.2.752.243.1.1.20200303144816605.1110.67773.dcm")
 testv2 = pydicom.dcmread("rtplan_v2.dcm")
+dataset2 = pydicom.dcmread("V1.dcm")
 test_dosemap_v2 = pydicom.dcmread("testv2.dcm")
-print(dataset.DoseSummationType)
+array = dataset2.pixel_array
+
+plt.figure()
+plt.imshow(array[35,:,:])
+plt.show()
+print(array.shape)

@@ -583,6 +583,12 @@ global profiles_input_longitudinal_displacement
 global profiles_input_vertical_displacement
 
 global profiles_isocenter_or_reference_point
+
+global profiles_lateral
+global profiles_vertical
+global profiles_longitudinal
+
+
 ############################### Correction matrix ######################################
 
 global correction127_red
