@@ -103,7 +103,7 @@ except:
 
 #[507,640]
 #slice 94, [93,88]
-
+"""
 def pixel_to_dose(P,a,b,c):
     ret = c + b/(P-a)
     return ret
@@ -146,3 +146,46 @@ plt.ylabel("Dose")
 plt.title("Profiles, lateral direction across isocenter")
 plt.show()
 
+"""
+
+dataset1 = pydicom.dcmread("struct_test.dcm")
+structures = dataset1.ROIContourSequence
+struct = structures[1]
+"""
+print(len(structures))
+print(struct.ContourSequence[0])
+print(struct.ContourSequence[0].ContourData)
+"""
+struct_cont_coord_px = np.round(struct.ContourSequence[25].ContourData)
+
+
+
+print(struct_cont_coord_px)
+
+dataset1 = pydicom.dcmread("testDicom1.dcm")
+dataset1_array = dataset1.pixel_array
+#slice = dataset1_array[10+120,:,:]
+
+"""
+for i in range(0, len(struct_cont_coord_px), 3):
+   dataset1_array[120+int(struct_cont_coord_px[i+2]), 315+int(struct_cont_coord_px[i+1]),\
+        166+int(struct_cont_coord_px[i])] = 0
+
+
+plt.figure()
+plt.imshow(slice)
+plt.show()
+"""
+"""
+x = [1,2,3,4]
+y = [1,2,3,4]
+m = [[15,14,13,12],[14,12,10,8],[13,10,7,4],[12,8,4,0]]
+cs = plt.contour(x,y,m, [9.5])
+print(cs.collections[0].get_paths())
+"""
+
+
+dataset = pydicom.dcmread("RD1.2.752.243.1.1.20200303144816605.1110.67773.dcm")
+testv2 = pydicom.dcmread("rtplan_v2.dcm")
+test_dosemap_v2 = pydicom.dcmread("testv2.dcm")
+print(dataset.DoseSummationType)

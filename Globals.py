@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, \
     HORIZONTAL, E, W, N, S, BOTH, Frame, Canvas, LEFT, FLAT, INSERT, DISABLED, ALL, X, BOTTOM, \
-    DoubleVar, PanedWindow, RAISED, TOP
+    DoubleVar, PanedWindow, RAISED, TOP, Radiobutton
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -13,6 +13,7 @@ global dose_response_dose_border
 global save_button
 global help_button
 global done_button_image
+
 
 
 global form 
@@ -420,7 +421,7 @@ profiles_view_film_doseplan_ROI.config(bg='#E5f9ff', relief=FLAT, highlightthick
 
 global profile_plot_canvas
 profile_plot_canvas = tk.Canvas(tab4_canvas)
-profile_plot_canvas.grid(row=4, column=0, rowspan=3, columnspan=2, sticky=N+S+E+W, pady=(0,5), padx=(5,10))
+profile_plot_canvas.grid(row=3, column=0, rowspan=10, columnspan=2, sticky=N+E+W, pady=(0,5), padx=(5,10))
 tab4_canvas.grid_columnconfigure(4, weight=0)
 tab4_canvas.grid_rowconfigure(4, weight=0)
 profile_plot_canvas.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
@@ -428,7 +429,7 @@ profile_plot_canvas.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
 profiles_fig = Figure(figsize=(5,3))
 profiles_a = profiles_fig.add_subplot(111, ylim=(0,40000), xlim=(0,500))
 profiles_plot_canvas = FigureCanvasTkAgg(profiles_fig, master=profile_plot_canvas)
-profiles_plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+S+E+W, padx=(5,0), pady=(0,0))
+profiles_plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+E+W, padx=(5,0), pady=(0,0))
 profiles_a.set_title ("Profiles", fontsize=12)
 profiles_a.set_ylabel("Pixel value", fontsize=12)
 profiles_a.set_xlabel("Distance (mm)", fontsize=12)
@@ -442,15 +443,19 @@ global profiles_depth_float
 
 global profiles_mark_isocenter_button_image
 global profiles_mark_ROI_button_image
+global profiles_mark_point_button_image
 
 global profiles_iscoenter_coords
 profiles_iscoenter_coords = []
 
 #Given from top left corner [right, down]
 global profiles_film_isocenter
+global profiles_film_reference_point
 
 global profiles_distance_isocenter_ROI
 profiles_distance_isocenter_ROI = []
+global profiles_distance_reference_point_ROI
+profiles_distance_reference_point_ROI = []
 
 global profiles_mark_isocenter_up_down_line
 profiles_mark_isocenter_up_down_line = []
@@ -461,17 +466,26 @@ profiles_mark_isocenter_oval = []
 global profiles_mark_ROI_rectangle
 profiles_mark_ROI_rectangle = []
 
+global profiles_mark_reference_point_oval
+profiles_mark_reference_point_oval = []
+
 global profiles_ROI_coords
 profiles_ROI_coords = []
 
 global profiles_done_button
 profiles_done_button = None
+global profiles_done_button_reference_point
+profiles_done_button_reference_point = None
 
 global profiles_isocenter_check
 profiles_isocenter_check=False
+global profiles_reference_point_check
+profiles_reference_point_check = False
 
 global profiles_ROI_check
 profiles_ROI_check = False
+global profiles_ROI_reference_point_check
+profiles_ROI_reference_point_check = False
 
 global profiles_film_batch
 profiles_film_batch = IntVar()
@@ -497,22 +511,35 @@ profiles_test_if_added_doseplan = False
 profiles_test_if_added_rtplan = False
 
 global profiles_isocenter_mm
-global profiles_longitudinal_displacement_mm
-global profiles_lateral_displacement_mm
-global profiles_vertical_displacement_mm
+
 
 global profiles_dose_scaling_doseplan
 
 global profiles_max_dose_film
 
+profiles_choose_profile_canvas = tk.Canvas(profiles_view_film_doseplan_ROI)
+profiles_choose_profile_canvas.pack()
+profiles_choose_profile_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0)
+global profiles_choice_of_profile_line_type
+profiles_choice_of_profile_line_type = StringVar()
+profiles_choice_of_profile_line_type.set("h")
 
-#global profiles_film_notebook_canvas
-#profiles_film_notebook_canvas = tk.Canvas(profiles_view_film_doseplan_ROI)
-#profiles_film_notebook_canvas.pack()
-#profiles_film_notebook_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0)
+profiles_choose_profile_type_text = tk.Text(profiles_choose_profile_canvas, height=1)
+profiles_choose_profile_type_text.insert(INSERT, "How to draw the profile:")
+profiles_choose_profile_type_text.pack(side=TOP)
+profiles_choose_profile_type_text.config(bg='#ffffff', relief=FLAT, \
+highlightthickness=0, state=DISABLED, font=('calibri', '11'))
+Radiobutton(profiles_choose_profile_canvas, text="Horizontal", variable=profiles_choice_of_profile_line_type, \
+    value="h", bg='#ffffff', cursor='hand2').pack(side=LEFT)
+Radiobutton(profiles_choose_profile_canvas, text="Vertical", \
+    variable=profiles_choice_of_profile_line_type, value='v', bg='#ffffff', cursor='hand2').pack(side=LEFT)
+Radiobutton(profiles_choose_profile_canvas, text="Draw", \
+    variable=profiles_choice_of_profile_line_type, value="d", bg='#ffffff', cursor='hand2').pack(side=LEFT)
+
+
 global profiles_film_panedwindow
 profiles_film_panedwindow = PanedWindow(profiles_view_film_doseplan_ROI, orient='vertical')
-profiles_film_panedwindow.pack(side=TOP)
+profiles_film_panedwindow.pack()
 profiles_film_panedwindow.configure(sashrelief = RAISED, showhandle=True)
 
 
@@ -538,6 +565,28 @@ profiles_film_panedwindow.configure(sashrelief = RAISED, showhandle=True)
 global profiles_scanned_image_text_image
 global profiles_film_dose_map_text_image
 global profiles_doseplan_text_image
+
+global doseplan_write_image
+global doseplan_write_image_width
+global doseplan_write_image_height
+global doseplan_write_image_var_x 
+doseplan_write_image_var_x= 0
+
+
+global new_window_factor_textbox
+
+global profiles_doseplan_lateral_displacement
+global profiles_doseplan_vertical_displacement
+global profiles_doseplan_longitudianl_displacement
+global profiles_doseplan_patient_position
+
+global profiles_reference_point_in_doseplan
+
+global profiles_input_lateral_displacement
+global profiles_input_longitudinal_displacement
+global profiles_input_vertical_displacement
+
+global profiles_isocenter_or_reference_point
 ############################### Correction matrix ######################################
 
 global correction127_red

@@ -168,6 +168,9 @@ Globals.profiles_film_dose_map_text_image = ImageTk.PhotoImage(file=profiles_fil
 
 profiles_doseplan_text_image_file = "doseplan_text_image.png"
 Globals.profiles_doseplan_text_image = ImageTk.PhotoImage(file=profiles_doseplan_text_image_file)
+
+profiles_mark_point_file = "mark_point_button.png"
+Globals.profiles_mark_point_button_image = ImageTk.PhotoImage(file=profiles_mark_point_file)
 ###################################### INTRO TAB #################################################
 
 
@@ -767,7 +770,7 @@ Globals.tab4_canvas.grid_rowconfigure(0, weight=0)
 profiles_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
 
 profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_film_frame.grid(row=3, column = 0, padx = (0, 240), pady=(10,0))
+profiles_upload_film_frame.grid(row=2, column = 0, padx = (0, 240), pady=(10,0), sticky=N)
 Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
 profiles_upload_film_frame.config(bg = '#ffffff')
@@ -779,7 +782,7 @@ Globals.profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffff
 Globals.profiles_upload_button_film.image = profiles_add_film_button_image
 
 profiles_upload_doseplan_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_doseplan_frame.grid(row=3, column = 0, padx = (0,40), pady=(10,0))
+profiles_upload_doseplan_frame.grid(row=2, column = 0, padx = (0,40), pady=(10,0), sticky=N)
 Globals.tab4_canvas.grid_columnconfigure(3, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(3, weight=0)
 profiles_upload_film_frame.config(bg = '#ffffff')
@@ -791,7 +794,7 @@ Globals.profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground
 Globals.profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
 
 profiles_upload_rtplan_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_rtplan_frame.grid(row=3, column=0, padx=(160,0), pady=(10,0))
+profiles_upload_rtplan_frame.grid(row=2, column=0, padx=(160,0), pady=(10,0), sticky=N)
 Globals.tab4_canvas.grid_columnconfigure(10, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(10, weight=0)
 profiles_upload_rtplan_frame.config(bg='#ffffff')
@@ -828,7 +831,7 @@ profiles_help_button_orientation.configure(bg='#ffffff',activebackground='#fffff
 profiles_help_button_orientation.image=Globals.help_button
 
 profiles_resetAll_frame = tk.Frame(Globals.tab4_canvas)
-profiles_resetAll_frame.grid(row=10,column=0, padx=(0,0), pady=(0,0))
+profiles_resetAll_frame.grid(row=15,column=0, padx=(0,0), pady=(0,0), sticky=S)
 Globals.tab4_canvas.grid_columnconfigure(5, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(5, weight=0)
 profiles_resetAll_frame.config(bg='#ffffff')
@@ -838,32 +841,6 @@ profiles_resetAll_button = tk.Button(profiles_resetAll_frame, text='Reset', imag
 profiles_resetAll_button.pack(expand=True, fill=BOTH)
 profiles_resetAll_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 profiles_resetAll_button.image = dose_response_clear_all_button_image
-
-film_depth_text = tk.Text(Globals.tab4_canvas, width=14, height=1)
-film_depth_text.insert(INSERT, "Film depth (cm):")
-film_depth_text.config(state=DISABLED, font=('calibri', '10'), bd = 0, relief=FLAT)
-film_depth_text.grid(row=2, column=0, sticky=N+S+W, padx=(30,0), pady=(5,0))
-Globals.tab4_canvas.grid_columnconfigure(7, weight=0)
-Globals.tab4_canvas.grid_rowconfigure(7, weight=0)
-
-Globals.profiles_depth = tk.Text(Globals.tab4_canvas, width=7, height=1)
-Globals.profiles_depth.insert(INSERT, " ")
-Globals.profiles_depth.config(state=NORMAL, font=('calibri', '10'), bd=2, relief=GROOVE)
-Globals.profiles_depth.grid(row=2, column=0, sticky=N+S, padx=(60,0), pady=(5,0))
-Globals.tab4_canvas.grid_columnconfigure(8, weight=0)
-Globals.tab4_canvas.grid_rowconfigure(8, weight=0)
-
-profiles_depth_help_frame = tk.Frame(Globals.tab4_canvas)
-profiles_depth_help_frame.grid(row=2, column=0, sticky=N+S+E, padx=(0,40))
-Globals.tab4_canvas.grid_columnconfigure(9, weight=0)
-Globals.tab4_canvas.grid_rowconfigure(9, weight=0)
-profiles_depth_help_frame.configure(bg='#ffffff')
-
-profiles_help_button_depth = tk.Button(profiles_depth_help_frame, text='help', image=Globals.help_button, \
-    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.help_showDepth)
-profiles_help_button_depth.pack(expand=True, fill=BOTH)
-profiles_help_button_depth.configure(bg='#ffffff',activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-profiles_help_button_depth.image=Globals.help_button
 
 Globals.tab4_canvas.pack(expand=True, fill=BOTH)
 ##################################### End statements ############################################
