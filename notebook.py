@@ -841,32 +841,6 @@ profiles_resetAll_button.pack(expand=True, fill=BOTH)
 profiles_resetAll_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 profiles_resetAll_button.image = dose_response_clear_all_button_image
 
-#film_depth_text = tk.Text(Globals.tab4_canvas, width=14, height=1)
-#film_depth_text.insert(INSERT, "Film depth (cm):")
-#film_depth_text.config(state=DISABLED, font=('calibri', '10'), bd = 0, relief=FLAT)
-#film_depth_text.grid(row=2, column=0, sticky=N+S+W, padx=(30,0), pady=(5,0))
-#Globals.tab4_canvas.grid_columnconfigure(7, weight=0)
-#Globals.tab4_canvas.grid_rowconfigure(7, weight=0)
-
-#Globals.profiles_depth = tk.Text(Globals.tab4_canvas, width=7, height=1)
-#Globals.profiles_depth.insert(INSERT, " ")
-#Globals.profiles_depth.config(state=NORMAL, font=('calibri', '10'), bd=2, relief=GROOVE)
-#Globals.profiles_depth.grid(row=2, column=0, sticky=N+S, padx=(60,0), pady=(5,0))
-#Globals.tab4_canvas.grid_columnconfigure(8, weight=0)
-#Globals.tab4_canvas.grid_rowconfigure(8, weight=0)
-
-#profiles_depth_help_frame = tk.Frame(Globals.tab4_canvas)
-#profiles_depth_help_frame.grid(row=2, column=0, sticky=N+S+E, padx=(0,40))
-#Globals.tab4_canvas.grid_columnconfigure(9, weight=0)
-#Globals.tab4_canvas.grid_rowconfigure(9, weight=0)
-#profiles_depth_help_frame.configure(bg='#ffffff')
-
-#profiles_help_button_depth = tk.Button(profiles_depth_help_frame, text='help', image=Globals.help_button, \
-#    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=Profile_functions.help_showDepth)
-#profiles_help_button_depth.pack(expand=True, fill=BOTH)
-#profiles_help_button_depth.configure(bg='#ffffff',activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-#profiles_help_button_depth.image=Globals.help_button
-
 Globals.tab4_canvas.pack(expand=True, fill=BOTH)
 ##################################### End statements ############################################
 #Globals.tab_parent.place(relwidth=1, relheight=0.9, relx=0, rely=0.15)

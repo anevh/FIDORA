@@ -150,16 +150,22 @@ def processDoseplan_usingReferencePoint():
     if(longit==" "):longit=0
     try:
         vertical = float(vertical)
-        vertial = int(vertical)
+        vertical = int(vertical)
+    except:
+        messagebox.showerror("Error", "Could not read the vertical displacements\n (Code: displacements to integer)")
+        return
     try:
         lateral = float(lateral)
         lateral = int(lateral)
+    except:
+        messagebox.showerror("Error", "Could not read the lateral displacements\n (Code: displacements to integer)")
+        return
     try:
         longit = float(longit)
         longit = int(longit)
     except:
-        messagebox.showerror("Error", "Could not read the input displacements\n\
-(Code: displacements to integer)")
+        messagebox.showerror("Error", "Could not read the longitudinal displacements\n (Code: displacements to integer)")
+        return
     isocenter_px = np.zeros(3)
     distance_in_doseplan_ROI_reference_point_px = []
     if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
@@ -1210,6 +1216,7 @@ def UploadRTplan():
 
 
 def UploadDoseplan():
+    messagebox.askyesno("Question", "Are you going to upload several doseplans and/or use a factor on a plan?")
     file = filedialog.askopenfilename()
     ext = os.path.splitext(file)[-1].lower()
     if(not(ext == '.dcm')):
@@ -1223,6 +1230,16 @@ def UploadDoseplan():
     parent = os.path.dirname(file)
     os.chdir(parent)
     dataset = pydicom.dcmread(file)
+    try:
+        dose_summation_type = dataset.DoseSummationType
+    except:
+        messagebox.showerror("Error", "Could not upload the doseplan correctly. Try again or another file.\n (Code: dose summation)")
+        return
+    
+    if(not(dose_summation_type == "PLAN")):
+        ok = messagebox.askokcancel("Dose summation", "You did not upload the full doseplan. Do you want to continue?")
+        if not ok:
+            return
     os.chdir(current_folder)
     doseplan_dataset = dataset.pixel_array
 
@@ -1786,31 +1803,29 @@ are not happy with the placement click the button again.")
         mark_ROI_reference_point_button.image=Globals.profiles_mark_ROI_button_image
 
         def finishFilmMarkers(ref_test):
-            if(not(Globals.profiles_input_lateral_displacement.get("1.0",'end')==" ")):
-                try:
-                    test = float(Globals.profiles_input_lateral_displacement.get("1.0",'end'))
-                except:
-                    messagebox.showerror("Error", "The displacements must be numbers\n\
-                    (Code: lateral displacement)")
-                    return
-            if(not(Globals.profiles_input_longitudinal_displacement.get("1.0",'end')==" ")):
-                try:
-                    test = float(Globals.profiles_input_longitudinal_displacement.get("1.0", 'end'))
-                except:
-                    messagebox.showerror("Error", "The displacements must be numbers\n\
-                    (Code: longitudinal displacement)")
-                    return
-            if(not(Globals.profiles_input_vertical_displacement.get("1.0",'end')==" ")):
-                try:
-                    test = float(Globals.profiles_input_vertical_displacement.get("1.0", 'end'))
-                except:
-                    messagebox.showerror("Error", "The displacements must be numbers\n\
-                    (Code: vertical displacement)")
-                    return
+            if(ref_test):
+                if(not(Globals.profiles_input_lateral_displacement.get("1.0",'end')==" ")):
+                    try:
+                        test = float(Globals.profiles_input_lateral_displacement.get("1.0",'end'))
+                    except:
+                        messagebox.showerror("Error", "The displacements must be numbers\n (Code: lateral displacement)")
+                        return
+                if(not(Globals.profiles_input_longitudinal_displacement.get("1.0",'end')==" ")):
+                    try:
+                        test = float(Globals.profiles_input_longitudinal_displacement.get("1.0", 'end'))
+                    except:
+                        messagebox.showerror("Error", "The displacements must be numbers\n (Code: longitudinal displacement)")
+                        return
+                if(not(Globals.profiles_input_vertical_displacement.get("1.0",'end')==" ")):
+                    try:
+                        test = float(Globals.profiles_input_vertical_displacement.get("1.0", 'end'))
+                    except:
+                        messagebox.showerror("Error", "The displacements must be numbers\n (Code: vertical displacement)")
+                        return
 
-            Globals.profiles_input_vertical_displacement.config(state=DISABLED)
-            Globals.profiles_input_longitudinal_displacement.config(state=DISABLED)
-            Globals.profiles_input_lateral_displacement.config(state=DISABLED)
+                Globals.profiles_input_vertical_displacement.config(state=DISABLED)
+                Globals.profiles_input_longitudinal_displacement.config(state=DISABLED)
+                Globals.profiles_input_lateral_displacement.config(state=DISABLED)
 
             if(ref_test):
                 choose_batch_window = tk.Toplevel(new_window_reference_point_tab)

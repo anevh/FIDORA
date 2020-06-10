@@ -188,9 +188,4 @@ print(cs.collections[0].get_paths())
 dataset = pydicom.dcmread("RD1.2.752.243.1.1.20200303144816605.1110.67773.dcm")
 testv2 = pydicom.dcmread("rtplan_v2.dcm")
 test_dosemap_v2 = pydicom.dcmread("testv2.dcm")
-print(testv2.PatientSetupSequence[0].TableTopLongitudinalSetupDisplacement)
-print(testv2.PatientSetupSequence[0].TableTopLateralSetupDisplacement)
-print(testv2.PatientSetupSequence[0].TableTopVerticalSetupDisplacement)
-
-a = 0
-if(a==0): print("Hei")
+print(dataset.DoseSummationType)
