@@ -149,17 +149,20 @@ def processDoseplan_usingReferencePoint():
     #if(vertical==" "):vertical=0
     #if(longit==" "):longit=0
     try:
-        Globals.profile_plot_canvasvertical = int(Globals.profiles_vertical)
+        Globals.profiles_vertical = int(Globals.profiles_vertical)
+        print(Globals.profiles_vertical)
     except:
         messagebox.showerror("Error", "Could not read the vertical displacements\n (Code: displacements to integer)")
         return
     try:
         Globals.profiles_lateral = int(Globals.profiles_lateral)
+        print(Globals.profiles_lateral)
     except:
         messagebox.showerror("Error", "Could not read the lateral displacements\n (Code: displacements to integer)")
         return
     try:
         Globals.profiles_longitudinal = int(Globals.profiles_longitudinal)
+        print(Globals.profiles_longitudinal)
     except:
         messagebox.showerror("Error", "Could not read the longitudinal displacements\n (Code: displacements to integer)")
         return
@@ -251,37 +254,37 @@ def processDoseplan_usingReferencePoint():
 
     #Finding reference point in doseplan
     if(Globals.profiles_doseplan_patient_position=='HFS'):
-        temp_ref_point_doseplan[0] = isocenter_px[0]+ doseplan_lateral_displacement_px + lateral_px
-        temp_ref_point_doseplan[1] = isocenter_px[1]+ doseplan_vertical_displacement_px + vertical_px
-        temp_ref_point_doseplan[2] = isocenter_px[2]+ doseplan_longitudinal_displacement_px + longit_px
+        temp_ref_point_doseplan[0] = int(isocenter_px[0]+ doseplan_lateral_displacement_px - lateral_px)
+        temp_ref_point_doseplan[1] = int(isocenter_px[1]- doseplan_vertical_displacement_px + vertical_px)
+        temp_ref_point_doseplan[2] = int(isocenter_px[2]+ doseplan_longitudinal_displacement_px - longit_px)
     elif(Globals.profiles_doseplan_patient_position=='HFP'):
-        temp_ref_point_doseplan[0] = isocenter_px[0]- doseplan_lateral_displacement_px- lateral_px
-        temp_ref_point_doseplan[1] = isocenter_px[1]- doseplan_vertical_displacement_px - vertical_px
-        temp_ref_point_doseplan[2] = isocenter_px[2]+ doseplan_longitudinal_displacement_px + longit_px
+        temp_ref_point_doseplan[0] = isocenter_px[0]- doseplan_lateral_displacement_px+ lateral_px
+        temp_ref_point_doseplan[1] = isocenter_px[1]+ doseplan_vertical_displacement_px - vertical_px
+        temp_ref_point_doseplan[2] = isocenter_px[2]+ doseplan_longitudinal_displacement_px - longit_px
     elif(Globals.profiles_doseplan_patient_position=='HFDR'):
-        temp_ref_point_doseplan[0] = isocenter_px[0]- doseplan_vertical_displacement_px - vertical_px
-        temp_ref_point_doseplan[1] = isocenter_px[1]+ doseplan_lateral_displacement_px + lateral_px
-        temp_ref_point_doseplan[2] = isocenter_px[2]+ doseplan_longitudinal_displacement_px + longit_px
+        temp_ref_point_doseplan[0] = isocenter_px[0]- doseplan_vertical_displacement_px + vertical_px
+        temp_ref_point_doseplan[1] = isocenter_px[1]+ doseplan_lateral_displacement_px - lateral_px
+        temp_ref_point_doseplan[2] = isocenter_px[2]+ doseplan_longitudinal_displacement_px - longit_px
     elif(Globals.profiles_doseplan_patient_position=='HFDL'):
-        temp_ref_point_doseplan[0] = isocenter_px[0]+ doseplan_vertical_displacement_px + vertical_px
-        temp_ref_point_doseplan[1] = isocenter_px[1]- doseplan_lateral_displacement_px - lateral_px
-        temp_ref_point_doseplan[2] = isocenter_px[2]+ doseplan_longitudinal_displacement_px + longit_px
+        temp_ref_point_doseplan[0] = isocenter_px[0]+ doseplan_vertical_displacement_px - vertical_px
+        temp_ref_point_doseplan[1] = isocenter_px[1]- doseplan_lateral_displacement_px + lateral_px
+        temp_ref_point_doseplan[2] = isocenter_px[2]+ doseplan_longitudinal_displacement_px - longit_px
     elif(Globals.profiles_doseplan_patient_position=='FFS'):
-        temp_ref_point_doseplan[0] = isocenter_px[0]- doseplan_lateral_displacement_px - lateral_px
-        temp_ref_point_doseplan[1] = isocenter_px[1]+ doseplan_vertical_displacement_px + vertical_px
-        temp_ref_point_doseplan[2] = isocenter_px[2]- doseplan_longitudinal_displacement_px - longit_px
+        temp_ref_point_doseplan[0] = isocenter_px[0]- doseplan_lateral_displacement_px + lateral_px
+        temp_ref_point_doseplan[1] = isocenter_px[1]+ doseplan_vertical_displacement_px - vertical_px
+        temp_ref_point_doseplan[2] = isocenter_px[2]- doseplan_longitudinal_displacement_px + longit_px
     elif(Globals.profiles_doseplan_patient_position=='FFP'):
-        temp_ref_point_doseplan[0] = isocenter_px[0]+ doseplan_lateral_displacement_px+ lateral_px
-        temp_ref_point_doseplan[1] = isocenter_px[1]- doseplan_vertical_displacement_px - vertical_px
-        temp_ref_point_doseplan[2] = isocenter_px[2]- doseplan_longitudinal_displacement_px - longit_px
+        temp_ref_point_doseplan[0] = isocenter_px[0]+ doseplan_lateral_displacement_px- lateral_px
+        temp_ref_point_doseplan[1] = isocenter_px[1]- doseplan_vertical_displacement_px + vertical_px
+        temp_ref_point_doseplan[2] = isocenter_px[2]- doseplan_longitudinal_displacement_px + longit_px
     elif(Globals.profiles_doseplan_patient_position=='FFDR'):
-        temp_ref_point_doseplan[0] = isocenter_px[0]- doseplan_vertical_displacement_px - vertical_px
-        temp_ref_point_doseplan[1] = isocenter_px[1]- doseplan_lateral_displacement_px - lateral_px
-        temp_ref_point_doseplan[2] = isocenter_px[2]- doseplan_longitudinal_displacement_px - longit_px
+        temp_ref_point_doseplan[0] = isocenter_px[0]- doseplan_vertical_displacement_px + vertical_px
+        temp_ref_point_doseplan[1] = isocenter_px[1]- doseplan_lateral_displacement_px + lateral_px
+        temp_ref_point_doseplan[2] = isocenter_px[2]- doseplan_longitudinal_displacement_px + longit_px
     else:
-        temp_ref_point_doseplan[0] = isocenter_px[0] + doseplan_vertical_displacement_px + vertical_px
-        temp_ref_point_doseplan[1] = isocenter_px[1] + doseplan_lateral_displacement_px + lateral_px
-        temp_ref_point_doseplan[2] = isocenter_px[2]- doseplan_longitudinal_displacement_px - longit_px
+        temp_ref_point_doseplan[0] = isocenter_px[0] + doseplan_vertical_displacement_px - vertical_px
+        temp_ref_point_doseplan[1] = isocenter_px[1] + doseplan_lateral_displacement_px - lateral_px
+        temp_ref_point_doseplan[2] = isocenter_px[2]- doseplan_longitudinal_displacement_px + longit_px
 
     Globals.profiles_reference_point_in_doseplan = temp_ref_point_doseplan
     reference_point = np.zeros(3)
@@ -1594,6 +1597,7 @@ def UploadFilm():
             if(cv2Img.shape[0]==1270 and cv2Img.shape[1]==1016):
                 cv2Img = abs(cv2Img-Globals.correctionMatrix127)
                 cv2Img = np.clip(cv2Img, 0, 65535)
+                cv2Img = cv2.flip(cv2Img,1)
                 img_scaled = img.resize((508, 635), Image.ANTIALIAS)
                 img_scaled = ImageTk.PhotoImage(image=img_scaled)
                 
