@@ -788,7 +788,7 @@ Globals.tab4_canvas.grid_rowconfigure(3, weight=0)
 profiles_upload_film_frame.config(bg = '#ffffff')
 
 Globals.profiles_upload_button_doseplan = tk.Button(profiles_upload_doseplan_frame, text='Browse', image=profiles_add_doseplan_button_image,\
-    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=DISABLED, command=Profile_functions.UploadDoseplan)
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=DISABLED, command=Profile_functions.UploadDoseplan_button_function)
 Globals.profiles_upload_button_doseplan.pack(expand=True, fill=BOTH)
 Globals.profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 Globals.profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
