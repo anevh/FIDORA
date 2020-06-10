@@ -247,7 +247,7 @@ def plot_dose_response():
             Globals.popt_red, pcov_red = curve_fit(fitted_dose_response, sorted_temp_dose, sorted_temp_avg_red, p0=[1700, 15172069, -390], maxfev=10000)
             popt_green, pcov_green = curve_fit(fitted_dose_response, sorted_temp_dose, sorted_temp_avg_green, p0=[1700, 15172069, -390], maxfev=10000)
             
-            xdata = np.linspace(0,500,1001)
+            xdata = np.linspace(0,2000,1001)
             ydata_red = np.zeros(len(xdata));ydata_green=np.zeros(len(xdata))
             for i in range(len(xdata)):
                 ydata_red[i] = fitted_dose_response(xdata[i], Globals.popt_red[0], Globals.popt_red[1], Globals.popt_red[2])

@@ -30,7 +30,7 @@ def calculate_dose_map(cv2Img):
     wid = Globals.map_dose_ROI_x_end.get() - Globals.map_dose_ROI_x_start.get()
     heig = Globals.map_dose_ROI_y_end.get() - Globals.map_dose_ROI_y_start.get()
     print(wid, heig)
-    doseMap_film = np.zeros((heig, wid))
+    doseMap_film = np.zeros((heig,wid))
     for i in range(heig):
         for j in range(wid):
             doseMap_film[i,j] = pixel_to_dose(cv2Img[Globals.map_dose_ROI_y_start.get()+i,Globals.map_dose_ROI_x_start.get()+j,2], \
@@ -40,6 +40,8 @@ def calculate_dose_map(cv2Img):
     
     fig = Figure(figsize=(0.8,0.8))
     a = fig.add_subplot(111)
+    #test ane:
+    #plot_image = cv2.flip(doseMap_film,-1) #fjern test etterpå
     plot_image = a.pcolormesh(doseMap_film, cmap='viridis', rasterized=True, vmin=0, vmax=600)
     fig.colorbar(plot_image, ax=a)
     canvas_dosemap_film = FigureCanvasTkAgg(fig,master = Globals.tab3)
