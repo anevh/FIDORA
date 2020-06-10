@@ -32,6 +32,7 @@ Globals.tab_parent.add(Globals.tab1, text='CoMet')
 Globals.tab_parent.add(Globals.tab2, text='Dose-response')
 Globals.tab_parent.add(Globals.tab3, text='Map dose')
 Globals.tab_parent.add(Globals.tab4, text='Profiles')
+Globals.tab_parent.add(Globals.tab5,text='DVH')
 
 style = ttk.Style()
 style.theme_create('MyStyle', parent= 'classic', settings={

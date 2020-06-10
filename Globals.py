@@ -60,6 +60,8 @@ global tab3
 tab3 = ttk.Frame(tab_parent)
 global tab4
 tab4 = ttk.Frame(tab_parent)
+global tab5
+tab5 = ttk.Frame(tab_parent)
 
 global tab1_canvas
 tab1_canvas = tk.Canvas(tab1)
@@ -69,6 +71,8 @@ global tab3_canvas
 tab3_canvas = tk.Canvas(tab3)
 global tab4_canvas
 tab4_canvas = tk.Canvas(tab4)
+global tab5_canvas
+tab5_canvas= tk.Canvas(tab5)
 
 ########################################   CoMet related   ###################################################
 global CoMet_progressbar
