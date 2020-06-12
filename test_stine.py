@@ -184,14 +184,93 @@ cs = plt.contour(x,y,m, [9.5])
 print(cs.collections[0].get_paths())
 """
 
-
+"""
 dataset = pydicom.dcmread("RD1.2.752.243.1.1.20200303144816605.1110.67773.dcm")
 testv2 = pydicom.dcmread("rtplan_v2.dcm")
 dataset2 = pydicom.dcmread("V1.dcm")
 test_dosemap_v2 = pydicom.dcmread("testv2.dcm")
 array = dataset2.pixel_array
+v2 = test_dosemap_v2.pixel_array
 
-plt.figure()
-plt.imshow(array[35,:,:])
-plt.show()
-print(array.shape)
+print(np.max(v2)*test_dosemap_v2.DoseGridScaling)
+"""
+
+
+def get_line(x1, y1, x2, y2):
+    points = []
+    issteep = abs(y2-y1) - abs(x2-x1)
+    if issteep > 0:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
+    rev = False
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+        rev = True
+    deltax = x2 - x1
+    deltay = abs(y2-y1)
+    error = int(deltax / 2)
+    y = y1
+    ystep = None
+    if y1 < y2:
+        ystep = 1
+    else:
+        ystep = -1
+    for x in range(x1, x2 + 1):
+        if issteep:
+            points.append((y, x))
+        else:
+            points.append((x, y))
+        error -= deltay
+        if error < 0:
+            y += ystep
+            error += deltax
+    # Reverse the list if the coordinates were reversed
+    if rev:
+        points.reverse()
+    return points
+
+p = get_line(7,7,7,2)
+
+print(p)
+
+
+
+
+def getCoordsInRandomLine(x0,y0,x1,y1):
+    check_slope = abs(y1-y0) - abs(x1-x0)
+    if check_slope > 0:
+        x0, y0 = y0, x0
+        x1, y1 = y1, x1
+    if x0 > x1:
+        #The line goes "wrong way", must switch
+        x0, x1 = x1, x0
+        y0, y1 = y1, y0
+        must_be_reversed = True
+    else:
+        must_be_reversed = False
+    dx=abs(x1-x0);dy=abs(y1-y0)
+    error = int(dx/2)
+    if y0 < y1:
+        ystep = 1
+    else:
+        ystep = -1
+    coords = []
+    y = y1
+    for x in range(x0, x1+1):
+        if check_slope > 0:
+            coords.append((y,x))
+        else:
+            coords.append((x,y))
+        error = error - dy
+        if(error < 0):
+            y += ystep
+            error += dx
+    if must_be_reversed:
+        coords.reverse()
+    return coords
+
+p = getCoordsInRandomLine(0,1,6,6)
+u = get_line(0,1,6,6)
+print(p)
+print(u)

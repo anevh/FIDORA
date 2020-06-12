@@ -307,10 +307,10 @@ def plot_dose_response():
 
             axLatex.get_xaxis().set_visible(False)
             axLatex.get_yaxis().set_visible(False)
-            a=round(Globals.popt_red[0])
-            b=round(Globals.popt_red[1])
-            c=round(Globals.popt_red[2])
-            clickFunction(a,b,c)
+            a_=round(Globals.popt_red[0])
+            b_=round(Globals.popt_red[1])
+            c_=round(Globals.popt_red[2])
+            clickFunction(a_,b_,c_)
 
             #displayButton = Button(Globals.dose_response_equation_frame,text="display equation",width=15,command=lambda: clickFunction(12,3,4))
             #displayButton.grid(row=1,column=0,sticky="N")
@@ -329,15 +329,11 @@ Try adding more data points to improve the optimization.\
 Try adding more data points to improve the optimization. \
 Or, check that your specified dose matches your uploaded files.")
     ####
-    a.set_title ("Dose-response", fontsize=12)
+    a.set_title("Dose-response", fontsize=12)
     a.set_ylabel("Pixel value", fontsize=12)
     a.set_xlabel("Dose", fontsize=12)
-    print("sjekk3 ************************************************")
     fig.tight_layout()
-    print("sjekk4*************************************************")
 
-
-    return
 
 def delete_line(delete_button):
     #The button index equals the index in Globals.avg_red_vector etc.

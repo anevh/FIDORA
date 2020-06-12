@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, \
     HORIZONTAL, E, W, N, S, BOTH, Frame, Canvas, LEFT, FLAT, INSERT, DISABLED, ALL, X, BOTTOM, \
-    DoubleVar, PanedWindow, RAISED, TOP, Radiobutton
+    DoubleVar, PanedWindow, RAISED, TOP, Radiobutton, CENTER
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -13,7 +13,12 @@ global dose_response_dose_border
 global save_button
 global help_button
 global done_button_image
-
+global profiles_add_doseplan_button_image
+global profiles_add_doseplans_button_image
+global adjust_button_left_image
+global adjust_button_right_image
+global adjust_button_up_image
+global adjust_button_down_image
 
 
 global form 
@@ -399,9 +404,15 @@ profiles_film_orientation.set('-')
 
 global profiles_film_orientation_menu
 
-
+#Total doseplan
 global profiles_film_dataset
+#total doseplan in red channel
 global profiles_film_dataset_red_channel
+#Dose in whole film for red channel
+global profiles_film_dataset_red_channel_dose
+#Coords to ROI (will vary). Given as [index 0 from, index 0 to, index1 from, index1 to] 
+global profiles_film_variable_ROI_coords
+
 global profiles_film_dataset_ROI
 global profiles_film_dataset_ROI_red_channel
 global profiles_doseplan_dataset_ROI
@@ -417,7 +428,7 @@ profiles_view_film_doseplan_ROI.config(bg='#E5f9ff', relief=FLAT, highlightthick
 
 global profile_plot_canvas
 profile_plot_canvas = tk.Canvas(tab4_canvas)
-profile_plot_canvas.grid(row=3, column=0, rowspan=10, columnspan=2, sticky=N+E+W, pady=(0,5), padx=(5,10))
+profile_plot_canvas.grid(row=4, column=0, rowspan=10, columnspan=2, sticky=N+E+W, pady=(0,5), padx=(5,10))
 tab4_canvas.grid_columnconfigure(4, weight=0)
 tab4_canvas.grid_rowconfigure(4, weight=0)
 profile_plot_canvas.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
@@ -436,6 +447,8 @@ global profiles_showDirections_image
 
 global profiles_depth
 global profiles_depth_float
+
+global profiles_film_factor_input
 
 global profiles_mark_isocenter_button_image
 global profiles_mark_ROI_button_image
@@ -499,6 +512,7 @@ global profiles_upload_button_film
 global profiles_upload_button_rtplan
 
 global profiles_dataset_doseplan
+profiles_dataset_doseplan = None
 global profiles_dataset_rtplan
 
 global profiles_test_if_added_doseplan
@@ -513,6 +527,7 @@ global profiles_dose_scaling_doseplan
 
 global profiles_max_dose_film
 
+global profiles_choose_profile_canvas
 profiles_choose_profile_canvas = tk.Canvas(profiles_view_film_doseplan_ROI)
 profiles_choose_profile_canvas.pack()
 profiles_choose_profile_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0)
@@ -525,12 +540,28 @@ profiles_choose_profile_type_text.insert(INSERT, "How to draw the profile:")
 profiles_choose_profile_type_text.pack(side=TOP)
 profiles_choose_profile_type_text.config(bg='#ffffff', relief=FLAT, \
 highlightthickness=0, state=DISABLED, font=('calibri', '11'))
+
 Radiobutton(profiles_choose_profile_canvas, text="Horizontal", variable=profiles_choice_of_profile_line_type, \
     value="h", bg='#ffffff', cursor='hand2').pack(side=LEFT)
 Radiobutton(profiles_choose_profile_canvas, text="Vertical", \
     variable=profiles_choice_of_profile_line_type, value='v', bg='#ffffff', cursor='hand2').pack(side=LEFT)
 Radiobutton(profiles_choose_profile_canvas, text="Draw", \
     variable=profiles_choice_of_profile_line_type, value="d", bg='#ffffff', cursor='hand2').pack(side=LEFT)
+
+profiles_adjust_ROI_text = tk.Text(profiles_choose_profile_canvas, width=20, height=1)
+profiles_adjust_ROI_text.insert(INSERT, "Adjust ROI in film: ")
+profiles_adjust_ROI_text.config(state=DISABLED, font=('calibri', '11'), bg='#ffffff', relief=FLAT, bd=0)
+profiles_adjust_ROI_text.pack(side=LEFT, padx=(70,0))
+
+
+global profiles_redefine_film_ROI_frame
+profiles_redefine_film_ROI_frame = tk.Frame(profiles_choose_profile_canvas)
+profiles_redefine_film_ROI_frame.pack(side=LEFT, padx=(0,100))
+profiles_redefine_film_ROI_frame.config(bg='#ffffff')
+global profiles_adjust_button_left
+global profiles_adjust_button_right
+global profiles_adjust_button_down
+global profiles_adjust_button_up
 
 
 global profiles_film_panedwindow
@@ -563,11 +594,19 @@ global profiles_film_dose_map_text_image
 global profiles_doseplan_text_image
 
 global doseplan_write_image
+global film_dose_write_image
+global film_write_image
 global doseplan_write_image_width
 global doseplan_write_image_height
 global doseplan_write_image_var_x 
 doseplan_write_image_var_x= 0
+global doseplan_write_image_var_y
+doseplan_write_image_var_y = 0
+global profiles_coordinate_in_dataset
+profiles_coordinate_in_dataset = 0
 
+global profiles_first_time_in_drawProfiles
+profiles_first_time_in_drawProfiles = True
 
 global new_window_factor_textbox
 
@@ -587,6 +626,32 @@ global profiles_isocenter_or_reference_point
 global profiles_lateral
 global profiles_vertical
 global profiles_longitudinal
+
+global doseplans_scroll_frame
+
+global profiles_number_of_doseplans
+profiles_number_of_doseplans = 0
+global profiles_number_of_doseplans_row_count
+profiles_number_of_doseplans_row_count = 4
+global profiles_doseplans_grid_config_count
+profiles_doseplans_grid_config_count = 6
+global profiles_doseplans_filenames
+profiles_doseplans_filenames = []
+global profiles_doseplans_factor_text
+profiles_doseplans_factor_text = []
+global profiles_doseplans_factor_input
+profiles_doseplans_factor_input = []
+
+
+global profiles_doseplan_dataset_ROI_several
+profiles_doseplan_dataset_ROI_several = []
+global profiles_several_img
+profiles_several_img = []
+
+global profiles_film_factor
+
+global profiles_lines
+profiles_lines = []
 
 
 ############################### Correction matrix ######################################

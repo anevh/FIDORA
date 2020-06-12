@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
     NORMAL, ACTIVE, messagebox, Menu, IntVar, Checkbutton, FLAT, PhotoImage, Label,\
         SOLID, N, S, W, E, END, LEFT, Scrollbar, RIGHT, Y, BOTH, TOP, OptionMenu, SUNKEN, \
-        RIDGE
+        RIDGE, BOTTOM, X
 import Globals
 import re
 import CoMet_functions, intro_tab_functions, Map_Dose
@@ -139,7 +139,7 @@ dose_response_dose_border_file = "dose_border.png"
 Globals.dose_response_dose_border = ImageTk.PhotoImage(file=dose_response_dose_border_file)
 
 profiles_add_doseplan_button_file = "add_doseplan_button.png"
-profiles_add_doseplan_button_image = ImageTk.PhotoImage(file=profiles_add_doseplan_button_file)
+Globals.profiles_add_doseplan_button_image = ImageTk.PhotoImage(file=profiles_add_doseplan_button_file)
 
 profiles_add_film_button_file = "add_film_button.png"
 profiles_add_film_button_image = ImageTk.PhotoImage(file=profiles_add_film_button_file)
@@ -170,6 +170,21 @@ Globals.profiles_doseplan_text_image = ImageTk.PhotoImage(file=profiles_doseplan
 
 profiles_mark_point_file = "mark_point_button.png"
 Globals.profiles_mark_point_button_image = ImageTk.PhotoImage(file=profiles_mark_point_file)
+
+profiles_add_doseplans_button_file = "add_doseplan.png"
+Globals.profiles_add_doseplans_button_image = ImageTk.PhotoImage(file=profiles_add_doseplans_button_file)
+
+adjust_button_left_file = "adjust_button_left.png"
+Globals.adjust_button_left_image = ImageTk.PhotoImage(file=adjust_button_left_file)
+
+adjust_button_right_file = "adjust_button_right.png"
+Globals.adjust_button_right_image = ImageTk.PhotoImage(file=adjust_button_right_file)
+
+adjust_button_down_file = "adjust_button_down.png"
+Globals.adjust_button_down_image = ImageTk.PhotoImage(file=adjust_button_down_file)
+
+adjust_button_up_file = "adjust_button_up.png"
+Globals.adjust_button_up_image = ImageTk.PhotoImage(file=adjust_button_up_file)
 ###################################### INTRO TAB #################################################
 
 
@@ -769,7 +784,7 @@ Globals.tab4_canvas.grid_rowconfigure(0, weight=0)
 profiles_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
 
 profiles_upload_film_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_film_frame.grid(row=2, column = 0, padx = (0, 240), pady=(10,0), sticky=N)
+profiles_upload_film_frame.grid(row=3, column = 0, padx = (0, 240), pady=(10,0), sticky=N)
 Globals.tab4_canvas.grid_columnconfigure(1, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(1, weight=0)
 profiles_upload_film_frame.config(bg = '#ffffff')
@@ -781,19 +796,19 @@ Globals.profiles_upload_button_film.config(bg='#ffffff', activebackground='#ffff
 Globals.profiles_upload_button_film.image = profiles_add_film_button_image
 
 profiles_upload_doseplan_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_doseplan_frame.grid(row=2, column = 0, padx = (0,40), pady=(10,0), sticky=N)
+profiles_upload_doseplan_frame.grid(row=3, column = 0, padx = (0,40), pady=(10,0), sticky=N)
 Globals.tab4_canvas.grid_columnconfigure(3, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(3, weight=0)
 profiles_upload_film_frame.config(bg = '#ffffff')
 
-Globals.profiles_upload_button_doseplan = tk.Button(profiles_upload_doseplan_frame, text='Browse', image=profiles_add_doseplan_button_image,\
+Globals.profiles_upload_button_doseplan = tk.Button(profiles_upload_doseplan_frame, text='Browse', image=Globals.profiles_add_doseplan_button_image,\
     cursor='hand2', font=('calibri', '14'), relief=FLAT, state=DISABLED, command=Profile_functions.UploadDoseplan_button_function)
 Globals.profiles_upload_button_doseplan.pack(expand=True, fill=BOTH)
 Globals.profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-Globals.profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
+Globals.profiles_upload_button_doseplan.image = Globals.profiles_add_doseplan_button_image
 
 profiles_upload_rtplan_frame = tk.Frame(Globals.tab4_canvas)
-profiles_upload_rtplan_frame.grid(row=2, column=0, padx=(160,0), pady=(10,0), sticky=N)
+profiles_upload_rtplan_frame.grid(row=3, column=0, padx=(160,0), pady=(10,0), sticky=N)
 Globals.tab4_canvas.grid_columnconfigure(10, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(10, weight=0)
 profiles_upload_rtplan_frame.config(bg='#ffffff')
@@ -829,6 +844,21 @@ profiles_help_button_orientation.pack(expand=True, fill=BOTH)
 profiles_help_button_orientation.configure(bg='#ffffff',activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 profiles_help_button_orientation.image=Globals.help_button
 
+profiles_film_factor = tk.Text(Globals.tab4_canvas, width=20, height=2)
+profiles_film_factor.insert(INSERT, "Film factor \n(number of fractions):")
+profiles_film_factor.config(state=DISABLED, font=('calibri', '10'), bd = 0, relief=FLAT)
+profiles_film_factor.grid(row=2, column=0, sticky=N+S+W, padx=(30,0), pady=(5,0))
+Globals.tab4_canvas.grid_columnconfigure(30, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(30, weight=0)
+
+Globals.profiles_film_factor_input = tk.Text(Globals.tab4_canvas, width=8, height=1)
+Globals.profiles_film_factor_input.grid(row=2, column=0, sticky=E, padx=(0,160), pady=(5,0))
+Globals.profiles_film_factor_input.insert(INSERT, " ")
+Globals.profiles_film_factor_input.config(state=NORMAL, font=('calibri', '10'), bd = 2, bg='#ffffff')
+Globals.tab4_canvas.grid_columnconfigure(31, weight=0)
+Globals.tab4_canvas.grid_rowconfigure(31, weight=0)
+
+
 profiles_resetAll_frame = tk.Frame(Globals.tab4_canvas)
 profiles_resetAll_frame.grid(row=15,column=0, padx=(0,0), pady=(0,0), sticky=S)
 Globals.tab4_canvas.grid_columnconfigure(5, weight=0)
@@ -840,6 +870,38 @@ profiles_resetAll_button = tk.Button(profiles_resetAll_frame, text='Reset', imag
 profiles_resetAll_button.pack(expand=True, fill=BOTH)
 profiles_resetAll_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 profiles_resetAll_button.image = dose_response_clear_all_button_image
+
+
+Globals.profiles_adjust_button_left = tk.Button(Globals.profiles_redefine_film_ROI_frame, text="left", image=Globals.adjust_button_left_image,\
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Profile_functions.adjustROILeft)
+Globals.profiles_adjust_button_left.pack(side=LEFT)
+Globals.profiles_adjust_button_left.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.profiles_adjust_button_left.image = Globals.adjust_button_left_image
+
+Globals.profiles_adjust_button_up = tk.Button(Globals.profiles_redefine_film_ROI_frame, text="left", image=Globals.adjust_button_up_image,\
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Profile_functions.adjustROIUp)
+Globals.profiles_adjust_button_up.pack(side=LEFT)
+Globals.profiles_adjust_button_up.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.profiles_adjust_button_up.image = Globals.adjust_button_up_image
+
+Globals.profiles_adjust_button_down = tk.Button(Globals.profiles_redefine_film_ROI_frame, text="left", image=Globals.adjust_button_down_image,\
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Profile_functions.adjustROIDown)
+Globals.profiles_adjust_button_down.pack(side=LEFT)
+Globals.profiles_adjust_button_down.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.profiles_adjust_button_down.image = Globals.adjust_button_down_image
+
+Globals.profiles_adjust_button_right = tk.Button(Globals.profiles_redefine_film_ROI_frame, text="left", image=Globals.adjust_button_right_image,\
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Profile_functions.adjustROIRight)
+Globals.profiles_adjust_button_right.pack(side=LEFT)
+Globals.profiles_adjust_button_right.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.profiles_adjust_button_right.image = Globals.adjust_button_right_image
+
+Globals.profiles_adjust_button_return = tk.Button(Globals.profiles_redefine_film_ROI_frame, text="Original",\
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Profile_functions.returnToOriginalROICoordinates)
+Globals.profiles_adjust_button_return.pack(side=LEFT)
+Globals.profiles_adjust_button_return.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+
+Globals.profiles_choice_of_profile_line_type.trace_add('write', Profile_functions.test_drawProfiles)
 
 Globals.tab4_canvas.pack(expand=True, fill=BOTH)
 ##################################### End statements ############################################

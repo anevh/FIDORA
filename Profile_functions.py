@@ -10,6 +10,7 @@ import cv2
 from cv2 import imread, IMREAD_ANYCOLOR, IMREAD_ANYDEPTH, imwrite
 import pydicom
 from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib as mpl
 from matplotlib import cm
 import matplotlib.pyplot as plt
@@ -68,68 +69,627 @@ def clearAll():
     Globals.profiles_test_if_added_rtplan = False
     Globals.profiles_test_if_added_doseplan = False
 
+    Globals.tab4_canvas.unbind("<Up>")
+    Globals.tab4_canvas.unbind("<Down>")
+
 
     return
 
+def getCoordsInRandomLine(x1,y1,x2,y2):
+    points = []
+    issteep = abs(y2-y1) - abs(x2-x1)
+    if issteep > 0:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
+    rev = False
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+        rev = True
+    deltax = x2 - x1
+    deltay = abs(y2-y1)
+    error = int(deltax / 2)
+    y = y1
+    ystep = None
+    if y1 < y2:
+        ystep = 1
+    else:
+        ystep = -1
+    for x in range(x1, x2 + 1):
+        if issteep:
+            points.append((y, x))
+        else:
+            points.append((x, y))
+        error -= deltay
+        if error < 0:
+            y += ystep
+            error += deltax
+    # Reverse the list if the coordinates were reversed
+    if rev:
+        points.reverse()
+    return points
+
+
 
 def drawProfiles():
-    if(Globals.profiles_choice_of_profile_line_type.get() == 'h'): #Funker kun på [1,1,1]
+    Globals.profiles_lines = []
+
+    if Globals.profiles_dataset_doseplan == None:
+        return
+   
+    Globals.profiles_adjust_button_right.config(state=ACTIVE)
+    Globals.profiles_adjust_button_left.config(state=ACTIVE)
+    Globals.profiles_adjust_button_down.config(state=ACTIVE)
+    Globals.profiles_adjust_button_up.config(state=ACTIVE)
+    Globals.profiles_adjust_button_return.config(state=ACTIVE)
+        
+        
+    def draw(line_orient, dataset_film, dataset_doseplan):
+        Globals.profile_plot_canvas.delete('all')
+        fig = Figure(figsize=(5,3))
+        a = fig.add_subplot(111)
+        plot_canvas = FigureCanvasTkAgg(fig, master=Globals.profile_plot_canvas)
+        plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+E+W, padx=(5,0), pady=(0,0))
+
+        if line_orient == 'h':
+            x = np.linspace(0,10, dataset_film.shape[1])
+            y = np.linspace(0,10, Globals.profiles_doseplan_dataset_ROI.shape[1])
+            a.plot(x,dataset_film[Globals.profiles_coordinate_in_dataset,:]/100, 'r')
+            a.plot(y,dataset_doseplan[Globals.profiles_coordinate_in_dataset, :]*Globals.profiles_dataset_doseplan.DoseGridScaling, 'b')
+        elif line_orient == 'v':
+            x = np.linspace(0,10, dataset_film.shape[0])
+            y = np.linspace(0,10, Globals.profiles_doseplan_dataset_ROI.shape[0])
+            a.plot(x,dataset_film[:,Globals.profiles_coordinate_in_dataset]/100, 'r')
+            a.plot(y,Globals.profiles_doseplan_dataset_ROI[:, Globals.profiles_coordinate_in_dataset]*Globals.profiles_dataset_doseplan.DoseGridScaling, 'b')
+        elif line_orient == 'd':
+            x = np.linspace(0,10,len(dataset_film))
+            y = np.linspace(0,10,len(dataset_doseplan))
+            a.plot(x, dataset_film/100, 'r')
+            a.plot(y, dataset_doseplan*Globals.profiles_dataset_doseplan.DoseGridScaling, 'b')
+
+        else:
+            messagebox.showerror("Error", "Fatal error. Something has gone wrong, try again \n(Code: draw")
+        a.legend(('Film', 'Doseplan'))
+        a.set_title("Profiles", fontsize=12)
+        a.set_ylabel("Pixel value", fontsize=12)
+        a.set_xlabel("Distance (mm)", fontsize=12)
+        fig.tight_layout()
+
+
+    if(Globals.profiles_choice_of_profile_line_type.get() == 'h' and Globals.profiles_dataset_doseplan.PixelSpacing == [1, 1]):
         dataset_film = np.zeros(\
             (Globals.profiles_doseplan_dataset_ROI.shape[0], Globals.profiles_film_dataset_ROI_red_channel_dose.shape[1]))
-        i = 0;el=0
-        while(el<dataset_film.shape[0]):     #Average 5 rows together to match doseplan resolution, keeps second dimension of film.
-            j = Globals.profiles_film_dataset_ROI_red_channel_dose.shape[0] - i
-            if(j > 5):
-                dataset_film[el,:] = (Globals.profiles_film_dataset_ROI_red_channel_dose[i, :] + \
-                Globals.profiles_film_dataset_ROI_red_channel_dose[i+1,:]+Globals.profiles_film_dataset_ROI_red_channel_dose[i+2,:]+\
-                Globals.profiles_film_dataset_ROI_red_channel_dose[i+3,:]+Globals.profiles_film_dataset_ROI_red_channel_dose[i+4,:])/5.0
-                i+=5;el+=1
-            else:
-                temp = np.zeros((1,Globals.profiles_film_dataset_ROI_red_channel_dose.shape[1]))
-                for k in range(i, dataset_film.shape[0]):
-                    temp[k,:] += Globals.profiles_film_dataset_ROI_red_channel_dose[k,:]
-                dataset_film[el,:] = temp/j
-                el+=1
-       
+        for i in range(dataset_film.shape[0]-1):
+            dataset_film[i,:] = Globals.profiles_film_dataset_ROI_red_channel_dose[int((i*5)+2),:]
+        try:
+            dataset_film[dataset_film.shape[0]-1,:] = Globals.profiles_film_dataset_ROI_red_channel_dose[int((dataset_film.shape[0]-1)*5+2), :]
+        except:
+            dataset_film[dataset_film.shape[0]-1,:] = \
+                Globals.profiles_film_dataset_ROI_red_channel_dose[Globals.profiles_film_dataset_ROI_red_channel_dose.shape[0]-1,:]
 
-        Globals.doseplan_write_image.create_line(0,Globals.doseplan_write_image_var_x,\
+
+        line_doseplan = Globals.doseplan_write_image.create_line(0,Globals.doseplan_write_image_var_x,\
+            Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x, fill='red')
+        line_film_dosemap = Globals.film_dose_write_image.create_line(0,Globals.doseplan_write_image_var_x,\
+            Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x, fill='red')
+        line_film = Globals.film_write_image.create_line(0,Globals.doseplan_write_image_var_x,\
             Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x, fill='red')
         
+        Globals.profiles_lines.append(line_doseplan)
+        Globals.profiles_lines.append(line_film_dosemap)
+        Globals.profiles_lines.append(line_film)
+    
         def up_button_pressed(event):
-            temp_x = Globals.doseplan_write_image_var_x - 1
+            temp_x = Globals.doseplan_write_image_var_x - 5
             if(temp_x < 0):
-                drawProfiles()
+                #Outside the frame
                 return
+            #inside the frame
             Globals.doseplan_write_image_var_x = temp_x
-            drawProfiles()
-            return
+            Globals.profiles_coordinate_in_dataset = int(temp_x/5)
+            Globals.doseplan_write_image.coords(line_doseplan,0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_dose_write_image.coords(line_film_dosemap, 0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_write_image.coords(line_film, 0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            draw('h', dataset_film, Globals.profiles_doseplan_dataset_ROI)
 
         def down_button_pressed(event):
-            temp_x = Globals.doseplan_write_image_var_x + 1
+            temp_x = Globals.doseplan_write_image_var_x + 5
             if(temp_x >= Globals.doseplan_write_image_height):
-                drawProfiles()
+                #Outside the frame
                 return
+            #Inside the frame
+            Globals.profiles_coordinate_in_dataset = int(temp_x/5)
             Globals.doseplan_write_image_var_x = temp_x
-            drawProfiles()
-            return
+            Globals.doseplan_write_image.coords(line_doseplan,0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_dose_write_image.coords(line_film_dosemap,0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_write_image.coords(line_film, 0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            draw('h', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+            
 
-        Globals.doseplan_write_image.bind("<Up>", up_button_pressed)
-        Globals.doseplan_write_image.bind("<Down>", down_button_pressed)
+        Globals.form.bind("<Up>", up_button_pressed)
+        Globals.form.bind("<Down>", down_button_pressed)
+
+        if Globals.profiles_first_time_in_drawProfiles:
+            Globals.profiles_first_time_in_drawProfiles = False
+            draw('h', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+    elif(Globals.profiles_choice_of_profile_line_type.get()=='h' and Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+        dataset_film = np.zeros(\
+            (Globals.profiles_doseplan_dataset_ROI.shape[0], Globals.profiles_film_dataset_ROI_red_channel_dose.shape[1]))
+        for i in range(dataset_film.shape[0]-1):
+            dataset_film[i,:] = Globals.profiles_film_dataset_ROI_red_channel_dose[int((i*10)+5),:]
+        try:
+            dataset_film[dataset_film.shape[0]-1,:] = Globals.profiles_film_dataset_ROI_red_channel_dose[int((dataset_film.shape[0]-1)*10+5), :]
+        except:
+            dataset_film[dataset_film.shape[0]-1,:] = \
+                Globals.profiles_film_dataset_ROI_red_channel_dose[Globals.profiles_film_dataset_ROI_red_channel_dose.shape[0]-1,:]
 
 
-    elif(Globals.profiles_choice_of_profile_line_type.get() == 'v'):
-        print("Ikke laget for vertikal profile enda")
+        line_doseplan = Globals.doseplan_write_image.create_line(0,Globals.doseplan_write_image_var_x,\
+            Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x, fill='red')
+        line_film_dosemap = Globals.film_dose_write_image.create_line(0,Globals.doseplan_write_image_var_x,\
+            Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x, fill='red')
+        line_film = Globals.film_write_image.create_line(0,Globals.doseplan_write_image_var_x,\
+            Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x, fill='red')
+
+        Globals.profiles_lines.append(line_doseplan)
+        Globals.profiles_lines.append(line_film_dosemap)
+        Globals.profiles_lines.append(line_film)
+
+        def up_button_pressed(event):
+            temp_x = Globals.doseplan_write_image_var_x - 10
+            if(temp_x < 0):
+                #Outside the frame
+                return
+            #inside the frame
+            Globals.doseplan_write_image_var_x = temp_x
+            Globals.profiles_coordinate_in_dataset = int(temp_x/10)
+            Globals.doseplan_write_image.coords(line_doseplan,0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_dose_write_image.coords(line_film_dosemap, 0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_write_image.coords(line_film, 0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            draw('h', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+
+        def down_button_pressed(event):
+            temp_x = Globals.doseplan_write_image_var_x + 10
+            if(temp_x >= Globals.doseplan_write_image_height):
+                #Outside the frame
+                return
+            #Inside the frame
+            Globals.profiles_coordinate_in_dataset = int(temp_x/10)
+            Globals.doseplan_write_image_var_x = temp_x
+            Globals.doseplan_write_image.coords(line_doseplan,0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_dose_write_image.coords(line_film_dosemap,0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_write_image.coords(line_film, 0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            draw('h', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+
+        Globals.form.bind("<Up>", up_button_pressed)
+        Globals.form.bind("<Down>", down_button_pressed)
+
+        if Globals.profiles_first_time_in_drawProfiles:
+            Globals.profiles_first_time_in_drawProfiles = False
+            draw('h', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+
+    elif(Globals.profiles_choice_of_profile_line_type.get() == 'h' and Globals.profiles_dataset_doseplan.PixelSpacing==[3, 3]):
+        dataset_film = np.zeros(\
+            (Globals.profiles_doseplan_dataset_ROI.shape[0], Globals.profiles_film_dataset_ROI_red_channel_dose.shape[1]))
+        for i in range(dataset_film.shape[0]-1):
+            dataset_film[i,:] = Globals.profiles_film_dataset_ROI_red_channel_dose[int((i*15)+7),:]
+        try:
+            dataset_film[dataset_film.shape[0]-1,:] = Globals.profiles_film_dataset_ROI_red_channel_dose[int((dataset_film.shape[0]-1)*15+7), :]
+        except:
+            dataset_film[dataset_film.shape[0]-1,:] = \
+                Globals.profiles_film_dataset_ROI_red_channel_dose[Globals.profiles_film_dataset_ROI_red_channel_dose.shape[0]-1,:]
+
+
+        line_doseplan = Globals.doseplan_write_image.create_line(0,Globals.doseplan_write_image_var_x,\
+            Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x, fill='red')
+        line_film_dosemap = Globals.film_dose_write_image.create_line(0,Globals.doseplan_write_image_var_x,\
+            Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x, fill='red')
+        line_film = Globals.film_write_image.create_line(0,Globals.doseplan_write_image_var_x,\
+            Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x, fill='red')
+
+        Globals.profiles_lines.append(line_doseplan)
+        Globals.profiles_lines.append(line_film_dosemap)
+        Globals.profiles_lines.append(line_film)
+
+        def up_button_pressed(event):
+            temp_x = Globals.doseplan_write_image_var_x - 15
+            if(temp_x < 0):
+                #Outside the frame
+                return
+            #inside the frame
+            Globals.doseplan_write_image_var_x = temp_x
+            Globals.profiles_coordinate_in_dataset = int(temp_x/15)
+            Globals.doseplan_write_image.coords(line_doseplan,0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_dose_write_image.coords(line_film_dosemap, 0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_write_image.coords(line_film, 0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            draw('h', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+
+        def down_button_pressed(event):
+            temp_x = Globals.doseplan_write_image_var_x + 15
+            if(temp_x >= Globals.doseplan_write_image_height):
+                #Outside the frame
+                return
+            #Inside the frame
+            Globals.profiles_coordinate_in_dataset = int(temp_x/15)
+            Globals.doseplan_write_image_var_x = temp_x
+            Globals.doseplan_write_image.coords(line_doseplan,0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_dose_write_image.coords(line_film_dosemap,0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            Globals.film_write_image.coords(line_film, 0,Globals.doseplan_write_image_var_x,\
+                Globals.doseplan_write_image_width,Globals.doseplan_write_image_var_x)
+            draw('h', dataset_film,Globals.profiles_doseplan_dataset_ROI)
+
+        Globals.form.bind("<Up>", up_button_pressed)
+        Globals.form.bind("<Down>", down_button_pressed)
+
+        if Globals.profiles_first_time_in_drawProfiles:
+            Globals.profiles_first_time_in_drawProfiles = False
+            draw('h', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+
+    elif(Globals.profiles_choice_of_profile_line_type.get() == 'v' and Globals.profiles_dataset_doseplan.PixelSpacing == [1, 1]):
+        dataset_film = np.zeros(\
+            (Globals.profiles_film_dataset_ROI_red_channel_dose.shape[0], Globals.profiles_doseplan_dataset_ROI.shape[1]))
+        for i in range(dataset_film.shape[1]-1):
+            dataset_film[:,i] = Globals.profiles_film_dataset_ROI_red_channel_dose[:,int((i*5)+2)]
+        try:
+            dataset_film[:,dataset_film.shape[1]-1] = Globals.profiles_film_dataset_ROI_red_channel_dose[:,int((dataset_film.shape[1]-1)*5+2)]
+        except:
+            dataset_film[:,dataset_film.shape[1]-1] = \
+                Globals.profiles_film_dataset_ROI_red_channel_dose[:,Globals.profiles_film_dataset_ROI_red_channel_dose.shape[1]-1]
+
+
+        line_doseplan = Globals.doseplan_write_image.create_line(Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height, fill='red')
+        line_film_dosemap = Globals.film_dose_write_image.create_line(Globals.doseplan_write_image_var_y,0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height, fill='red')
+        line_film = Globals.film_write_image.create_line(Globals.doseplan_write_image_var_y,0,\
+            Globals.doseplan_write_image_var_y,Globals.doseplan_write_image_height, fill='red')
+        
+        Globals.profiles_lines.append(line_doseplan)
+        Globals.profiles_lines.append(line_film_dosemap)
+        Globals.profiles_lines.append(line_film)
+    
+        def left_button_pressed(event):
+            temp_y = Globals.doseplan_write_image_var_y - 5
+            if(temp_y < 0):
+                #Outside the frame
+                return
+            #inside the frame
+            Globals.doseplan_write_image_var_y = temp_y
+            Globals.profiles_coordinate_in_dataset = int(temp_y/5)
+            Globals.doseplan_write_image.coords(line_doseplan,Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_dose_write_image.coords(line_film_dosemap, Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_write_image.coords(line_film, Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            draw('v', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+
+        def right_button_pressed(event):
+            temp_y = Globals.doseplan_write_image_var_y + 5
+            if(temp_y >= Globals.doseplan_write_image_width):
+                #Outside the frame
+                return
+            #Inside the frame
+            Globals.profiles_coordinate_in_dataset = int(temp_y/5)
+            Globals.doseplan_write_image_var_y = temp_y
+            Globals.doseplan_write_image.coords(line_doseplan,Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_dose_write_image.coords(line_film_dosemap,Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_write_image.coords(line_film, Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            draw('v', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+            
+
+        Globals.form.bind("<Left>", left_button_pressed)
+        Globals.form.bind("<Right>", right_button_pressed)
+
+        if Globals.profiles_first_time_in_drawProfiles:
+            Globals.profiles_first_time_in_drawProfiles = False
+            draw('v', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+
+    elif(Globals.profiles_choice_of_profile_line_type.get() == 'v' and Globals.profiles_dataset_doseplan.PixelSpacing == [2, 2]):
+        dataset_film = np.zeros(\
+            (Globals.profiles_film_dataset_ROI_red_channel_dose.shape[0], Globals.profiles_doseplan_dataset_ROI.shape[1]))
+        for i in range(dataset_film.shape[1]-1):
+            dataset_film[:,i] = Globals.profiles_film_dataset_ROI_red_channel_dose[:,int((i*10)+5)]
+        try:
+            dataset_film[:,dataset_film.shape[1]-1] = Globals.profiles_film_dataset_ROI_red_channel_dose[:,int((dataset_film.shape[1]-1)*10+5)]
+        except:
+            dataset_film[:,dataset_film.shape[1]-1] = \
+                Globals.profiles_film_dataset_ROI_red_channel_dose[:,Globals.profiles_film_dataset_ROI_red_channel_dose.shape[1]-1]
+
+
+        line_doseplan = Globals.doseplan_write_image.create_line(Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height, fill='red')
+        line_film_dosemap = Globals.film_dose_write_image.create_line(Globals.doseplan_write_image_var_y,0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height, fill='red')
+        line_film = Globals.film_write_image.create_line(Globals.doseplan_write_image_var_y,0,\
+            Globals.doseplan_write_image_var_y,Globals.doseplan_write_image_height, fill='red')
+        
+        Globals.profiles_lines.append(line_doseplan)
+        Globals.profiles_lines.append(line_film_dosemap)
+        Globals.profiles_lines.append(line_film)
+    
+        def left_button_pressed(event):
+            temp_y = Globals.doseplan_write_image_var_y - 10
+            if(temp_y < 0):
+                #Outside the frame
+                return
+            #inside the frame
+            Globals.doseplan_write_image_var_y = temp_y
+            Globals.profiles_coordinate_in_dataset = int(temp_y/10)
+            Globals.doseplan_write_image.coords(line_doseplan,Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_dose_write_image.coords(line_film_dosemap, Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_write_image.coords(line_film, Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            draw('v', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+
+        def right_button_pressed(event):
+            temp_y = Globals.doseplan_write_image_var_y + 10
+            if(temp_y >= Globals.doseplan_write_image_width):
+                #Outside the frame
+                return
+            #Inside the frame
+            Globals.profiles_coordinate_in_dataset = int(temp_y/10)
+            Globals.doseplan_write_image_var_y = temp_y
+            Globals.doseplan_write_image.coords(line_doseplan,Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_dose_write_image.coords(line_film_dosemap,Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_write_image.coords(line_film, Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            draw('v', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+            
+
+        Globals.form.bind("<Left>", left_button_pressed)
+        Globals.form.bind("<Right>", right_button_pressed)
+
+        if Globals.profiles_first_time_in_drawProfiles:
+            Globals.profiles_first_time_in_drawProfiles = False
+            draw('v', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+
+    elif(Globals.profiles_choice_of_profile_line_type.get() == 'v' and Globals.profiles_dataset_doseplan.PixelSpacing == [3, 3]):
+        dataset_film = np.zeros(\
+            (Globals.profiles_film_dataset_ROI_red_channel_dose.shape[0], Globals.profiles_doseplan_dataset_ROI.shape[1]))
+        for i in range(dataset_film.shape[1]-1):
+            dataset_film[:,i] = Globals.profiles_film_dataset_ROI_red_channel_dose[:,int((i*15)+7)]
+        try:
+            dataset_film[:,dataset_film.shape[1]-1] = Globals.profiles_film_dataset_ROI_red_channel_dose[:,int((dataset_film.shape[1]-1)*15+7)]
+        except:
+            dataset_film[:,dataset_film.shape[1]-1] = \
+                Globals.profiles_film_dataset_ROI_red_channel_dose[:,Globals.profiles_film_dataset_ROI_red_channel_dose.shape[1]-1]
+
+
+        line_doseplan = Globals.doseplan_write_image.create_line(Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height, fill='red')
+        line_film_dosemap = Globals.film_dose_write_image.create_line(Globals.doseplan_write_image_var_y,0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height, fill='red')
+        line_film = Globals.film_write_image.create_line(Globals.doseplan_write_image_var_y,0,\
+            Globals.doseplan_write_image_var_y,Globals.doseplan_write_image_height, fill='red')
+        
+        Globals.profiles_lines.append(line_doseplan)
+        Globals.profiles_lines.append(line_film_dosemap)
+        Globals.profiles_lines.append(line_film)
+    
+        def left_button_pressed(event):
+            temp_y = Globals.doseplan_write_image_var_y - 15
+            if(temp_y < 0):
+                #Outside the frame
+                return
+            #inside the frame
+            Globals.doseplan_write_image_var_y = temp_y
+            Globals.profiles_coordinate_in_dataset = int(temp_y/15)
+            Globals.doseplan_write_image.coords(line_doseplan,Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_dose_write_image.coords(line_film_dosemap, Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_write_image.coords(line_film, Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            draw('v', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+
+        def right_button_pressed(event):
+            temp_y = Globals.doseplan_write_image_var_y + 15
+            if(temp_y >= Globals.doseplan_write_image_width):
+                #Outside the frame
+                return
+            #Inside the frame
+            Globals.profiles_coordinate_in_dataset = int(temp_y/15)
+            Globals.doseplan_write_image_var_y = temp_y
+            Globals.doseplan_write_image.coords(line_doseplan,Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_dose_write_image.coords(line_film_dosemap,Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            Globals.film_write_image.coords(line_film, Globals.doseplan_write_image_var_y, 0,\
+            Globals.doseplan_write_image_var_y, Globals.doseplan_write_image_height)
+            draw('v', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+            
+
+        Globals.form.bind("<Left>", left_button_pressed)
+        Globals.form.bind("<Right>", right_button_pressed)
+
+        if Globals.profiles_first_time_in_drawProfiles:
+            Globals.profiles_first_time_in_drawProfiles = False
+            draw('v', dataset_film, Globals.profiles_doseplan_dataset_ROI)
+    elif(Globals.profiles_choice_of_profile_line_type.get() == 'd' and Globals.profiles_dataset_doseplan.PixelSpacing == [1, 1]):
+        start_point = [0,0]; end_point = [0,0]
+        def mousePushed(event):
+            start_point = [event.x, event.y]
+            print(start_point)
+            line_doseplan = Globals.doseplan_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
+            line_film_dosemap = Globals.film_dose_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
+            line_film = Globals.film_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
+
+            Globals.profiles_lines.append(line_doseplan)
+            Globals.profiles_lines.append(line_film_dosemap)
+            Globals.profiles_lines.append(line_film)
+
+            def mouseMoving(event):
+                Globals.doseplan_write_image.coords(line_doseplan, start_point[0], start_point[1], event.x, event.y)
+                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[0], start_point[1], event.x, event.y)
+                Globals.film_write_image.coords(line_film, start_point[0], start_point[1], event.x, event.y)
+
+                
+
+            Globals.film_dose_write_image.bind("<B1-Motion>", mouseMoving)
+
+            def mouseReleased(event):
+                end_point = [event.x, event.y]
+                Globals.doseplan_write_image.coords(line_doseplan, start_point[0], start_point[1], event.x, event.y)
+                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[0], start_point[1], event.x, event.y)
+                Globals.film_write_image.coords(line_film, start_point[0], start_point[1], event.x, event.y)
+                line_coords_film = getCoordsInRandomLine(start_point[1], start_point[0], end_point[1], end_point[0])
+                line_coords_doseplan = getCoordsInRandomLine(int(start_point[1]/5), int(start_point[0]/5), \
+                    int(end_point[1]/5), int(end_point[0]/5))
+                dataset_film = np.zeros(len(line_coords_film))
+                dataset_doseplan=np.zeros(len(line_coords_doseplan))
+                
+                print(Globals.profiles_film_dataset_ROI_red_channel_dose.shape)
+                print(Globals.profiles_doseplan_dataset_ROI.shape)
+                for i in range(len(dataset_film)):
+                    coord = line_coords_film[i]
+                    #print(coord[1], ", ", coord[0])
+                    dataset_film[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+                
+                for i in range(len(dataset_doseplan)):
+                    dataset_doseplan[i] = Globals.profiles_doseplan_dataset_ROI[int(line_coords_doseplan[i][1]/5), int(line_coords_doseplan[i][0]/5)]
+
+                draw('d', dataset_film, dataset_doseplan)
+
+            Globals.film_dose_write_image.bind("<ButtonRelease-1>", mouseReleased)
+        Globals.film_dose_write_image.bind("<Button-1>", mousePushed)
+        
+    elif(Globals.profiles_choice_of_profile_line_type.get() == 'd' and Globals.profiles_dataset_doseplan.PixelSpacing == [2, 2]):
+        return
+    elif(Globals.profiles_choice_of_profile_line_type.get() == 'd' and Globals.profiles_dataset_doseplan.PixelSpacing == [3, 3]):
         return
     else:
-        print("Ikke laget for draw enda")
+        messagebox.showerror("Error", "Fatal error. Somethin went wrong, try again \n(Code: drawProfiles)")
         return
+        
 
+def test_drawProfiles(var, indx, mode):
+    if Globals.profiles_dataset_doseplan == None:
+        return
+    else:
+        Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+        Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+        Globals.film_write_image.delete(Globals.profiles_lines[2])
+        Globals.form.unbind("<Up>")
+        Globals.form.unbind("<Down>")
+        Globals.form.unbind("<Left>")
+        Globals.form.unbind("<Rigth>")
+        Globals.profiles_first_time_in_drawProfiles = True
+        drawProfiles()
+
+
+def adjustROILeft():
+    Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+    Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+    Globals.film_write_image.delete(Globals.profiles_lines[2])
+    if(Globals.profiles_film_variable_ROI_coords[2]-1 < 0):
+        messagebox.showwarning("Warning", "Reached end of film \n(Code: adjustROILeft)")
+        return
+    Globals.profiles_film_variable_ROI_coords = \
+        [Globals.profiles_film_variable_ROI_coords[0], Globals.profiles_film_variable_ROI_coords[1],\
+            Globals.profiles_film_variable_ROI_coords[2]-1, Globals.profiles_film_variable_ROI_coords[3]-1]
+    Globals.profiles_film_dataset_ROI_red_channel_dose = \
+        Globals.profiles_film_dataset_red_channel_dose\
+            [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
+                Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
+    Globals.profiles_first_time_in_drawProfiles = True
+    drawProfiles()
+
+def adjustROIRight():
+    Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+    Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+    Globals.film_write_image.delete(Globals.profiles_lines[2])
+    if(Globals.profiles_film_variable_ROI_coords[3]+1 > Globals.profiles_film_dataset_red_channel_dose.shape[1]):
+        messagebox.showwarning("Warning", "Reached end of film \n(Code: adjustROIRight)")
+        return
+    Globals.profiles_film_variable_ROI_coords = \
+        [Globals.profiles_film_variable_ROI_coords[0], Globals.profiles_film_variable_ROI_coords[1],\
+            Globals.profiles_film_variable_ROI_coords[2]+1, Globals.profiles_film_variable_ROI_coords[3]+1]
+    Globals.profiles_film_dataset_ROI_red_channel_dose = \
+        Globals.profiles_film_dataset_red_channel_dose\
+            [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
+                Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
+    Globals.profiles_first_time_in_drawProfiles = True
+    drawProfiles()
+
+def adjustROIUp():
+    Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+    Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+    Globals.film_write_image.delete(Globals.profiles_lines[2])
+    if(Globals.profiles_film_variable_ROI_coords[0]-1 < 0):
+        messagebox.showwarning("Warning", "Reached end of film \n(Code: adjustROIUp)")
+        return
+    Globals.profiles_film_variable_ROI_coords = \
+        [Globals.profiles_film_variable_ROI_coords[0]-1, Globals.profiles_film_variable_ROI_coords[1]-1,\
+            Globals.profiles_film_variable_ROI_coords[2], Globals.profiles_film_variable_ROI_coords[3]]
+    Globals.profiles_film_dataset_ROI_red_channel_dose = \
+        Globals.profiles_film_dataset_red_channel_dose\
+            [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
+                Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
+    Globals.profiles_first_time_in_drawProfiles = True
+    drawProfiles()
+
+def adjustROIDown():
+    Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+    Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+    Globals.film_write_image.delete(Globals.profiles_lines[2])
+    if(Globals.profiles_film_variable_ROI_coords[1]+1 > Globals.profiles_film_dataset_red_channel_dose.shape[0]):
+        messagebox.showwarning("Warning", "Reached end of film \n(Code: adjustROILeft)")
+        return
+    Globals.profiles_film_variable_ROI_coords = \
+        [Globals.profiles_film_variable_ROI_coords[0]+1, Globals.profiles_film_variable_ROI_coords[1]+1,\
+            Globals.profiles_film_variable_ROI_coords[2], Globals.profiles_film_variable_ROI_coords[3]]
+    Globals.profiles_film_dataset_ROI_red_channel_dose = \
+        Globals.profiles_film_dataset_red_channel_dose\
+            [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
+                Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
+    Globals.profiles_first_time_in_drawProfiles = True
+    drawProfiles()
+
+def returnToOriginalROICoordinates():
+    Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+    Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+    Globals.film_write_image.delete(Globals.profiles_lines[2])
+    Globals.profiles_film_variable_ROI_coords = \
+        [Globals.profiles_ROI_coords[0][1], Globals.profiles_ROI_coords[2][1],\
+                Globals.profiles_ROI_coords[0][0], Globals.profiles_ROI_coords[1][0]]
+    
+    Globals.profiles_film_dataset_ROI_red_channel_dose = \
+        Globals.profiles_film_dataset_red_channel_dose\
+            [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
+                Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
+    Globals.profiles_first_time_in_drawProfiles = True
+    drawProfiles()
 
 def pixel_to_dose(P,a,b,c):
     ret = c + b/(P-a)
     return ret
 
-def processDoseplan_usingReferencePoint():
+def processDoseplan_usingReferencePoint(only_one):
 
     ################  RT Plan ######################
 
@@ -137,7 +697,6 @@ def processDoseplan_usingReferencePoint():
     iso_1 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[0] - Globals.profiles_isocenter_mm[0])
     iso_2 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[1] - Globals.profiles_isocenter_mm[1])
     iso_3 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[2] - Globals.profiles_isocenter_mm[2])
-    print(Globals.profiles_isocenter_mm)
     #Given as [x,y,z] in patient coordinates
     Globals.profiles_isocenter_mm = [iso_1, iso_2, iso_3]
     
@@ -150,19 +709,16 @@ def processDoseplan_usingReferencePoint():
     #if(longit==" "):longit=0
     try:
         Globals.profiles_vertical = int(Globals.profiles_vertical)
-        print(Globals.profiles_vertical)
     except:
         messagebox.showerror("Error", "Could not read the vertical displacements\n (Code: displacements to integer)")
         return
     try:
         Globals.profiles_lateral = int(Globals.profiles_lateral)
-        print(Globals.profiles_lateral)
     except:
         messagebox.showerror("Error", "Could not read the lateral displacements\n (Code: displacements to integer)")
         return
     try:
         Globals.profiles_longitudinal = int(Globals.profiles_longitudinal)
-        print(Globals.profiles_longitudinal)
     except:
         messagebox.showerror("Error", "Could not read the longitudinal displacements\n (Code: displacements to integer)")
         return
@@ -591,53 +1147,91 @@ def processDoseplan_usingReferencePoint():
     doseplan_ROI_coords.append([bottom_left_to_side, bottom_left_down])
     doseplan_ROI_coords.append([bottom_right_to_side, bottom_right_down])
 
-    Globals.profiles_doseplan_dataset_ROI = dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+    if only_one:
+        Globals.profiles_doseplan_dataset_ROI = \
+            dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
    
-    img=Globals.profiles_doseplan_dataset_ROI
-    if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
-        img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
-    elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
-        img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+        img=Globals.profiles_doseplan_dataset_ROI
+        if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+            img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
+        elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+            img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+        else:
+            img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+
+        mx=np.max(img)
+        #max_dose = mx*Globals.profiles_dose_scaling_doseplan
+        img = img/mx
+        PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
+
+        wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
+        doseplan_canvas = tk.Canvas(Globals.profiles_film_panedwindow)
+        doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
+        Globals.profiles_film_panedwindow.add(doseplan_canvas, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+        doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+
+
+        Globals.doseplan_write_image = tk.Canvas(doseplan_canvas)
+        Globals.doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+        Globals.doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+
+        doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
+        doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
+        doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            width=Globals.profiles_doseplan_text_image.width(), height=Globals.profiles_doseplan_text_image.height())
+
+        scaled_image_visual = PIL_img_doseplan_ROI
+        scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
+        Globals.doseplan_write_image_width = scaled_image_visual.width()
+        Globals.doseplan_write_image_height = scaled_image_visual.height()
+        Globals.doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
+        Globals.doseplan_write_image.image = scaled_image_visual
+        doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
+        doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
+
+        drawProfiles()
+    
     else:
-        img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+        img=dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+        """
+        if(Globals.profiles_number_of_doseplans == 1):
+            Globals.profiles_doseplan_dataset_ROI_several = img
+            Globals.profiles_number_of_doseplans+=1
 
-    mx=np.max(img)
-    max_dose = mx*Globals.profiles_dose_scaling_doseplan
-    img = img/mx
-    PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
+            if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+                Globals.profiles_several_img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
+            elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+                Globals.profiles_several_img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+            else:
+                Globals.profiles_several_img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
 
-    wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
-    doseplan_canvas = tk.Canvas(Globals.profiles_film_panedwindow)
-    doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
-    Globals.profiles_film_panedwindow.add(doseplan_canvas, \
-        height=max(heig, Globals.profiles_doseplan_text_image.height()), \
-            width=wid + Globals.profiles_doseplan_text_image.width())
-    doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-        height=max(heig, Globals.profiles_doseplan_text_image.height()), \
-            width=wid + Globals.profiles_doseplan_text_image.width())
+        else:
+            Globals.profiles_doseplan_dataset_ROI_several += img
+            Globals.profiles_number_of_doseplans+=1
+            
+            if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+                Globals.profiles_several_img += cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
+            elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+                Globals.profiles_several_img += cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+            else:
+                Globals.profiles_several_img += cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+        """
+        Globals.profiles_doseplan_dataset_ROI_several.append(img)
+        Globals.profiles_number_of_doseplans+=1
+
+        if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5)))
+        elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10)))
+        else:
+            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15)))
 
 
-    Globals.doseplan_write_image = tk.Canvas(doseplan_canvas)
-    Globals.doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
-    Globals.doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
-
-    doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
-    doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
-    doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-        width=Globals.profiles_doseplan_text_image.width(), height=Globals.profiles_doseplan_text_image.height())
-
-    scaled_image_visual = PIL_img_doseplan_ROI
-    scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
-    Globals.doseplan_write_image_width = scaled_image_visual.width()
-    Globals.doseplan_write_image_height = scaled_image_visual.height()
-    Globals.doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
-    Globals.doseplan_write_image.image = scaled_image_visual
-    doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
-    doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
-
-    drawProfiles()
-
-def processDoseplan_usingIsocenter():
+def processDoseplan_usingIsocenter(only_one):
 
     ################  RT Plan ######################
 
@@ -653,9 +1247,9 @@ def processDoseplan_usingIsocenter():
     isocenter_px = np.zeros(3)
     distance_in_doseplan_ROI_reference_point_px = []
     if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
-        isocenter_px[0] = np.round(Globals.profiles_isocenter_mm[0])
-        isocenter_px[1] = np.round(Globals.profiles_isocenter_mm[1])
-        isocenter_px[2] = np.round(Globals.profiles_isocenter_mm[2])
+        isocenter_px[0] = np.round(iso_1)#np.round(Globals.profiles_isocenter_mm[0])
+        isocenter_px[1] = np.round(iso_2)#np.round(Globals.profiles_isocenter_mm[1])
+        isocenter_px[2] = np.round(iso_3)#np.round(Globals.profiles_isocenter_mm[2])
         
         #Change distance in film to pixel in doseplan
         distance_in_doseplan_ROI_reference_point_px.append([np.round(Globals.profiles_distance_isocenter_ROI[0][0]),\
@@ -668,9 +1262,9 @@ def processDoseplan_usingIsocenter():
             np.round(Globals.profiles_distance_isocenter_ROI[3][1])])
     
     elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
-        isocenter_px[0] = np.round(Globals.profiles_isocenter_mm[0]/2)
-        isocenter_px[1] = np.round(Globals.profiles_isocenter_mm[1]/2)
-        isocenter_px[2] = np.round(Globals.profiles_isocenter_mm[2]/2)
+        isocenter_px[0] = np.round(iso_1/2)#np.round(Globals.profiles_isocenter_mm[0]/2)
+        isocenter_px[1] = np.round(iso_2/2)#np.round(Globals.profiles_isocenter_mm[1]/2)
+        isocenter_px[2] = np.round(iso_3/2)#np.round(Globals.profiles_isocenter_mm[2]/2)
        
         
         #Change distance in film to pixel in doseplan
@@ -684,9 +1278,9 @@ def processDoseplan_usingIsocenter():
             np.round((Globals.profiles_distance_isocenter_ROI[3][1])/2)])
 
     else:
-        isocenter_px[0] = np.round(Globals.profiles_isocenter_mm[0]/3)
-        isocenter_px[1] = np.round(Globals.profiles_isocenter_mm[1]/3)
-        isocenter_px[2] = np.round(Globals.profiles_isocenter_mm[2]/3)
+        isocenter_px[0] = np.round(iso_1/3)#np.round(Globals.profiles_isocenter_mm[0]/3)
+        isocenter_px[1] = np.round(iso_2/3)#np.round(Globals.profiles_isocenter_mm[1]/3)
+        isocenter_px[2] = np.round(iso_3/3)#np.round(Globals.profiles_isocenter_mm[2]/3)
         
         #Change distance in film to pixel in doseplan
         distance_in_doseplan_ROI_reference_point_px.append([np.round((Globals.profiles_distance_isocenter_ROI[0][0])/3),\
@@ -1098,53 +1692,93 @@ def processDoseplan_usingIsocenter():
     doseplan_ROI_coords.append([bottom_left_to_side, bottom_left_down])
     doseplan_ROI_coords.append([bottom_right_to_side, bottom_right_down])
 
-    Globals.profiles_doseplan_dataset_ROI = dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+    dose_slice = cv2.flip(dose_slice, 1)
+    if(only_one):
+        Globals.profiles_doseplan_dataset_ROI = \
+            dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
     
     
-    img=Globals.profiles_doseplan_dataset_ROI
-    if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
-        img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
-    elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
-        img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+        img=Globals.profiles_doseplan_dataset_ROI
+        if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+            img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
+        elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+            img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+        else:
+            img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+
+        mx=np.max(img)
+        max_dose = mx*Globals.profiles_dose_scaling_doseplan
+        img = img/mx
+        PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
+
+        wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
+        doseplan_canvas = tk.Canvas(Globals.profiles_film_panedwindow)
+        doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
+        Globals.profiles_film_panedwindow.add(doseplan_canvas, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+        doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+
+
+        Globals.doseplan_write_image = tk.Canvas(doseplan_canvas)
+        Globals.doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+        Globals.doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+
+        doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
+        doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
+        doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            width=Globals.profiles_doseplan_text_image.width(), height=Globals.profiles_doseplan_text_image.height())
+
+        scaled_image_visual = PIL_img_doseplan_ROI
+        scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
+        Globals.doseplan_write_image_width = scaled_image_visual.width()
+        Globals.doseplan_write_image_height = scaled_image_visual.height()
+        Globals.doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
+        Globals.doseplan_write_image.image = scaled_image_visual
+        doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
+        doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
+
+        drawProfiles()
+
     else:
-        img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+        img=dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+        """
+        if(Globals.profiles_number_of_doseplans == 1):
+            Globals.profiles_doseplan_dataset_ROI_several = img
+            Globals.profiles_number_of_doseplans+=1
 
-    mx=np.max(img)
-    max_dose = mx*Globals.profiles_dose_scaling_doseplan
-    img = img/mx
-    PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
+            if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+                Globals.profiles_several_img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
+            elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+                Globals.profiles_several_img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+            else:
+                Globals.profiles_several_img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
 
-    wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
-    doseplan_canvas = tk.Canvas(Globals.profiles_film_panedwindow)
-    doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
-    Globals.profiles_film_panedwindow.add(doseplan_canvas, \
-        height=max(heig, Globals.profiles_doseplan_text_image.height()), \
-            width=wid + Globals.profiles_doseplan_text_image.width())
-    doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-        height=max(heig, Globals.profiles_doseplan_text_image.height()), \
-            width=wid + Globals.profiles_doseplan_text_image.width())
+        else:
+            Globals.profiles_doseplan_dataset_ROI_several += img
+            Globals.profiles_number_of_doseplans+=1
+            
+            if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+                Globals.profiles_several_img += cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
+            elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+                Globals.profiles_several_img += cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+            else:
+                Globals.profiles_several_img += cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+        """
+        Globals.profiles_doseplan_dataset_ROI_several.append(img)
+        Globals.profiles_number_of_doseplans+=1
 
+        if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5)))
+        elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10)))
+        else:
+            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15)))
 
-    Globals.doseplan_write_image = tk.Canvas(doseplan_canvas)
-    Globals.doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
-    Globals.doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
-
-    doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
-    doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
-    doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-        width=Globals.profiles_doseplan_text_image.width(), height=Globals.profiles_doseplan_text_image.height())
-
-    scaled_image_visual = PIL_img_doseplan_ROI
-    scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
-    Globals.doseplan_write_image_width = scaled_image_visual.width()
-    Globals.doseplan_write_image_height = scaled_image_visual.height()
-    Globals.doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
-    Globals.doseplan_write_image.image = scaled_image_visual
-    doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
-    doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
-
-    drawProfiles()
-
+        
+        
 
 
 
@@ -1207,26 +1841,26 @@ def UploadRTplan():
         return
     
     Globals.profiles_test_if_added_rtplan = True
-    if(Globals.profiles_test_if_added_doseplan):
-        if(Globals.profiles_isocenter_or_reference_point == "Isocenter"):
-            processDoseplan_usingIsocenter()
-        elif(Globals.profiles_isocenter_or_reference_point == "Ref_point"):
-            processDoseplan_usingReferencePoint()
-        else:
-            messagebox.showerror("Error", "Something went wrong. Try again.\n\
-                (Code: processDoseplan)")
-            return
-
+    #if(Globals.profiles_test_if_added_doseplan):
+    #    if(Globals.profiles_isocenter_or_reference_point == "Isocenter"):
+    #        processDoseplan_usingIsocenter(only_one)
+    #    elif(Globals.profiles_isocenter_or_reference_point == "Ref_point"):
+    #        processDoseplan_usingReferencePoint(only_one)
+    #    else:
+    #        messagebox.showerror("Error", "Something went wrong. Try again.\n\
+    #            (Code: processDoseplan)")
+    #        return
+    Globals.profiles_upload_button_doseplan.config(state=ACTIVE)
     Globals.profiles_upload_button_rtplan.config(state=DISABLED)
 
 def UploadDoseplan_button_function():
     yes = messagebox.askyesno("Question", "Are you going to upload several doseplans and/or use a factor on a plan?")
     if not yes:
-        UploadDoseplan()
+        UploadDoseplan(True)
         return
     
     several_doseplans_window = tk.Toplevel(Globals.tab4_canvas)
-    several_doseplans_window.geometry("700x700+10+10")
+    several_doseplans_window.geometry("600x500+10+10")
     several_doseplans_window.grab_set()
     
     doseplans_over_all_frame = tk.Frame(several_doseplans_window, bd=0, relief=FLAT)
@@ -1235,10 +1869,10 @@ def UploadDoseplan_button_function():
     doseplans_xscrollbar = Scrollbar(doseplans_over_all_frame, orient=HORIZONTAL, command=doseplans_over_all_canvas.xview)
     doseplans_yscrollbar = Scrollbar(doseplans_over_all_frame, command=doseplans_over_all_canvas.yview)
 
-    doseplans_scroll_frame = ttk.Frame(doseplans_over_all_canvas)
-    doseplans_scroll_frame.bind("<Configure>", lambda e: doseplans_over_all_canvas.configure(scrollregion=doseplans_over_all_canvas.bbox('all')))
+    Globals.doseplans_scroll_frame = ttk.Frame(doseplans_over_all_canvas)
+    Globals.doseplans_scroll_frame.bind("<Configure>", lambda e: doseplans_over_all_canvas.configure(scrollregion=doseplans_over_all_canvas.bbox('all')))
 
-    doseplans_over_all_canvas.create_window((0,0), window=doseplans_scroll_frame, anchor='nw')
+    doseplans_over_all_canvas.create_window((0,0), window=Globals.doseplans_scroll_frame, anchor='nw')
     doseplans_over_all_canvas.configure(xscrollcommand=doseplans_xscrollbar.set, yscrollcommand=doseplans_yscrollbar.set)
 
     doseplans_over_all_frame.config(highlightthickness=0, bg='#ffffff')
@@ -1254,22 +1888,114 @@ def UploadDoseplan_button_function():
     doseplans_over_all_frame.grid_columnconfigure(2, weight=0)
     doseplans_over_all_frame.grid_rowconfigure(2, weight=0)
 
-    upload_doseplan_frame = tk.Frame(doseplans_scroll_frame)
-    upload_doseplan_frame.grid(row=2, column = 0, padx = (0,40), pady=(10,0), sticky=N)
-    doseplans_scroll_frame.grid_columnconfigure(0, weight=0)
-    doseplans_scroll_frame.grid_rowconfigure(0, weight=0)
-    upload_film_frame.config(bg = '#ffffff')
+    upload_doseplan_frame = tk.Frame(Globals.doseplans_scroll_frame)
+    upload_doseplan_frame.grid(row=0, column = 0, padx = (30,30), pady=(30,0), sticky=N+S+E+W)
+    Globals.doseplans_scroll_frame.grid_columnconfigure(0, weight=0)
+    Globals.doseplans_scroll_frame.grid_rowconfigure(0, weight=0)
+    upload_doseplan_frame.config(bg = '#ffffff')
 
-    upload_button_doseplan = tk.Button(upload_doseplan_frame, text='Browse', image=profiles_add_doseplan_button_image,\
-        cursor='hand2', font=('calibri', '14'), relief=FLAT, state=DISABLED, command=UploadDoseplan)
-    Globals.profiles_upload_button_doseplan.pack(expand=True, fill=BOTH)
-    Globals.profiles_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-    Globals.profiles_upload_button_doseplan.image = profiles_add_doseplan_button_image
+    upload_button_doseplan = tk.Button(upload_doseplan_frame, text='Browse', image=Globals.profiles_add_doseplans_button_image,\
+        cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: UploadDoseplan(False))
+    upload_button_doseplan.pack(expand=True, fill=BOTH)
+    upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+    upload_button_doseplan.image = Globals.profiles_add_doseplans_button_image
+
+    def closeUploadDoseplans():
+        if(len(Globals.profiles_doseplan_dataset_ROI_several) == 0):
+            messagebox.showinfo("INFO", "No doseplan has been uploaded")
+            return
+        for i in range(len(Globals.profiles_doseplan_dataset_ROI_several)):
+            if Globals.profiles_doseplans_factor_input[i].get("1.0", 'end-1c') == " ":
+                factor = 1
+            else:
+                try:
+                    factor = float(Globals.profiles_doseplans_factor_input[i].get("1.0", 'end-1c'))
+                except:
+                    messagebox.showerror("Error", "Invalid factor. Must be number.\n (Code: closeUploadDoseplans)")
+                    return
+            if i == 0:
+                doseplan_ROI = Globals.profiles_doseplan_dataset_ROI_several[i]
+                doseplan_ROI= doseplan_ROI*factor
+
+                img_ROI = Globals.profiles_several_img[i]
+                img_ROI = img_ROI*factor
+            else:
+                doseplan_ROI+= factor*Globals.profiles_doseplan_dataset_ROI_several[i]
+                img_ROI+= factor*Globals.profiles_several_img[i]
+
+        
+
+        mx=np.max(img_ROI)
+        #max_dose = mx*Globals.profiles_dose_scaling_doseplan
+        img_ROI = img_ROI/mx
+        PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img_ROI)*255))
+
+        wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
+        doseplan_canvas = tk.Canvas(Globals.profiles_film_panedwindow)
+        doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
+        Globals.profiles_film_panedwindow.add(doseplan_canvas, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+        doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+
+
+        Globals.doseplan_write_image = tk.Canvas(doseplan_canvas)
+        Globals.doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+        Globals.doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+
+        doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
+        doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
+        doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            width=Globals.profiles_doseplan_text_image.width(), height=Globals.profiles_doseplan_text_image.height())
+
+        scaled_image_visual = PIL_img_doseplan_ROI
+        scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
+        Globals.doseplan_write_image_width = scaled_image_visual.width()
+        Globals.doseplan_write_image_height = scaled_image_visual.height()
+        Globals.doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
+        Globals.doseplan_write_image.image = scaled_image_visual
+        doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
+        doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
+
+        Globals.profiles_doseplan_dataset_ROI = doseplan_ROI
+
+        Globals.profiles_upload_button_doseplan.config(state=DISABLED)
+
+        several_doseplans_window.after(500, lambda: several_doseplans_window.destroy())
+        drawProfiles()
+
+    doseplans_done_button_frame = tk.Frame(Globals.doseplans_scroll_frame)
+    doseplans_done_button_frame.grid(row=0, column = 1, padx=(0,40), pady=(30,0), sticky=N+S+W+E)
+    doseplans_done_button_frame.config(bg='#ffffff')
+    Globals.doseplans_scroll_frame.grid_rowconfigure(3, weight=0)
+    Globals.doseplans_scroll_frame.grid_columnconfigure(3, weight=0)
+
+    doseplans_done_button = tk.Button(doseplans_done_button_frame, text='Done', image=Globals.done_button_image,\
+        cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=closeUploadDoseplans)
+    doseplans_done_button.pack(expand=True, fill=BOTH)
+    doseplans_done_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+    doseplans_done_button.image = Globals.done_button_image
+    
+
+    filename_title = tk.Text(Globals.doseplans_scroll_frame, width = 15, height= 1)
+    filename_title.insert(INSERT, "Filename")
+    filename_title.grid(row=2, column=0, sticky=N+S+E+W, pady=(40,0), padx=(45,15))
+    filename_title.config(bg='#ffffff', relief=FLAT, state=DISABLED, font=('calibri', '15', 'bold'))
+    Globals.doseplans_scroll_frame.grid_rowconfigure(1, weight=0)
+    Globals.doseplans_scroll_frame.grid_columnconfigure(1, weight=0)
+
+    factor_title = tk.Text(Globals.doseplans_scroll_frame, width=30, height=2)
+    factor_title.insert(INSERT, "Here you can write a factor to use \non the doseplan. Defaults to 1.")
+    factor_title.grid(row=2, column=1, sticky=N+W+S+E, pady=(37,10), padx=(15,25))
+    factor_title.config(bg='#ffffff', relief=FLAT, state=DISABLED, font=('calibri', '15', 'bold'))
+    Globals.doseplans_scroll_frame.grid_columnconfigure(2,weight=0)
+    Globals.doseplans_scroll_frame.grid_rowconfigure(2, weight=0)
 
 
 
-
-def UploadDoseplan():
+def UploadDoseplan(only_one):
     file = filedialog.askopenfilename()
     ext = os.path.splitext(file)[-1].lower()
     if(not(ext == '.dcm')):
@@ -1310,20 +2036,61 @@ def UploadDoseplan():
         dataset.ImageOrientationPatient==[0, 0, 1, 0, 1, 0])):
         messagebox.showerror("Error", "The Image Orientation (Patient) must be parallel to one of the main axis and perpendicular to the two others.")
         return
-
+    
+    if not only_one and not Globals.profiles_number_of_doseplans==1:
+        if(not (Globals.profiles_dataset_doseplan.PixelSpacing==dataset.PixelSpacing)):
+            messagebox.showerror("Error", "Resolution of the doseplans must be equal. \n(Code: UploadDoseplan)")
+            return
+        if(not (Globals.profiles_dataset_doseplan.DoseGridScaling == dataset.DoseGridScaling)):
+            messagebox.showerror("Error", "Dose grid scaling of the doseplans must be equal. \n(Code: UploadDoseplan)")
+            return
     Globals.profiles_dataset_doseplan = dataset
     Globals.profiles_dose_scaling_doseplan = dataset.DoseGridScaling
     Globals.profiles_test_if_added_doseplan = True
     if(Globals.profiles_test_if_added_rtplan):
         if(Globals.profiles_isocenter_or_reference_point == "Isocenter"):
-            processDoseplan_usingIsocenter()
+            processDoseplan_usingIsocenter(only_one)
         elif(Globals.profiles_isocenter_or_reference_point == "Ref_point"):
-            processDoseplan_usingReferencePoint()
+            processDoseplan_usingReferencePoint(only_one)
         else:
             messagebox.showerror("Error", "Something went wrong. Try again.\n (Code: processDoseplan)")
             return
 
-    Globals.profiles_upload_button_doseplan.config(state=DISABLED)
+    if only_one:
+        Globals.profiles_upload_button_doseplan.config(state=DISABLED)
+
+    if not only_one:
+        filename = basename(normpath(file))
+        textbox_filename = tk.Text(Globals.doseplans_scroll_frame, width = 30, height = 1)
+        textbox_filename.insert(INSERT, filename)
+        textbox_filename.config(bg='#ffffff', font=('calibri', '12'), state=DISABLED, relief=FLAT)
+        textbox_filename.grid(row = Globals.profiles_number_of_doseplans_row_count, column = 0, sticky=N+S+W+E, pady=(10,10), padx=(10,10))
+        Globals.doseplans_scroll_frame.grid_columnconfigure(Globals.profiles_doseplans_grid_config_count, weight=0)
+        Globals.doseplans_scroll_frame.grid_rowconfigure(Globals.profiles_doseplans_grid_config_count, weight=0)
+        Globals.profiles_doseplans_filenames.append(textbox_filename)
+
+        Globals.profiles_doseplans_grid_config_count+=1;
+
+        textbox_factor = tk.Text(Globals.doseplans_scroll_frame, width = 6, height = 1)
+        textbox_factor.insert(INSERT, "Factor: ")
+        textbox_factor.config(bg='#ffffff', font=('calibri', '12'), state=DISABLED, relief=FLAT)
+        textbox_factor.grid(row = Globals.profiles_number_of_doseplans_row_count, column = 1, sticky=N+S+W+E, pady=(10,10), padx=(10,10))
+        Globals.doseplans_scroll_frame.grid_columnconfigure(Globals.profiles_doseplans_grid_config_count, weight=0)
+        Globals.doseplans_scroll_frame.grid_rowconfigure(Globals.profiles_doseplans_grid_config_count, weight=0)
+        Globals.profiles_doseplans_factor_text.append(textbox_factor)
+
+        Globals.profiles_doseplans_grid_config_count+=1;
+
+        textbox_factor_input = tk.Text(Globals.doseplans_scroll_frame)
+        textbox_factor_input.insert(INSERT, " ")
+        textbox_factor_input.config(bg='#E5f9ff', font=('calibri', '12'), state=NORMAL, bd = 2)
+        textbox_factor_input.grid(row = Globals.profiles_number_of_doseplans_row_count, column = 1, sticky=N+S+W+E, pady=(10,10), padx=(30,10))
+        Globals.doseplans_scroll_frame.grid_columnconfigure(Globals.profiles_doseplans_grid_config_count, weight=0)
+        Globals.doseplans_scroll_frame.grid_rowconfigure(Globals.profiles_doseplans_grid_config_count, weight=0)
+        Globals.profiles_doseplans_factor_input.append(textbox_factor_input)
+
+        Globals.profiles_number_of_doseplans_row_count+=1
+        Globals.profiles_doseplans_grid_config_count+=1;
 
 
 ######################################################## F I L M ########################################################
@@ -1375,7 +2142,7 @@ def markIsocenter(img, new_window_isocenter_tab, image_canvas, cv2Img):
 
     mark_isocenter_image_canvas.create_image(0,0,image=img_mark_isocenter,anchor="nw")
     mark_isocenter_image_canvas.image = img_mark_isocenter
-    mark_isocenter_image_canvas.config(cursor='top_side', bg='#ffffff', relief=FLAT, bd=0, \
+    mark_isocenter_image_canvas.config(cursor='hand2', bg='#ffffff', relief=FLAT, bd=0, \
         scrollregion=mark_isocenter_image_canvas.bbox(ALL), height=img_mark_isocenter.height(), width=img_mark_isocenter.width())
     mark_isocenter_image_canvas.grid_propagate(0)
 
@@ -1383,7 +2150,7 @@ def markIsocenter(img, new_window_isocenter_tab, image_canvas, cv2Img):
         mark_isocenter_image_canvas.create_oval(event.x-2, event.y-2, event.x+2, event.y+2, fill='red')
         if(Globals.profiles_iscoenter_coords==[]):
             Globals.profiles_iscoenter_coords.append([event.x, event.y])
-            mark_isocenter_image_canvas.config(cursor='right_side')
+            mark_isocenter_image_canvas.config(cursor='hand2')
 
         elif(len(Globals.profiles_iscoenter_coords)==1):
             Globals.profiles_iscoenter_coords.append([event.x, event.y])
@@ -1567,8 +2334,17 @@ def UploadFilm():
     #    Globals.profiles_film_window.destroy()
     #    Globals.profiles_film_window_open = False
     if(Globals.profiles_film_orientation.get() == '-'):
-        messagebox.showerror("Missing parameter", "Film orientation missing")
+        messagebox.showerror("Missing parameter", "Film orientation missing \n (Code: UploadFilm)")
         return
+    if Globals.profiles_film_factor_input.get("1.0", 'end-1c') == " ":
+        Globals.profiles_film_factor = 1
+    else:
+        try:
+            Globals.profiles_film_factor = float(Globals.profiles_film_factor_input.get("1.0", 'end-1c'))
+        except:
+            messagebox.showerror("Missing parameter", "Film factor invalid format. \n (Code: UploadFilm)")
+            return
+                        
     #if(Globals.profiles_depth.get("1.0",'end-1c') == " "):
     #    messagebox.showerror("Missing parameter", "Film depth missing")
     #    return
@@ -1618,6 +2394,7 @@ def UploadFilm():
             return
 
         Globals.profiles_film_orientation_menu.configure(state=DISABLED)
+        Globals.profiles_film_factor_input.config(state=DISABLED)
     
         #scale_horizontal = 2
         #scale_vertical = 2
@@ -1952,18 +2729,26 @@ are not happy with the placement click the button again.")
                 Globals.profiles_popt_red[0] = float(words[3])
                 Globals.profiles_popt_red[1] = float(words[4])
                 Globals.profiles_popt_red[2] = float(words[5])
-                print("popt:")
-                print(Globals.profiles_popt_red)
                 f.close()
 
                 Globals.profiles_film_dataset_ROI_red_channel_dose = np.zeros((Globals.profiles_film_dataset_ROI_red_channel.shape[0],\
                     Globals.profiles_film_dataset_ROI_red_channel.shape[1]))
                 for i in range(Globals.profiles_film_dataset_ROI_red_channel_dose.shape[0]):
                     for j in range(Globals.profiles_film_dataset_ROI_red_channel_dose.shape[1]):
-                        Globals.profiles_film_dataset_ROI_red_channel_dose[i,j] = pixel_to_dose(Globals.profiles_film_dataset_ROI_red_channel[i,j], \
+                        Globals.profiles_film_dataset_ROI_red_channel_dose[i,j] = Globals.profiles_film_factor*\
+                            pixel_to_dose(Globals.profiles_film_dataset_ROI_red_channel[i,j], \
                             Globals.profiles_popt_red[0], Globals.profiles_popt_red[1], Globals.profiles_popt_red[2])
-                film_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
-                film_write_image.image = scaled_image_visual
+
+                Globals.profiles_film_dataset_red_channel_dose = np.zeros((Globals.profiles_film_dataset_red_channel.shape[0],\
+                    Globals.profiles_film_dataset_red_channel.shape[1]))
+                for i in range(Globals.profiles_film_dataset_red_channel_dose.shape[0]):
+                    for j in range(Globals.profiles_film_dataset_red_channel_dose.shape[1]):
+                        Globals.profiles_film_dataset_red_channel_dose[i,j] = Globals.profiles_film_factor*\
+                            pixel_to_dose(Globals.profiles_film_dataset_red_channel[i,j], \
+                            Globals.profiles_popt_red[0], Globals.profiles_popt_red[1], Globals.profiles_popt_red[2])
+
+                Globals.film_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
+                Globals.film_write_image.image = scaled_image_visual
 
                 mx_film=np.max(Globals.profiles_film_dataset_ROI_red_channel_dose)
                 Globals.profiles_max_dose_film = mx_film
@@ -1972,8 +2757,8 @@ are not happy with the placement click the button again.")
                 PIL_img_film = Image.fromarray(np.uint8(cm.viridis(img_film)*255))
 
                 scaled_image_visual_film = ImageTk.PhotoImage(image=PIL_img_film)
-                film_dose_write_image.create_image(0,0,image=scaled_image_visual_film, anchor="nw")
-                film_dose_write_image.image = scaled_image_visual_film
+                Globals.film_dose_write_image.create_image(0,0,image=scaled_image_visual_film, anchor="nw")
+                Globals.film_dose_write_image.image = scaled_image_visual_film
 
                 film_scanned_image_text_canvas.create_image(0,0,image=Globals.profiles_scanned_image_text_image, anchor="nw")
                 film_scanned_image_text_canvas.image = Globals.profiles_scanned_image_text_image
@@ -1993,9 +2778,12 @@ are not happy with the placement click the button again.")
             set_batch_button.pack(expand=True, fill=BOTH)
             set_batch_button.image=Globals.done_button_image
             
+
             img_ROI = Globals.profiles_film_dataset[Globals.profiles_ROI_coords[0][1]:Globals.profiles_ROI_coords[2][1],\
                 Globals.profiles_ROI_coords[0][0]:Globals.profiles_ROI_coords[1][0], :]
             img_ROI_red_channel = img_ROI[:,:,2]
+            Globals.profiles_film_variable_ROI_coords = [Globals.profiles_ROI_coords[0][1], Globals.profiles_ROI_coords[2][1],\
+                Globals.profiles_ROI_coords[0][0], Globals.profiles_ROI_coords[1][0]]
             Globals.profiles_film_dataset_ROI = img_ROI
             Globals.profiles_film_dataset_ROI_red_channel = img_ROI_red_channel
             R = img_ROI[:,:,2];B = img_ROI[:,:,0]; G = img_ROI[:,:,1]
@@ -2025,13 +2813,13 @@ are not happy with the placement click the button again.")
                 height=max(heig,Globals.profiles_film_dose_map_text_image.height()), \
                     width=wid + Globals.profiles_film_dose_map_text_image.width())
 
-            film_write_image = tk.Canvas(film_image_canvas)
-            film_write_image.grid(row=0,column=1,sticky=N+S+W+E)
-            film_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+            Globals.film_write_image = tk.Canvas(film_image_canvas)
+            Globals.film_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+            Globals.film_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
             
-            film_dose_write_image = tk.Canvas(film_dose_canvas)
-            film_dose_write_image.grid(row=0,column=1,sticky=N+S+W+E)
-            film_dose_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)           
+            Globals.film_dose_write_image = tk.Canvas(film_dose_canvas)
+            Globals.film_dose_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+            Globals.film_dose_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)           
 
             film_scanned_image_text_canvas=tk.Canvas(film_image_canvas)
             film_scanned_image_text_canvas.grid(row=0,column=0,sticky=N+S+W+E)
@@ -2049,7 +2837,7 @@ are not happy with the placement click the button again.")
             #film_window_write_image.create_image(0,0,image=scaled_image_visual,anchor="nw")
             #film_window_write_image.image = scaled_image_visual
 
-            Globals.profiles_upload_button_doseplan.config(state=ACTIVE)
+            Globals.profiles_upload_button_doseplan.config(state=DISABLED)
             Globals.profiles_upload_button_rtplan.config(state=ACTIVE)
             Globals.profiles_upload_button_film.config(state=DISABLED)
 
