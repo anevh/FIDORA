@@ -1,7 +1,9 @@
+import Globals
 import pydicom 
 import matplotlib.pyplot as plt 
 import numpy as np
 import cv2 
+from cv2 import imread, IMREAD_ANYCOLOR, IMREAD_ANYDEPTH, imwrite
 from sympy import Point, Polygon, pi, Point2D
 def get_contours(contour_data):
     roi_seq_names = [roi_seq.ROIName for roi_seq in list(contour_data.StructureSetROISequence)]
@@ -139,25 +141,15 @@ def main():
     poly = struktur_array("V1_struktur.dcm")
     #print(poly, "er polygon listen som definerer strukturen")
     print(DVH(array,poly)[0:10], "er punktene i DVH listen")
-    
-    #print(find_pixels_in_structure(array), "er punktene i DVH")
  
-
-
     ###############################  Doseplan ###############################
     datasetPlan = pydicom.dcmread("V1.dcm")
     dataset_1 = pydicom.dcmread("V1_1.dcm")
-    #dataset_2 = pydicom.dcmread("V1_2.dcm")
-    #dataset_3 = pydicom.dcmread("V1_3.dcm")
-    #dataset_4 = pydicom.dcmread("V1_4.dcm")
-    #dataset_5 = pydicom.dcmread("V1_5.dcm")
+
     ds = datasetPlan.pixel_array*datasetPlan.DoseGridScaling #scaled to dose
     print(datasetPlan.pixel_array.shape, "er dimensjonene til doseplan_matrisen")
     #må multiplisere med DoseGridScaling
-    #print(datasetPlan.pixel_array[30:40,30:40,50]*datasetPlan.DoseGridScaling)
-    #print(dataset_5.pixel_array.shape) #77,83,110
-    #print(dataset_1.pixel_array+dataset_2.pixel_array+dataset_3.pixel_array+dataset_4.pixel_array+dataset_5.pixel_array)
-    #dose summation type: plan(totalt) vs beam
+   
     s = struktur_array_ikke_points("V1_struktur.dcm")
     for i in range(0, len(s),3):
         ds[round(-15,int(s[i])):round(int(s[i]))+3, round(int(s[i+1])):round(int(s[i+1]))+3] = 100
@@ -168,9 +160,6 @@ def main():
     plt.show()
 
 
-
-  
-
     #######################  struktur #################################3
     #print(struktur_array("V1_struktur.dcm"))
 
@@ -179,15 +168,28 @@ def main():
 
     #######################33 Film ######################################
 
-    filmA = cv2.imread("filmA_V1_001.tif",-1)
-    filmA = np.asarray(filmA[:,:,2])
+    #load film
+    filmA = cv2.imread("filmA_V1_001.tif",cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+    filmA = np.asarray(filmA[:,:,:])
     filmA = np.fliplr(filmA) #speiler bildet
     print(filmA.shape, "er dimensjonene til filmA") #sier hvor mange bits som er i hver fargekanal
-    doseMapA = filmA 
-    (w,h) = filmA.shape
+    (w,h,rgb) = filmA.shape
+
+    #correction method on scanned film
+    filmA = abs(filmA-Globals.correctionMatrix127)
+    filmA = np.clip(filmA, 0, 65535)
+
+    filmA = np.uint16(filmA)
+
+    #median filtering
+    filmA = cv2.medianBlur(filmA, 3) #medianfilter with a kernel of 3, must be an odd number
+
+    #map from pixel to dose using calibration curve values
+    doseMapA = filmA[:,:,2]
+
     for i in range(w):
         for j in range(h):
-            doseMapA[i][j] = -403 + 15497108/(filmA[i][j]-2838 ) #D(mGy) = c + b/(PV-a) from calibration curve fitting
+            doseMapA[i][j] = -403 + 15497108/(filmA[i,j,2]-2838 ) #D(mGy) = c + b/(PV-a) from calibration curve fitting
     dose_plan =datasetPlan.pixel_array*datasetPlan.DoseGridScaling
     #for i in range(0,len(struktur_array(filename)),3):
     #    doseMapA[round(int(s[i+1])*3/0.2)+635:round(int(s[i+1])*3/0.2)+636,round(int(s[i])*3/0.2)+508:round(int(s[i])*3/0.2)+509] = 0
