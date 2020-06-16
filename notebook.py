@@ -6,7 +6,7 @@ from tkinter import ttk, INSERT, DISABLED, GROOVE, CURRENT, Radiobutton, \
 import Globals
 import re
 import CoMet_functions, intro_tab_functions, Map_Dose
-import Dose_response_functions, Profile_functions
+import Dose_response_functions, Profile_functions, DVH_functions
 from PIL import Image, ImageTk
 import os
 import sys
@@ -32,6 +32,7 @@ Globals.tab_parent.add(Globals.tab1, text='CoMet')
 Globals.tab_parent.add(Globals.tab2, text='Dose-response')
 Globals.tab_parent.add(Globals.tab3, text='Map dose')
 Globals.tab_parent.add(Globals.tab4, text='Profiles')
+Globals.tab_parent.add(Globals.tab5,text='DVH')
 
 style = ttk.Style()
 style.theme_create('MyStyle', parent= 'classic', settings={
@@ -904,6 +905,98 @@ Globals.profiles_adjust_button_return.config(bg='#ffffff', activebackground='#ff
 Globals.profiles_choice_of_profile_line_type.trace_add('write', Profile_functions.test_drawProfiles)
 
 Globals.tab4_canvas.pack(expand=True, fill=BOTH)
+
+#################################### DVH tab 5 ##################################################3
+"""
+Globals.tab5_canvas.config(bg='#ffffff', bd = 0, relief=FLAT, highlightthickness=0)
+
+DVH_explain_text = tk.Text(Globals.tab5_canvas, height=4, width=140)
+DVH_explain_text.insert(INSERT, "\
+SliceThickness i plan må være ['1','1'], ['2','2'] eller ['3','3'], Filmen må legges i xy, xz eller yz planet (lage figur?), Filmen må scannes  \n\
+parallelt med retningene i skanneren (programmet vil anta dette), man må markere \"opp\" og \"bort\" på filmen. Når man skanner må man legge \n\
+oppmerket oppover og bort merket mot høyre (kan man kreve dette i alle plan?). \
+Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det, \n\
+Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det tekst, Her kommer det, " )
+DVH_explain_text.grid(row=0, column=0, columnspan=5, sticky=N+S+E+W, pady=(20,20), padx=(20,10))
+Globals.tab5_canvas.grid_columnconfigure(0, weight=0)
+Globals.tab5_canvas.grid_rowconfigure(0, weight=0)
+DVH_explain_text.config(state=DISABLED, font=('calibri', '11'), bg ='#E5f9ff', relief=FLAT)
+
+DVH_upload_film_frame = tk.Frame(Globals.tab5_canvas)
+DVH_upload_film_frame.grid(row=2, column = 0, padx = (0, 240), pady=(10,0), sticky=N)
+Globals.tab5_canvas.grid_columnconfigure(1, weight=0)
+Globals.tab5_canvas.grid_rowconfigure(1, weight=0)
+DVH_upload_film_frame.config(bg = '#ffffff')
+
+Globals.DVH_upload_button_film = tk.Button(DVH_upload_film_frame, text='Browse', image = profiles_add_film_button_image, \
+    cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=DVH_functions.UploadFilm)
+Globals.DVH_upload_button_film.pack(expand=True, fill=BOTH)
+Globals.DVH_upload_button_film.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.DVH_upload_button_film.image = profiles_add_film_button_image
+
+DVH_upload_doseplan_frame = tk.Frame(Globals.tab4_canvas)
+DVH_upload_doseplan_frame.grid(row=2, column = 0, padx = (0,40), pady=(10,0), sticky=N)
+Globals.tab5_canvas.grid_columnconfigure(3, weight=0)
+Globals.tab5_canvas.grid_rowconfigure(3, weight=0)
+DVH_upload_film_frame.config(bg = '#ffffff')
+
+Globals.DVH_upload_button_doseplan = tk.Button(DVH_upload_doseplan_frame, text='Browse', image=profiles_add_doseplan_button_image,\
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=DISABLED, command=DVH_functions.UploadDoseplan_button_function)
+Globals.DVH_upload_button_doseplan.pack(expand=True, fill=BOTH)
+Globals.DVH_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.DVH_upload_button_doseplan.image = profiles_add_doseplan_button_image
+
+DVH_upload_rtplan_frame = tk.Frame(Globals.tab5_canvas)
+DVH_upload_rtplan_frame.grid(row=2, column=0, padx=(160,0), pady=(10,0), sticky=N)
+Globals.tab5_canvas.grid_columnconfigure(10, weight=0)
+Globals.tab5_canvas.grid_rowconfigure(10, weight=0)
+DVH_upload_rtplan_frame.config(bg='#ffffff')
+
+Globals.DVH_upload_button_rtplan = tk.Button(DVH_upload_rtplan_frame, text='Browse', image=profiles_add_rtplan_button_image,\
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=DISABLED, command=DVH_functions.UploadRTplan)
+Globals.DVH_upload_button_rtplan.pack(expand=True, fill=BOTH)
+Globals.DVH_upload_button_rtplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+Globals.DVH_upload_button_rtplan.image=profiles_add_rtplan_button_image
+
+Globals.DVH_film_orientation_menu = OptionMenu(Globals.tab5_canvas, Globals.DVH_film_orientation, 'Axial', 'Coronal', 'Sagittal')
+Globals.DVH_film_orientation_menu.grid(row=1, column=0, sticky=N+S, padx=(60,0))
+Globals.tab5_canvas.grid_columnconfigure(2, weight=0)
+Globals.tab5_canvas.grid_rowconfigure(2, weight=0)
+Globals.DVH_film_orientation_menu.config(bg = '#ffffff', width=15, relief=FLAT)
+
+film_orientation_menu_text = tk.Text(Globals.tab5_canvas, width=14, height=1)
+film_orientation_menu_text.insert(INSERT, "Film orientation:")
+film_orientation_menu_text.config(state=DISABLED, font=('calibri', '10'), bd = 0, relief=FLAT)
+film_orientation_menu_text.grid(row=1, column=0, sticky=N+S+W, padx=(30,0), pady=(5,0))
+Globals.tab5_canvas.grid_columnconfigure(3, weight=0)
+Globals.tab5_canvas.grid_rowconfigure(3, weight=0)
+
+DVH_film_orientation_help_frame = tk.Frame(Globals.tab5_canvas)
+DVH_film_orientation_help_frame.grid(row=1, column=0, sticky=N+S+E, padx=(0,40))
+Globals.tab5_canvas.grid_columnconfigure(6, weight=0)
+Globals.tab5_canvas.grid_rowconfigure(6, weight=0)
+DVH_film_orientation_help_frame.configure(bg='#ffffff')
+
+DVH_help_button_orientation = tk.Button(DVH_film_orientation_help_frame, text='help', image=Globals.help_button, \
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=DVH_functions.help_showPlanes)
+DVH_help_button_orientation.pack(expand=True, fill=BOTH)
+DVH_help_button_orientation.configure(bg='#ffffff',activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+DVH_help_button_orientation.image=Globals.help_button
+
+DVH_resetAll_frame = tk.Frame(Globals.tab5_canvas)
+DVH_resetAll_frame.grid(row=15,column=0, padx=(0,0), pady=(0,0), sticky=S)
+Globals.tab5_canvas.grid_columnconfigure(5, weight=0)
+Globals.tab5_canvas.grid_rowconfigure(5, weight=0)
+profiles_resetAll_frame.config(bg='#ffffff')
+
+DVH_resetAll_button = tk.Button(DVH_resetAll_frame, text='Reset', image=dose_response_clear_all_button_image, \
+    cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=DVH_functions.clearAll)
+DVH_resetAll_button.pack(expand=True, fill=BOTH)
+DVH_resetAll_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+DVH_resetAll_button.image = dose_response_clear_all_button_image
+
+Globals.tab5_canvas.pack(expand=True, fill=BOTH)
+"""
 ##################################### End statements ############################################
 #Globals.tab_parent.place(relwidth=1, relheight=0.9, relx=0, rely=0.15)
 Globals.form.mainloop()

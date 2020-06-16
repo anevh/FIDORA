@@ -1,8 +1,10 @@
+import Globals
 import pydicom 
 import matplotlib.pyplot as plt 
 import numpy as np
 import cv2 
-
+from cv2 import imread, IMREAD_ANYCOLOR, IMREAD_ANYDEPTH, imwrite
+from sympy import Point, Polygon, pi, Point2D
 def get_contours(contour_data):
     roi_seq_names = [roi_seq.ROIName for roi_seq in list(contour_data.StructureSetROISequence)]
     return roi_seq_names #en array med navn på strukturer i den angitte strukturfilen, contour_data
@@ -54,59 +56,144 @@ def name_to_index(name, names):
             return i
     return -1
 
-def main():
-    ###############################  Doseplan ###############################
-    datasetPlan = pydicom.dcmread("V1.dcm")
-    dataset_1 = pydicom.dcmread("V1_1.dcm")
-    #dataset_2 = pydicom.dcmread("V1_2.dcm")
-    #dataset_3 = pydicom.dcmread("V1_3.dcm")
-    #dataset_4 = pydicom.dcmread("V1_4.dcm")
-    #dataset_5 = pydicom.dcmread("V1_5.dcm")
+def find_pixels_in_structure(array): #passed 1d array of coordinates on the form (x,y,z)
+    points =array3D_to_points(array) # sorts array into a list of 2d points [(x0,y0), (x1,y1), ...]
 
-    print(datasetPlan.pixel_array.shape, "er dimensjonene til doseplan_matrisen")
-    #må multiplisere med DoseGridScaling
-    #print(datasetPlan.pixel_array[30:40,30:40,50]*datasetPlan.DoseGridScaling)
-    #print(dataset_5.pixel_array.shape) #77,83,110
-    #print(dataset_1.pixel_array+dataset_2.pixel_array+dataset_3.pixel_array+dataset_4.pixel_array+dataset_5.pixel_array)
-    #dose summation type: plan(totalt) vs beam
+    #creating polygon
+    polyList = []
+    for i in range(len(points)):
+        polyList.append(i)
+    t = tuple(polyList)
+    poly = Polygon(*t) #unpacking list elements to make a sequence of points
+  
+    DVH_points = []
+    #iterating through passed array and checking if points are insie polygon
+    for i in range(len(array)):
+            if (poly.encloses_point(array[i])):
+                DVH_points.append(array[i]) 
+    
+    return DVH_points #returning list of points that are inside the polygon
+
+# determine if a point is inside a given polygon or not
+# Polygon is a list of (x,y) pairs.
+def point_inside_polygon(x,y,poly):
+
+    n = len(poly)
+    inside =False
+
+    p1x,p1y = poly[0]
+    for i in range(n+1):
+        p2x,p2y = poly[i % n]
+        if y > min(p1y,p2y):
+            if y <= max(p1y,p2y):
+                if x <= max(p1x,p2x):
+                    if p1y != p2y:
+                        xinters = (y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
+                    if p1x == p2x or x <= xinters:
+                        inside = not inside
+        p1x,p1y = p2x,p2y
+
+    return inside
+
+def DVH(array,poly):
+    points = array3D_to_points(array)
+    DVH_points = []
+    for i, (x, y) in enumerate(points):
+        if (point_inside_polygon(x, y,poly)):
+            DVH_points.append(points[i])
+    return DVH_points
+
+def array3D_to_points(array):
+    Points = []
+
+    for i in range(0,len(array),3):
+        Points.append((array[i],array[i+1]))
+    return Points
 
 
-    #######################  struktur #################################3
-    struktur = pydicom.dcmread("V1_struktur.dcm")
-    #print(struktur)
-    #print("transfersyntax")
-    #struktur.file_meta.TransferSyntaxUID
+def struktur_array(filename):
+    struktur = pydicom.dcmread(filename) #("V1_struktur.dcm")
     ctrs = struktur.ROIContourSequence
-    #dette funker:
-    #print(type(ctrs))
     keys = {}
     for i, name in enumerate(get_contours(struktur)):
         keys[name] = i
     s = ctrs[name_to_index('PTV_v', get_contours(struktur))].ContourSequence[20].ContourData
-    #print(s[0:10])
+    s = [float(se) for se in s]
+    s = array3D_to_points(s)
+    return s
 
+def struktur_array_ikke_points(filename):
+    struktur = pydicom.dcmread(filename) #("V1_struktur.dcm")
+    ctrs = struktur.ROIContourSequence
+    keys = {}
+    for i, name in enumerate(get_contours(struktur)):
+        keys[name] = i
+    s = ctrs[name_to_index('PTV_v', get_contours(struktur))].ContourSequence[10].ContourData
+    print(ctrs[name_to_index('PTV_v', get_contours(struktur))].ContourSequence[10].ContourData)
+    return s
+
+
+def main():
+    ############### test polygon #########################################33#
+    print(array3D_to_points([1,2,3,2,4,6]), "er punktene omgitt fra array")
+    array =[0.0,0.0,0.0,110,-200,100, -100,-100,-100]
+    #poly = [(-1,1),(-1,2),(-1,-1),(-1,0), (0,2),(1,2), (2,2), (2,1), (2,0), (2,-1), (1,-1)]
+    poly = struktur_array("V1_struktur.dcm")
+    #print(poly, "er polygon listen som definerer strukturen")
+    print(DVH(array,poly)[0:10], "er punktene i DVH listen")
+ 
+    ###############################  Doseplan ###############################
+    datasetPlan = pydicom.dcmread("V1.dcm")
+    dataset_1 = pydicom.dcmread("V1_1.dcm")
+
+    ds = datasetPlan.pixel_array*datasetPlan.DoseGridScaling #scaled to dose
+    print(datasetPlan.pixel_array.shape, "er dimensjonene til doseplan_matrisen")
+    #må multiplisere med DoseGridScaling
+   
+    s = struktur_array_ikke_points("V1_struktur.dcm")
+    for i in range(0, len(s),3):
+        ds[round(-15,int(s[i])):round(int(s[i]))+3, round(int(s[i+1])):round(int(s[i+1]))+3] = 100
+    #ds[10,:,:] = 0    
+    plt.figure()
+    plt.imshow(ds[-15,:,:])
+    plt.colorbar()
+    plt.show()
+
+
+    #######################  struktur #################################3
+    #print(struktur_array("V1_struktur.dcm"))
 
 
     #print(struktur.Structu<<<reSetROISequence) #skriv akkurat dette!! for å se på de ulkike strukturnavnene
 
     #######################33 Film ######################################
 
-    filmA = cv2.imread("filmA_corrected.dcm",-1)
-    filmA = np.asarray(filmA[:,:,2])
+    #load film
+    filmA = cv2.imread("filmA_V1_001.tif",cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+    filmA = np.asarray(filmA[:,:,:])
     filmA = np.fliplr(filmA) #speiler bildet
     print(filmA.shape, "er dimensjonene til filmA") #sier hvor mange bits som er i hver fargekanal
-    doseMapA = filmA 
-    (w,h) = filmA.shape
+    (w,h,rgb) = filmA.shape
+
+    #correction method on scanned film
+    filmA = abs(filmA-Globals.correctionMatrix127)
+    filmA = np.clip(filmA, 0, 65535)
+
+    filmA = np.uint16(filmA)
+
+    #median filtering
+    filmA = cv2.medianBlur(filmA, 3) #medianfilter with a kernel of 3, must be an odd number
+
+    #map from pixel to dose using calibration curve values
+    doseMapA = filmA[:,:,2]
+
     for i in range(w):
         for j in range(h):
-            doseMapA[i][j] = -403 + 15497108/(filmA[i][j]-2838 ) #D(mGy) = c + b/(PV-a) from calibration curve fitting
+            doseMapA[i][j] = -403 + 15497108/(filmA[i,j,2]-2838 ) #D(mGy) = c + b/(PV-a) from calibration curve fitting
     dose_plan =datasetPlan.pixel_array*datasetPlan.DoseGridScaling
-    for i in range(0,len(s),3):
-        #dose_plan[round(int(s[i])/3):round(int(s[i])/3+20)+10,round(int(s[i+1])/3):round(int(s[i+1])/3)+10,25] = 0
-        #doseMapA[round(int(s[i+1])+70)*4:round(int(s[i+1])+71)*4,round(int(s[i])+50)*4:round(int(s[i])+51)*4] = 0
-        doseMapA[round(int(s[i+1])*3/0.2)+635:round(int(s[i+1])*3/0.2)+636,round(int(s[i])*3/0.2)+508:round(int(s[i])*3/0.2)+509] = 0
+    #for i in range(0,len(struktur_array(filename)),3):
+    #    doseMapA[round(int(s[i+1])*3/0.2)+635:round(int(s[i+1])*3/0.2)+636,round(int(s[i])*3/0.2)+508:round(int(s[i])*3/0.2)+509] = 0
 
-    print(doseMapA[500:505,400:405])
 
     #cm = m.colors.LinearSegmentedColormap('my_colormap', cdict, 1024)
     plt.figure()
@@ -117,7 +204,7 @@ def main():
     cbar.ax.set_ylabel('         cGy', rotation=0)
     plt.show()
 
-    cfile2pixels(struktur,"C:\\Users\\Ane\\Documents\\eksperiment 0106\\V1")
+#file2pixels(struktur,"C:\\Users\\Ane\\Documents\\eksperiment 0106\\V1")
 
 if __name__ == '__main__':
     main()

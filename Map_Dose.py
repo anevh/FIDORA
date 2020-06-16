@@ -45,7 +45,7 @@ def calculate_dose_map(cv2Img):
     plot_image = a.pcolormesh(doseMap_film, cmap='viridis', rasterized=True, vmin=0, vmax=600)
     fig.colorbar(plot_image, ax=a)
     canvas_dosemap_film = FigureCanvasTkAgg(fig,master = Globals.tab3)
-    canvas_dosemap_film.get_tk_widget().place(relwidth=0.3, relheight=0.55, relx = 0.03, rely=0.1)
+    canvas_dosemap_film.get_tk_widget().place(relwidth=0.6, relheight=0.55, relx = 0.03, rely=0.2)#relwidth=0.3, rely=0.1
     canvas_dosemap_film.draw()
     #plotte dosekartet (dette må være krympet (408,508))
 

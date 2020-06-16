@@ -66,6 +66,8 @@ global tab3
 tab3 = ttk.Frame(tab_parent)
 global tab4
 tab4 = ttk.Frame(tab_parent)
+global tab5
+tab5 = ttk.Frame(tab_parent)
 
 global tab1_canvas
 tab1_canvas = tk.Canvas(tab1)
@@ -75,6 +77,8 @@ global tab3_canvas
 tab3_canvas = tk.Canvas(tab3)
 global tab4_canvas
 tab4_canvas = tk.Canvas(tab4)
+global tab5_canvas
+tab5_canvas= tk.Canvas(tab5)
 
 ########################################   CoMet related   ###################################################
 global CoMet_progressbar
@@ -627,6 +631,11 @@ global profiles_lateral
 global profiles_vertical
 global profiles_longitudinal
 
+############################## DVH related ############################################
+"""
+global DVH_film_orientation
+DVH_film_orientation = StringVar()
+DVH_film_orientation.set('-')
 global doseplans_scroll_frame
 
 global profiles_number_of_doseplans
@@ -659,6 +668,176 @@ end_point = None
 global profiles_line_coords_film
 global profiles_line_coords_doseplan
 
+global DVH_film_orientation_menu
+
+
+global DVH_film_dataset
+global DVH_film_dataset_red_channel
+global DVH_film_dataset_ROI
+global DVH_film_dataset_ROI_red_channel
+global DVH_doseplan_dataset_ROI
+global DVH_film_dataset_ROI_red_channel_dose
+
+global DVH_view_film_doseplan_ROI
+DVH_view_film_doseplan_ROI = tk.Canvas(tab5_canvas)
+DVH_view_film_doseplan_ROI.grid(row=2, column=3, rowspan=25, sticky=E+W+N, pady=(0,5), padx=(5,10))
+tab5_canvas.grid_columnconfigure(11, weight=0)
+tab5_canvas.grid_rowconfigure(11, weight=0)
+DVH_view_film_doseplan_ROI.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
+
+
+global DVH_plot_canvas
+DVH_plot_canvas = tk.Canvas(tab4_canvas)
+DVH_plot_canvas.grid(row=3, column=0, rowspan=10, columnspan=2, sticky=N+E+W, pady=(0,5), padx=(5,10))
+tab5_canvas.grid_columnconfigure(4, weight=0)
+tab5_canvas.grid_rowconfigure(4, weight=0)
+DVH_plot_canvas.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
+
+DVH_fig = Figure(figsize=(5,3))
+DVH_a = profiles_fig.add_subplot(111, ylim=(0,40000), xlim=(0,500))
+DVH_plot_canvas = FigureCanvasTkAgg(profiles_fig, master=profile_plot_canvas)
+DVH_plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+E+W, padx=(5,0), pady=(0,0))
+DVH_a.set_title ("Profiles", fontsize=12)
+DVH_a.set_ylabel("Pixel value", fontsize=12)
+DVH_a.set_xlabel("Distance (mm)", fontsize=12)
+DVH_fig.tight_layout()
+
+global DVH_showPlanes_image
+global DVH_showDirections_image
+
+global DVH_depth
+global DVH_depth_float
+
+#global DVH_mark_isocenter_button_image
+#global DVH_mark_ROI_button_image
+#global DVH_mark_point_button_image
+
+global DVH_iscoenter_coords
+DVH_iscoenter_coords = []
+
+#Given from top left corner [right, down]
+global DVH_film_isocenter
+global DVH_film_reference_point
+
+global DVH_distance_isocenter_ROI
+DVH_distance_isocenter_ROI = []
+global DVH_distance_reference_point_ROI
+DVH_distance_reference_point_ROI = []
+
+global DVH_mark_isocenter_up_down_line
+DVH_mark_isocenter_up_down_line = []
+global DVH_mark_isocenter_right_left_line
+DVH_mark_isocenter_right_left_line = []
+global DVH_mark_isocenter_oval
+DVHs_mark_isocenter_oval = []
+global DVH_mark_ROI_rectangle
+DVH_mark_ROI_rectangle = []
+
+global DVH_mark_reference_point_oval
+DVH_mark_reference_point_oval = []
+
+global DVH_ROI_coords
+DVH_ROI_coords = []
+
+global DVH_done_button
+DVH_done_button = None
+global DVH_done_button_reference_point
+DVH_done_button_reference_point = None
+
+global DVH_isocenter_check
+DVH_isocenter_check=False
+global DVH_reference_point_check
+DVH_reference_point_check = False
+
+global DVH_ROI_check
+DVH_ROI_check = False
+global DVH_ROI_reference_point_check
+DVH_ROI_reference_point_check = False
+
+global DVH_film_batch
+DVH_film_batch = IntVar()
+DVH_film_batch.set(0)
+
+global DVH_popt_red
+DVH_popt_red = np.zeros(3)
+
+global DVH_upload_button_doseplan
+global DVH_upload_button_film
+global DVH_upload_button_rtplan
+
+global DVH_dataset_doseplan
+global DVH_dataset_rtplan
+
+global DVH_test_if_added_doseplan
+global DVH_test_if_added_rtplan
+DVH_test_if_added_doseplan = False
+DVH_test_if_added_rtplan = False
+
+global DVH_isocenter_mm
+
+
+global DVH_dose_scaling_doseplan
+
+global DVH_max_dose_film
+
+
+############## probably comment out this section ##############
+DVH_choose_profile_canvas = tk.Canvas(DVH_view_film_doseplan_ROI)
+DVH_choose_profile_canvas.pack()
+DVH_choose_profile_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0)
+global DVH_choice_of_profile_line_type
+DVH_choice_of_profile_line_type = StringVar()
+DVH_choice_of_profile_line_type.set("h")
+
+DVH_choose_profile_type_text = tk.Text(DVH_choose_profile_canvas, height=1)
+DVH_choose_profile_type_text.insert(INSERT, "How to draw the profile:")
+DVH_choose_profile_type_text.pack(side=TOP)
+DVH_choose_profile_type_text.config(bg='#ffffff', relief=FLAT, \
+highlightthickness=0, state=DISABLED, font=('calibri', '11'))
+Radiobutton(DVH_choose_profile_canvas, text="Horizontal", variable=DVH_choice_of_profile_line_type, \
+    value="h", bg='#ffffff', cursor='hand2').pack(side=LEFT)
+Radiobutton(DVH_choose_profile_canvas, text="Vertical", \
+    variable=DVH_choice_of_profile_line_type, value='v', bg='#ffffff', cursor='hand2').pack(side=LEFT)
+Radiobutton(DVH_choose_profile_canvas, text="Draw", \
+    variable=DVH_choice_of_profile_line_type, value="d", bg='#ffffff', cursor='hand2').pack(side=LEFT)
+##################################################################################################3
+
+global DVH_film_panedwindow
+DVH_film_panedwindow = PanedWindow(DVH_view_film_doseplan_ROI, orient='vertical')
+DVH_film_panedwindow.pack()
+DVH_film_panedwindow.configure(sashrelief = RAISED, showhandle=True)
+
+
+global DVH_scanned_image_text_image
+global DVH_film_dose_map_text_image
+global DVH_doseplan_text_image
+
+global DVH_doseplan_write_image
+global DVH_doseplan_write_image_width
+global DVH_doseplan_write_image_height
+global DVH_doseplan_write_image_var_x 
+DVH_doseplan_write_image_var_x= 0
+
+
+global DVH_new_window_factor_textbox ###
+
+global DVH_doseplan_lateral_displacement
+global DVH_doseplan_vertical_displacement
+global DVH_doseplan_longitudianl_displacement
+global DVH_doseplan_patient_position
+
+global DVH_reference_point_in_doseplan
+
+global DVH_input_lateral_displacement
+global DVH_input_longitudinal_displacement
+global DVH_input_vertical_displacement
+
+global DVH_isocenter_or_reference_point
+
+global DVH_lateral
+global DVH_vertical
+global DVH_longitudinal
+"""
 ############################### Correction matrix ######################################
 
 global correction127_red
