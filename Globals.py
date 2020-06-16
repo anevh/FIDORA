@@ -653,6 +653,11 @@ global profiles_film_factor
 global profiles_lines
 profiles_lines = []
 
+global end_point
+end_point = None
+
+global profiles_line_coords_film
+global profiles_line_coords_doseplan
 
 ############################### Correction matrix ######################################
 

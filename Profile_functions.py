@@ -111,7 +111,7 @@ def getCoordsInRandomLine(x1,y1,x2,y2):
 
 
 
-def drawProfiles():
+def drawProfiles(even):
     Globals.profiles_lines = []
 
     if Globals.profiles_dataset_doseplan == None:
@@ -531,10 +531,16 @@ def drawProfiles():
             Globals.profiles_first_time_in_drawProfiles = False
             draw('v', dataset_film, Globals.profiles_doseplan_dataset_ROI)
     elif(Globals.profiles_choice_of_profile_line_type.get() == 'd' and Globals.profiles_dataset_doseplan.PixelSpacing == [1, 1]):
-        start_point = [0,0]; end_point = [0,0]
+        start_point = [0,0]
         def mousePushed(event):
             start_point = [event.x, event.y]
             print(start_point)
+            if not len(Globals.profiles_lines)==0:
+                Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+                Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+                Globals.film_write_image.delete(Globals.profiles_lines[2])
+                Globals.profiles_lines = []
+
             line_doseplan = Globals.doseplan_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
             line_film_dosemap = Globals.film_dose_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
             line_film = Globals.film_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
@@ -553,37 +559,36 @@ def drawProfiles():
             Globals.film_dose_write_image.bind("<B1-Motion>", mouseMoving)
 
             def mouseReleased(event):
-                end_point = [event.x, event.y]
+                Globals.end_point = [event.x, event.y]
                 Globals.doseplan_write_image.coords(line_doseplan, start_point[0], start_point[1], event.x, event.y)
                 Globals.film_dose_write_image.coords(line_film_dosemap, start_point[0], start_point[1], event.x, event.y)
                 Globals.film_write_image.coords(line_film, start_point[0], start_point[1], event.x, event.y)
-                line_coords_film = getCoordsInRandomLine(start_point[1], start_point[0], end_point[1], end_point[0])
-                line_coords_doseplan = getCoordsInRandomLine(int(start_point[1]/5), int(start_point[0]/5), \
-                    int(end_point[1]/5), int(end_point[0]/5))
-                dataset_film = np.zeros(len(line_coords_film))
-                dataset_doseplan=np.zeros(len(line_coords_doseplan))
+                Globals.line_coords_film = getCoordsInRandomLine(start_point[1], start_point[0], Globals.end_point[1], Globals.end_point[0])
+                Globals.line_coords_doseplan = getCoordsInRandomLine(int(start_point[1]/5), int(start_point[0]/5), \
+                    int(Globals.end_point[1]/5), int(Globals.end_point[0]/5))
+                dataset_film = np.zeros(len(Globals.line_coords_film))
+                dataset_doseplan=np.zeros(len(Globals.line_coords_doseplan))
                 
-                print(Globals.profiles_film_dataset_ROI_red_channel_dose.shape)
-                print(Globals.profiles_doseplan_dataset_ROI.shape)
                 for i in range(len(dataset_film)):
-                    coord = line_coords_film[i]
+                    coord = Globals.line_coords_film[i]
                     #print(coord[1], ", ", coord[0])
                     dataset_film[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
                 
                 for i in range(len(dataset_doseplan)):
-                    dataset_doseplan[i] = Globals.profiles_doseplan_dataset_ROI[int(line_coords_doseplan[i][1]/5), int(line_coords_doseplan[i][0]/5)]
+                    dataset_doseplan[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.line_coords_doseplan[i][0]), int(Globals.line_coords_doseplan[i][1])]
 
                 draw('d', dataset_film, dataset_doseplan)
 
             Globals.film_dose_write_image.bind("<ButtonRelease-1>", mouseReleased)
         Globals.film_dose_write_image.bind("<Button-1>", mousePushed)
-        
+       
+
     elif(Globals.profiles_choice_of_profile_line_type.get() == 'd' and Globals.profiles_dataset_doseplan.PixelSpacing == [2, 2]):
         return
     elif(Globals.profiles_choice_of_profile_line_type.get() == 'd' and Globals.profiles_dataset_doseplan.PixelSpacing == [3, 3]):
         return
     else:
-        messagebox.showerror("Error", "Fatal error. Somethin went wrong, try again \n(Code: drawProfiles)")
+        messagebox.showerror("Error", "Fatal error. Something went wrong, try again \n(Code: drawProfiles)")
         return
         
 
@@ -599,13 +604,14 @@ def test_drawProfiles(var, indx, mode):
         Globals.form.unbind("<Left>")
         Globals.form.unbind("<Rigth>")
         Globals.profiles_first_time_in_drawProfiles = True
-        drawProfiles()
+        drawProfiles(False)
 
 
-def adjustROILeft():
-    Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
-    Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
-    Globals.film_write_image.delete(Globals.profiles_lines[2])
+def adjustROILeft(line_orient):
+    if not line_orient == 'd':
+        Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+        Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+        Globals.film_write_image.delete(Globals.profiles_lines[2])
     if(Globals.profiles_film_variable_ROI_coords[2]-1 < 0):
         messagebox.showwarning("Warning", "Reached end of film \n(Code: adjustROILeft)")
         return
@@ -617,12 +623,23 @@ def adjustROILeft():
             [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
                 Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
     Globals.profiles_first_time_in_drawProfiles = True
-    drawProfiles()
+    if line_orient == 'd':
+        for i in range(len(dataset_film)):
+            coord = Globals.line_coords_film[i]
+            #print(coord[1], ", ", coord[0])
+            dataset_film[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+                
+        for i in range(len(dataset_doseplan)):
+            dataset_doseplan[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.line_coords_doseplan[i][0]), int(Globals.line_coords_doseplan[i][1])]
+        drawProfiles(True)
+    else:
+        drawProfiles(False)
 
-def adjustROIRight():
-    Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
-    Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
-    Globals.film_write_image.delete(Globals.profiles_lines[2])
+def adjustROIRight(line_orient):
+    if not line_orient == 'd':
+        Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+        Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+        Globals.film_write_image.delete(Globals.profiles_lines[2])
     if(Globals.profiles_film_variable_ROI_coords[3]+1 > Globals.profiles_film_dataset_red_channel_dose.shape[1]):
         messagebox.showwarning("Warning", "Reached end of film \n(Code: adjustROIRight)")
         return
@@ -634,12 +651,13 @@ def adjustROIRight():
             [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
                 Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
     Globals.profiles_first_time_in_drawProfiles = True
-    drawProfiles()
+    drawProfiles(False)
 
-def adjustROIUp():
-    Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
-    Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
-    Globals.film_write_image.delete(Globals.profiles_lines[2])
+def adjustROIUp(line_orient):
+    if not line_orient == 'd':
+        Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+        Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+        Globals.film_write_image.delete(Globals.profiles_lines[2])
     if(Globals.profiles_film_variable_ROI_coords[0]-1 < 0):
         messagebox.showwarning("Warning", "Reached end of film \n(Code: adjustROIUp)")
         return
@@ -651,14 +669,15 @@ def adjustROIUp():
             [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
                 Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
     Globals.profiles_first_time_in_drawProfiles = True
-    drawProfiles()
+    drawProfiles(False)
 
-def adjustROIDown():
-    Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
-    Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
-    Globals.film_write_image.delete(Globals.profiles_lines[2])
+def adjustROIDown(line_orient):
+    if not line_orient == 'd':
+        Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+        Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+        Globals.film_write_image.delete(Globals.profiles_lines[2])
     if(Globals.profiles_film_variable_ROI_coords[1]+1 > Globals.profiles_film_dataset_red_channel_dose.shape[0]):
-        messagebox.showwarning("Warning", "Reached end of film \n(Code: adjustROILeft)")
+        messagebox.showwarning("Warning", "Reached end of film \n(Code: adjustROIDown)")
         return
     Globals.profiles_film_variable_ROI_coords = \
         [Globals.profiles_film_variable_ROI_coords[0]+1, Globals.profiles_film_variable_ROI_coords[1]+1,\
@@ -668,12 +687,13 @@ def adjustROIDown():
             [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
                 Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
     Globals.profiles_first_time_in_drawProfiles = True
-    drawProfiles()
+    drawProfiles(False)
 
-def returnToOriginalROICoordinates():
-    Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
-    Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
-    Globals.film_write_image.delete(Globals.profiles_lines[2])
+def returnToOriginalROICoordinates(line_orient):
+    if not line_orient == 'd':
+        Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
+        Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
+        Globals.film_write_image.delete(Globals.profiles_lines[2])
     Globals.profiles_film_variable_ROI_coords = \
         [Globals.profiles_ROI_coords[0][1], Globals.profiles_ROI_coords[2][1],\
                 Globals.profiles_ROI_coords[0][0], Globals.profiles_ROI_coords[1][0]]
@@ -683,7 +703,7 @@ def returnToOriginalROICoordinates():
             [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
                 Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
     Globals.profiles_first_time_in_drawProfiles = True
-    drawProfiles()
+    drawProfiles(False)
 
 def pixel_to_dose(P,a,b,c):
     ret = c + b/(P-a)
@@ -1193,7 +1213,7 @@ def processDoseplan_usingReferencePoint(only_one):
         doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
         doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
 
-        drawProfiles()
+        drawProfiles(False)
     
     else:
         img=dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
@@ -1740,7 +1760,7 @@ def processDoseplan_usingIsocenter(only_one):
         doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
         doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
 
-        drawProfiles()
+        drawProfiles(False)
 
     else:
         img=dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
@@ -1964,7 +1984,7 @@ def UploadDoseplan_button_function():
         Globals.profiles_upload_button_doseplan.config(state=DISABLED)
 
         several_doseplans_window.after(500, lambda: several_doseplans_window.destroy())
-        drawProfiles()
+        drawProfiles(False)
 
     doseplans_done_button_frame = tk.Frame(Globals.doseplans_scroll_frame)
     doseplans_done_button_frame.grid(row=0, column = 1, padx=(0,40), pady=(30,0), sticky=N+S+W+E)

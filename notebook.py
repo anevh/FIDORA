@@ -873,31 +873,31 @@ profiles_resetAll_button.image = dose_response_clear_all_button_image
 
 
 Globals.profiles_adjust_button_left = tk.Button(Globals.profiles_redefine_film_ROI_frame, text="left", image=Globals.adjust_button_left_image,\
-    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Profile_functions.adjustROILeft)
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=lambda: Profile_functions.adjustROILeft(Globals.profiles_choice_of_profile_line_type.get()))
 Globals.profiles_adjust_button_left.pack(side=LEFT)
 Globals.profiles_adjust_button_left.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 Globals.profiles_adjust_button_left.image = Globals.adjust_button_left_image
 
 Globals.profiles_adjust_button_up = tk.Button(Globals.profiles_redefine_film_ROI_frame, text="left", image=Globals.adjust_button_up_image,\
-    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Profile_functions.adjustROIUp)
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=lambda: Profile_functions.adjustROIUp(Globals.profiles_choice_of_profile_line_type.get()))
 Globals.profiles_adjust_button_up.pack(side=LEFT)
 Globals.profiles_adjust_button_up.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 Globals.profiles_adjust_button_up.image = Globals.adjust_button_up_image
 
 Globals.profiles_adjust_button_down = tk.Button(Globals.profiles_redefine_film_ROI_frame, text="left", image=Globals.adjust_button_down_image,\
-    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Profile_functions.adjustROIDown)
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=lambda: Profile_functions.adjustROIDown(Globals.profiles_choice_of_profile_line_type.get()))
 Globals.profiles_adjust_button_down.pack(side=LEFT)
 Globals.profiles_adjust_button_down.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 Globals.profiles_adjust_button_down.image = Globals.adjust_button_down_image
 
 Globals.profiles_adjust_button_right = tk.Button(Globals.profiles_redefine_film_ROI_frame, text="left", image=Globals.adjust_button_right_image,\
-    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Profile_functions.adjustROIRight)
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=lambda: Profile_functions.adjustROIRight(Globals.profiles_choice_of_profile_line_type.get()))
 Globals.profiles_adjust_button_right.pack(side=LEFT)
 Globals.profiles_adjust_button_right.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 Globals.profiles_adjust_button_right.image = Globals.adjust_button_right_image
 
 Globals.profiles_adjust_button_return = tk.Button(Globals.profiles_redefine_film_ROI_frame, text="Original",\
-    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=Profile_functions.returnToOriginalROICoordinates)
+    cursor='hand2', font=('calibri', '12'), relief=FLAT, state=DISABLED, command=lambda:Profile_functions.returnToOriginalROICoordinates(Globals.profiles_choice_of_profile_line_type.get()))
 Globals.profiles_adjust_button_return.pack(side=LEFT)
 Globals.profiles_adjust_button_return.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 
