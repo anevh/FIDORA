@@ -435,16 +435,18 @@ profile_plot_canvas = tk.Canvas(tab4_canvas)
 profile_plot_canvas.grid(row=4, column=0, rowspan=10, columnspan=2, sticky=N+E+W, pady=(0,5), padx=(5,10))
 tab4_canvas.grid_columnconfigure(4, weight=0)
 tab4_canvas.grid_rowconfigure(4, weight=0)
-profile_plot_canvas.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
+profile_plot_canvas.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0, width=500, height=500)
+profile_plot_canvas.grid_propagate(0)
 
 profiles_fig = Figure(figsize=(5,3))
 profiles_a = profiles_fig.add_subplot(111, ylim=(0,40000), xlim=(0,500))
 profiles_plot_canvas = FigureCanvasTkAgg(profiles_fig, master=profile_plot_canvas)
-profiles_plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+E+W, padx=(5,0), pady=(0,0))
+profiles_plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+E+W+S, padx=(5,0), pady=(0,0))
 profiles_a.set_title ("Profiles", fontsize=12)
 profiles_a.set_ylabel("Dose (Gy)", fontsize=12)
 profiles_a.set_xlabel("Distance (mm)", fontsize=12)
 profiles_fig.tight_layout()
+
 
 global profiles_showPlanes_image
 global profiles_showDirections_image
@@ -681,6 +683,7 @@ global profiles_line_coords_doseplan
 global profiles_dataset_film_variable_draw
 global profiles_dataset_doesplan_variable_draw
 
+global max_dose_doseplan
 ############################## DVH related ############################################
 """
 global DVH_film_orientation

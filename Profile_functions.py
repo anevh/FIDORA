@@ -14,7 +14,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib as mpl
 from matplotlib import cm
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg,  NavigationToolbar2Tk
 import numpy as np
 
 
@@ -270,10 +270,19 @@ def drawProfiles(even):
         
     def draw(line_orient, dataset_film, dataset_doseplan):
         Globals.profile_plot_canvas.delete('all')
-        fig = Figure(figsize=(5,3))
+        fig= Figure(figsize=(5,3))
         a = fig.add_subplot(111)
         plot_canvas = FigureCanvasTkAgg(fig, master=Globals.profile_plot_canvas)
-        plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+E+W, padx=(5,0), pady=(0,0))
+        plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+E+W+S, padx=(5,0), pady=(0,0))
+        #annotation = a.annotate("HEI", xy=(0,0), xytext=(0,20))
+        #annotation.set_visible(False)
+        txt = tk.Text(Globals.profile_plot_canvas, width=50, height=6)
+        txt.insert(INSERT, " ")
+        txt.grid(row=1, column = 1, sticky=N+E+W+S, pady=(5,0), padx=(5,0))  
+        txt.config(bg='#ffffff', font=('calibri', '10'), state=DISABLED, relief=FLAT, bd= 0)
+        
+        #a.text(0,0, "", fontsize=7, bbox=dict(facecolor='gray', alpha=0.1))
+        #txt.set_visible(False)
 
         if line_orient == 'h':
             if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
@@ -321,7 +330,7 @@ def drawProfiles(even):
                 start_d_x, start_d_y = Globals.profiles_line_coords_doseplan[0]
                 end_d_x, end_d_y = Globals.end_point
                 end_d_x=end_d_x/15; end_d_y=end_d_y/15
-                dy=np.sqrt(((end_d_x*-start_d_x)*3)**2 + ((end_d_y-start_d_y)*3)**2)/2
+                dy=np.sqrt(((end_d_x-start_d_x)*3)**2 + ((end_d_y-start_d_y)*3)**2)/2
             
                 
             x = np.linspace(-dx,dx,len(dataset_film))
@@ -333,21 +342,97 @@ def drawProfiles(even):
 
         else:
             messagebox.showerror("Error", "Fatal error. Something has gone wrong, try again \n(Code: draw")
+            return
 
-        film_left_20, film_left_80, film_right_20, film_right_80, \
-            doseplan_left_20, doseplan_left_80, doseplan_right_20, doseplan_right_80,\
-                y_max = calculate_stats(plot_film, plot_doseplan)
-
-        if Globals.profiles_choice_of_penumbra.get():
-            a.axvline(-dx + dx/len(dataset_film)*film_left_20,0, y_max)
-            a.axvline(-dx + dx/len(dataset_film)*film_left_80, 0, y_max)
-            a.axvline(-dx + dx/len(dataset_film)*film_right_20, 0, y_max)
+       
         a.legend(('Film', 'Doseplan'))
         a.set_title("Profiles", fontsize=12)
         a.set_ylabel("Dose (Gy)", fontsize=12)
         a.set_xlabel("Distance (mm)", fontsize=12)
-        fig.tight_layout()
-        
+
+        #def update_annonation(x_val, y_val, notation):
+        #    annotation.xytext = (x_val-5, y_val)
+        #    annotation.xy = (x_val, y_val)
+        #    annotation.set_text = notation
+        #    print(notation)
+        #    annotation.set_visible(True)
+        #    print(x_val, y_val)
+
+
+        def mouseMove(event):
+            if event.inaxes == a:
+                dist = event.xdata
+                idx_film = np.searchsorted(x, dist)
+                idx_doseplan = np.searchsorted(y, dist)
+                if idx_film == 0:
+                    idx_film = 0
+                elif idx_film == len(x):
+                    idx_film = len(x)-1
+                else:
+                    if abs(x[idx_film-1]-dist) < abs(x[idx_film]-dist):
+                        idx_film = idx_film-1
+                    else:
+                        idx_film = idx_film
+                if idx_doseplan == 0:
+                    idx_doseplan = 0
+                elif idx_doseplan == len(y):
+                    idx_doseplan = len(y)-1
+                else:
+                    if abs(y[idx_doseplan-1]-dist) < abs(y[idx_doseplan]-dist):
+                        idx_doseplan = idx_doseplan-1
+                    else:
+                        idx_doseplan = idx_doseplan
+                
+                idx_film = int(np.round(idx_film))
+                if idx_film < 0:
+                    idx_film = 0
+                if idx_film >= len(plot_film):
+                    idx_film = len(plot_film) - 1
+                #if Globals.profiles_dataset_doseplan.PixelSpacing == [1, 1]:
+                #    idx_doseplan = int(np.round(idx_doseplan/1))
+                #elif Globals.profiles_dataset_doseplan.PixelSpacing == [2, 2]:
+                #    idx_doseplan = int(np.round(idx_doseplan/2))
+                ##else:
+                #    idx_doseplan = np.round(idx_doseplan/3)
+                idx_doseplan = int(np.round(idx_doseplan))
+                if idx_doseplan < 0:
+                    idx_doseplan = 0
+                if idx_doseplan >= len(plot_doseplan):
+                    idx_doseplan = len(plot_doseplan) - 1
+                match = "Graph match: " + \
+                    str(np.round(min(plot_film[idx_film], plot_doseplan[idx_doseplan])/max(plot_film[idx_film], plot_doseplan[idx_doseplan])*100, 2)) + "\n"
+                distance = "Distance: " + str(np.round(dist,2)) + "\n"
+                film = "\t\tFILM: \t\t\t"
+                dose_film = "Dose: \t" + str(np.round(plot_film[idx_film],2)) + "\t\t\t"
+                rel_target_dose_film = "Relative to target dose: " + str(np.round(100*plot_film[idx_film]/Globals.max_dose_doseplan,2)) + "\t\t\t"
+                rel_mx_dose_ROI_film = "Relative to max dose in ROI: " + str(np.round(100*plot_film[idx_film]/np.max(plot_film),2)) + "\t\t\t"
+                doseplan = "DOSEPLAN: \n"
+                dose_doseplan = str(np.round(plot_doseplan[idx_doseplan],2)) + "\n"
+                rel_target_dose_doseplan =  str(np.round(100*plot_doseplan[idx_doseplan]/Globals.max_dose_doseplan,2)) + "\n"
+                rel_mx_dose_ROI_doseplan =  str(np.round(100*plot_doseplan[idx_doseplan]/np.max(plot_doseplan),2))
+                notation = match+distance+\
+                    film+doseplan+\
+                        dose_film+dose_doseplan+\
+                            rel_target_dose_film+rel_target_dose_doseplan+\
+                                rel_mx_dose_ROI_film+rel_mx_dose_ROI_doseplan
+
+                
+                #txt.set_text(notation)
+                #txt.x =dist
+                #txt.y =event.ydata
+                #txt.set_visible(True)
+                #update_annonation(event.xdata, event.ydata, notation)
+                #fig.canvas.draw_idle()
+                #txt.delete("1.0", END)
+                txt.config(state=NORMAL)
+                txt.delete("1.0", END)
+                txt.insert(INSERT, notation)
+                txt.config(state=DISABLED)
+            else:
+                return
+
+        cid = fig.canvas.mpl_connect('motion_notify_event', mouseMove)
+        fig.tight_layout()        
 
 
     if even:
@@ -1519,7 +1604,7 @@ def processDoseplan_usingReferencePoint(only_one):
             img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
 
         mx=np.max(img)
-        #max_dose = mx*Globals.profiles_dose_scaling_doseplan
+        Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan
         img = img/mx
         PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
 
@@ -2066,6 +2151,7 @@ def processDoseplan_usingIsocenter(only_one):
             img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
 
         mx=np.max(img)
+        Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan
         max_dose = mx*Globals.profiles_dose_scaling_doseplan
         img = img/mx
         PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
