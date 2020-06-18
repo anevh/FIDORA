@@ -109,10 +109,154 @@ def getCoordsInRandomLine(x1,y1,x2,y2):
         points.reverse()
     return points
 
+def calculate_stats(dataset_film, dataset_doseplan):
+    sum_film=0;sum_doseplan=0;cent=0
+    for i in range(len(dataset_doseplan)):
+        if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+            sum_doseplan+=dataset_doseplan[i]
+        elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+            sum_doseplan+=dataset_doseplan[i]*2
+        else:
+            sum_doseplan+=dataset_doseplan[i]*3
+    for i in range(len(dataset_film)):
+        sum_film+=dataset_film[i]*0.2
+    
+    if(sum_film < sum_doseplan):
+        cent=(sum_film/sum_doseplan)*100
+    else:
+        cent=(sum_doseplan/sum_film)*100
+    
+    dataset_film_reversed = np.flip(dataset_film)
+    dataset_doseplan_reversed = np.flip(dataset_doseplan)
 
+    max_film=np.max(dataset_film);max_doseplan=np.max(dataset_doseplan)
+
+    not_finished = True;i=0
+    while not_finished:
+        if dataset_film[i] > 0.2*max_film:
+            film_penumbra_left_20_coord = i
+            not_finished = False
+        i+=1
+    not_finished = True;i=0
+    while not_finished:
+        if dataset_film[i] > 0.8*max_film:
+            film_penumbra_left_80_coord = i
+            not_finished = False
+        i+=1
+    not_finished = True;i=0
+    while not_finished:
+        if dataset_film_reversed[i] > 0.2*max_film:
+            film_penumbra_right_20_coord = i
+            not_finished = False
+        i+=1
+    not_finished = True;i=0
+    while not_finished:
+        if dataset_film_reversed[i] > 0.8*max_film:
+            film_penumbra_right_80_coord = i
+            not_finished = False
+        i+=1
+    if Globals.profiles_choice_of_profile_line_type.get() == 'h' or Globals.profiles_choice_of_profile_line_type.get() == 'v':
+        if film_penumbra_left_20_coord > film_penumbra_left_80_coord:
+            film_penumbra_left = "None"
+        else:
+            film_penumbra_left = str((film_penumbra_left_80_coord-film_penumbra_left_20_coord)*0.2)
+        if film_penumbra_right_20_coord > film_penumbra_right_80_coord:
+            film_penumbra_right = "None"
+        else:
+            film_penumbra_right=str((film_penumbra_right_80_coord-film_penumbra_right_20_coord)*0.2)
+    else:
+        if film_penumbra_left_20_coord > film_penumbra_left_80_coord:
+            film_penumbra_left = "None"
+        else:
+            start_c_x, start_c_y = Globals.profiles_line_coords_film[film_penumbra_left_20_coord]
+            end_c_x,end_c_y = Globals.profiles_line_coords_film[film_penumbra_left_80_coord]
+            film_penumbra_left = str(np.sqrt(((end_c_x-start_c_x)*0.2)**2 + ((end_c_y-start_c_y)*0.2)**2))
+        if film_penumbra_right_20_coord > film_penumbra_right_80_coord:
+            film_penumbra_right="None"
+        else:
+            start_c_x, start_c_y = Globals.profiles_line_coords_film[len(dataset_film)-film_penumbra_right_20_coord]
+            end_c_x,end_c_y = Globals.profiles_line_coords_film[len(dataset_film)-film_penumbra_right_80_coord]
+            film_penumbra_right = str(np.sqrt(((end_c_x-start_c_x)*0.2)**2 + ((end_c_y-start_c_y)*0.2)**2))
+    
+    not_finished=True;i=0
+    while not_finished:
+        if dataset_doseplan[i] > 0.2*max_doseplan:
+            doseplan_penumbra_left_20_coord = i
+            not_finished=False
+        i+=1
+    not_finished=True;i=0
+    while not_finished:
+        if dataset_doseplan[i] > 0.8*max_doseplan:
+            doseplan_penumbra_left_80_coord = i
+            not_finished=False
+        i+=1
+    not_finished=True;i=0
+    while not_finished:
+        if dataset_doseplan_reversed[i] > 0.2*max_doseplan:
+            doseplan_penumbra_right_20_coord = i
+            not_finished=False
+        i+=1
+    not_finished=True;i=0
+    while not_finished:
+        if dataset_doseplan_reversed[i] > 0.8*max_doseplan:
+            doseplan_penumbra_right_80_coord = i
+            not_finished=False
+        i+=1
+    if Globals.profiles_choice_of_profile_line_type.get() == 'h' or Globals.profiles_choice_of_profile_line_type.get() == 'v':
+        if doseplan_penumbra_left_20_coord > doseplan_penumbra_left_80_coord:
+            doseplan_penumbra_left = "None"
+        else:
+            if Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]:
+                doseplan_penumbra_left = str((doseplan_penumbra_left_80_coord-doseplan_penumbra_left_20_coord))
+            elif Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]:
+                doseplan_penumbra_left = str((doseplan_penumbra_left_80_coord-doseplan_penumbra_left_20_coord)*2)
+            else:
+                doseplan_penumbra_left=str((doseplan_penumbra_left_80_coord-doseplan_penumbra_left_80_coord)*3)
+        if doseplan_penumbra_right_20_coord > doseplan_penumbra_right_80_coord:
+            doseplan_penumbra_right = "None"
+        else:
+            if Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]:
+                doseplan_penumbra_right=str((doseplan_penumbra_right_80_coord-doseplan_penumbra_right_20_coord))
+            elif Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]:
+                doseplan_penumbra_right=str((doseplan_penumbra_right_80_coord-doseplan_penumbra_right_20_coord)*2)
+            else:
+                doseplan_penumbra_right=str((doseplan_penumbra_right_80_coord-doseplan_penumbra_right_20_coord)*3)    
+    else:
+        if doseplan_penumbra_left_20_coord > doseplan_penumbra_left_80_coord:
+            doseplan_penumbra_left = "None"
+        else:
+            start_c_x, start_c_y = Globals.profiles_line_coords_doseplan[doseplan_penumbra_left_20_coord]
+            end_c_x,end_c_y = Globals.profiles_line_coords_doseplan[doseplan_penumbra_left_80_coord]
+            if Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]:
+                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x))**2 + ((end_c_y-start_c_y))**2))
+            elif Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]:
+                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x)*2)**2 + ((end_c_y-start_c_y)*2)**2))
+            else:
+                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x)*3)**2 + ((end_c_y-start_c_y)*3)**2))
+        if doseplan_penumbra_right_20_coord > doseplan_penumbra_right_80_coord:
+            doseplan_penumbra_right="None"
+        else:
+            start_c_x, start_c_y = Globals.profiles_line_coords_doseplan[len(dataset_doseplan)-doseplan_penumbra_right_20_coord]
+            end_c_x,end_c_y = Globals.profiles_line_coords_doseplan[len(dataset_doseplan)-doseplan_penumbra_right_80_coord]
+            if Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]:
+                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x))**2 + ((end_c_y-start_c_y))**2))
+            elif Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]:
+                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x)*2)**2 + ((end_c_y-start_c_y)*2)**2))
+            else:
+                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x)*3)**2 + ((end_c_y-start_c_y)*3)**2))
+    #HAR:
+    #cent - prosent match
+    #film_penumbra_left - lengden av left penumbra
+    #film_punumbra_right - lengden av right penumbra
+    #doseplan_penumbra_right - lenden av right penumbra
+    #doseplan_penumbra_left - lengden av left penumbra
+    return film_penumbra_left_20_coord, film_penumbra_left_80_coord, film_penumbra_right_20_coord, film_penumbra_right_80_coord,\
+        doseplan_penumbra_left_20_coord, doseplan_penumbra_left_80_coord, doseplan_penumbra_right_20_coord, doseplan_penumbra_right_80_coord,\
+            max(max_film, max_doseplan)
 
 def drawProfiles(even):
-    Globals.profiles_lines = []
+    if Globals.profiles_choice_of_profile_line_type.get() == 'h' or Globals.profiles_choice_of_profile_line_type.get() == 'v':
+        Globals.profiles_lines = []
 
     if Globals.profiles_dataset_doseplan == None:
         return
@@ -132,29 +276,84 @@ def drawProfiles(even):
         plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+E+W, padx=(5,0), pady=(0,0))
 
         if line_orient == 'h':
-            x = np.linspace(0,10, dataset_film.shape[1])
-            y = np.linspace(0,10, Globals.profiles_doseplan_dataset_ROI.shape[1])
-            a.plot(x,dataset_film[Globals.profiles_coordinate_in_dataset,:]/100, 'r')
-            a.plot(y,dataset_doseplan[Globals.profiles_coordinate_in_dataset, :]*Globals.profiles_dataset_doseplan.DoseGridScaling, 'b')
+            if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+                dy = Globals.profiles_doseplan_dataset_ROI.shape[1]/2
+            elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+                dy = Globals.profiles_doseplan_dataset_ROI.shape[1]/4
+            else:
+                dy = Globals.profiles_doseplan_dataset_ROI.shape[1]/6
+            dx = dataset_film.shape[1]*0.2/2
+            x = np.linspace(-dx,dx, dataset_film.shape[1])
+            y = np.linspace(-dy,dy, Globals.profiles_doseplan_dataset_ROI.shape[1])
+            plot_film = dataset_film[Globals.profiles_coordinate_in_dataset,:]/100
+            plot_doseplan = dataset_doseplan[Globals.profiles_coordinate_in_dataset, :]*Globals.profiles_dataset_doseplan.DoseGridScaling
+            a.plot(x,plot_film, 'r')
+            a.plot(y,plot_doseplan, 'b')
         elif line_orient == 'v':
-            x = np.linspace(0,10, dataset_film.shape[0])
-            y = np.linspace(0,10, Globals.profiles_doseplan_dataset_ROI.shape[0])
-            a.plot(x,dataset_film[:,Globals.profiles_coordinate_in_dataset]/100, 'r')
-            a.plot(y,Globals.profiles_doseplan_dataset_ROI[:, Globals.profiles_coordinate_in_dataset]*Globals.profiles_dataset_doseplan.DoseGridScaling, 'b')
+            if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+                dy = Globals.profiles_doseplan_dataset_ROI.shape[0]/2
+            elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+                dy = Globals.profiles_doseplan_dataset_ROI.shape[0]/4
+            else:
+                dy = Globals.profiles_doseplan_dataset_ROI.shape[0]/6
+            dx = dataset_film.shape[0]*0.2/2
+            x = np.linspace(-dx,dx, dataset_film.shape[0])
+            y = np.linspace(-dy,dy, Globals.profiles_doseplan_dataset_ROI.shape[0])
+            plot_film = dataset_film[:,Globals.profiles_coordinate_in_dataset]/100
+            plot_doseplan = dataset_doseplan[:, Globals.profiles_coordinate_in_dataset]*Globals.profiles_dataset_doseplan.DoseGridScaling  #Globals.profiles_doseplan_dataset_ROI
+            a.plot(x,plot_film, 'r')
+            a.plot(y,plot_doseplan, 'b')
         elif line_orient == 'd':
-            x = np.linspace(0,10,len(dataset_film))
-            y = np.linspace(0,10,len(dataset_doseplan))
-            a.plot(x, dataset_film/100, 'r')
-            a.plot(y, dataset_doseplan*Globals.profiles_dataset_doseplan.DoseGridScaling, 'b')
+            start_f_x, start_f_y = Globals.profiles_line_coords_film[0]
+            end_f_x, end_f_y = Globals.end_point
+            dx=np.sqrt(((end_f_x-start_f_x)*0.2)**2 + ((end_f_y-start_f_y)*0.2)**2)/2
+            if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
+                start_d_x, start_d_y = Globals.profiles_line_coords_doseplan[0]
+                end_d_x, end_d_y = Globals.end_point
+                end_d_x=end_d_x/5; end_d_y=end_d_y/5
+                dy=np.sqrt(((end_d_x-start_d_x))**2 + ((end_d_y-start_d_y))**2)/2
+            elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
+                start_d_x, start_d_y = Globals.profiles_line_coords_doseplan[0]
+                end_d_x, end_d_y = Globals.end_point
+                end_d_x=end_d_x/10; end_d_y=end_d_y/10
+                dy=np.sqrt(((end_d_x-start_d_x)*2)**2 + ((end_d_y-start_d_y)*2)**2)/2
+            else:
+                start_d_x, start_d_y = Globals.profiles_line_coords_doseplan[0]
+                end_d_x, end_d_y = Globals.end_point
+                end_d_x=end_d_x/15; end_d_y=end_d_y/15
+                dy=np.sqrt(((end_d_x*-start_d_x)*3)**2 + ((end_d_y-start_d_y)*3)**2)/2
+            
+                
+            x = np.linspace(-dx,dx,len(dataset_film))
+            y = np.linspace(-dy,dy,len(dataset_doseplan))
+            plot_film=dataset_film/100
+            plot_doseplan=dataset_doseplan*Globals.profiles_dataset_doseplan.DoseGridScaling
+            a.plot(x,plot_film, 'r')
+            a.plot(y,plot_doseplan, 'b')
 
         else:
             messagebox.showerror("Error", "Fatal error. Something has gone wrong, try again \n(Code: draw")
+
+        film_left_20, film_left_80, film_right_20, film_right_80, \
+            doseplan_left_20, doseplan_left_80, doseplan_right_20, doseplan_right_80,\
+                y_max = calculate_stats(plot_film, plot_doseplan)
+
+        if Globals.profiles_choice_of_penumbra.get():
+            a.axvline(-dx + dx/len(dataset_film)*film_left_20,0, y_max)
+            a.axvline(-dx + dx/len(dataset_film)*film_left_80, 0, y_max)
+            a.axvline(-dx + dx/len(dataset_film)*film_right_20, 0, y_max)
         a.legend(('Film', 'Doseplan'))
         a.set_title("Profiles", fontsize=12)
         a.set_ylabel("Pixel value", fontsize=12)
         a.set_xlabel("Distance (mm)", fontsize=12)
         fig.tight_layout()
+        
 
+
+    if even:
+        draw('d', Globals.profiles_dataset_film_variable_draw, Globals.profiles_dataset_doesplan_variable_draw)
+        return
+    
 
     if(Globals.profiles_choice_of_profile_line_type.get() == 'h' and Globals.profiles_dataset_doseplan.PixelSpacing == [1, 1]):
         dataset_film = np.zeros(\
@@ -534,7 +733,6 @@ def drawProfiles(even):
         start_point = [0,0]
         def mousePushed(event):
             start_point = [event.x, event.y]
-            print(start_point)
             if not len(Globals.profiles_lines)==0:
                 Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
                 Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
@@ -563,21 +761,21 @@ def drawProfiles(even):
                 Globals.doseplan_write_image.coords(line_doseplan, start_point[0], start_point[1], event.x, event.y)
                 Globals.film_dose_write_image.coords(line_film_dosemap, start_point[0], start_point[1], event.x, event.y)
                 Globals.film_write_image.coords(line_film, start_point[0], start_point[1], event.x, event.y)
-                Globals.line_coords_film = getCoordsInRandomLine(start_point[1], start_point[0], Globals.end_point[1], Globals.end_point[0])
-                Globals.line_coords_doseplan = getCoordsInRandomLine(int(start_point[1]/5), int(start_point[0]/5), \
+                Globals.profiles_line_coords_film = getCoordsInRandomLine(start_point[1], start_point[0], Globals.end_point[1], Globals.end_point[0])
+                Globals.profiles_line_coords_doseplan = getCoordsInRandomLine(int(start_point[1]/5), int(start_point[0]/5), \
                     int(Globals.end_point[1]/5), int(Globals.end_point[0]/5))
-                dataset_film = np.zeros(len(Globals.line_coords_film))
-                dataset_doseplan=np.zeros(len(Globals.line_coords_doseplan))
+                Globals.profiles_dataset_film_variable_draw = np.zeros(len(Globals.profiles_line_coords_film))
+                Globals.profiles_dataset_doesplan_variable_draw=np.zeros(len(Globals.profiles_line_coords_doseplan))
                 
-                for i in range(len(dataset_film)):
-                    coord = Globals.line_coords_film[i]
+                for i in range(len(Globals.profiles_dataset_film_variable_draw)):
+                    coord = Globals.profiles_line_coords_film[i]
                     #print(coord[1], ", ", coord[0])
-                    dataset_film[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+                    Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
                 
-                for i in range(len(dataset_doseplan)):
-                    dataset_doseplan[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.line_coords_doseplan[i][0]), int(Globals.line_coords_doseplan[i][1])]
+                for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
+                    Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
 
-                draw('d', dataset_film, dataset_doseplan)
+                draw('d', Globals.profiles_dataset_film_variable_draw, Globals.profiles_dataset_doesplan_variable_draw)
 
             Globals.film_dose_write_image.bind("<ButtonRelease-1>", mouseReleased)
         Globals.film_dose_write_image.bind("<Button-1>", mousePushed)
@@ -591,8 +789,13 @@ def drawProfiles(even):
         messagebox.showerror("Error", "Fatal error. Something went wrong, try again \n(Code: drawProfiles)")
         return
         
+def trace_profileLineType(var, indx, mode):
+    test_drawProfiles()
 
-def test_drawProfiles(var, indx, mode):
+def trace_choiceOfPenumbra(car, indx, mode):
+    test_drawProfiles()
+
+def test_drawProfiles():
     if Globals.profiles_dataset_doseplan == None:
         return
     else:
@@ -624,13 +827,13 @@ def adjustROILeft(line_orient):
                 Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
     Globals.profiles_first_time_in_drawProfiles = True
     if line_orient == 'd':
-        for i in range(len(dataset_film)):
-            coord = Globals.line_coords_film[i]
+        for i in range(len(Globals.profiles_dataset_film_variable_draw)):
+            coord = Globals.profiles_line_coords_film[i]
             #print(coord[1], ", ", coord[0])
-            dataset_film[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
                 
-        for i in range(len(dataset_doseplan)):
-            dataset_doseplan[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.line_coords_doseplan[i][0]), int(Globals.line_coords_doseplan[i][1])]
+        for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
+            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
         drawProfiles(True)
     else:
         drawProfiles(False)
@@ -651,7 +854,17 @@ def adjustROIRight(line_orient):
             [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
                 Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
     Globals.profiles_first_time_in_drawProfiles = True
-    drawProfiles(False)
+    if line_orient == 'd':
+        for i in range(len(Globals.profiles_dataset_film_variable_draw)):
+            coord = Globals.profiles_line_coords_film[i]
+            #print(coord[1], ", ", coord[0])
+            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+                
+        for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
+            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+        drawProfiles(True)
+    else:
+        drawProfiles(False)
 
 def adjustROIUp(line_orient):
     if not line_orient == 'd':
@@ -669,7 +882,17 @@ def adjustROIUp(line_orient):
             [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
                 Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
     Globals.profiles_first_time_in_drawProfiles = True
-    drawProfiles(False)
+    if line_orient == 'd':
+        for i in range(len(Globals.profiles_dataset_film_variable_draw)):
+            coord = Globals.profiles_line_coords_film[i]
+            #print(coord[1], ", ", coord[0])
+            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+                
+        for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
+            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+        drawProfiles(True)
+    else:
+        drawProfiles(False)
 
 def adjustROIDown(line_orient):
     if not line_orient == 'd':
@@ -687,7 +910,17 @@ def adjustROIDown(line_orient):
             [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
                 Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
     Globals.profiles_first_time_in_drawProfiles = True
-    drawProfiles(False)
+    if line_orient == 'd':
+        for i in range(len(Globals.profiles_dataset_film_variable_draw)):
+            coord = Globals.profiles_line_coords_film[i]
+            #print(coord[1], ", ", coord[0])
+            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+                
+        for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
+            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+        drawProfiles(True)
+    else:
+        drawProfiles(False)
 
 def returnToOriginalROICoordinates(line_orient):
     if not line_orient == 'd':
@@ -703,7 +936,17 @@ def returnToOriginalROICoordinates(line_orient):
             [Globals.profiles_film_variable_ROI_coords[0]:Globals.profiles_film_variable_ROI_coords[1],\
                 Globals.profiles_film_variable_ROI_coords[2]:Globals.profiles_film_variable_ROI_coords[3]]
     Globals.profiles_first_time_in_drawProfiles = True
-    drawProfiles(False)
+    if line_orient == 'd':
+        for i in range(len(Globals.profiles_dataset_film_variable_draw)):
+            coord = Globals.profiles_line_coords_film[i]
+            #print(coord[1], ", ", coord[0])
+            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+                
+        for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
+            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+        drawProfiles(True)
+    else:
+        drawProfiles(False)
 
 def pixel_to_dose(P,a,b,c):
     ret = c + b/(P-a)

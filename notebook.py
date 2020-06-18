@@ -861,7 +861,7 @@ Globals.tab4_canvas.grid_rowconfigure(31, weight=0)
 
 
 profiles_resetAll_frame = tk.Frame(Globals.tab4_canvas)
-profiles_resetAll_frame.grid(row=15,column=0, padx=(0,0), pady=(0,0), sticky=S)
+profiles_resetAll_frame.grid(row=18,column=0, padx=(0,0), pady=(0,0), sticky=S)
 Globals.tab4_canvas.grid_columnconfigure(5, weight=0)
 Globals.tab4_canvas.grid_rowconfigure(5, weight=0)
 profiles_resetAll_frame.config(bg='#ffffff')
@@ -902,7 +902,8 @@ Globals.profiles_adjust_button_return = tk.Button(Globals.profiles_redefine_film
 Globals.profiles_adjust_button_return.pack(side=LEFT)
 Globals.profiles_adjust_button_return.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 
-Globals.profiles_choice_of_profile_line_type.trace_add('write', Profile_functions.test_drawProfiles)
+Globals.profiles_choice_of_profile_line_type.trace_add('write', Profile_functions.trace_profileLineType)
+Globals.profiles_choice_of_penumbra.trace_add('write', Profile_functions.trace_choiceOfPenumbra)
 
 Globals.tab4_canvas.pack(expand=True, fill=BOTH)
 

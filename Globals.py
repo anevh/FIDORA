@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, StringVar, IntVar, Scrollbar, RIGHT, Y, \
     HORIZONTAL, E, W, N, S, BOTH, Frame, Canvas, LEFT, FLAT, INSERT, DISABLED, ALL, X, BOTTOM, \
-    DoubleVar, PanedWindow, RAISED, TOP, Radiobutton, CENTER
+    DoubleVar, PanedWindow, RAISED, TOP, Radiobutton, CENTER, BooleanVar
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -442,7 +442,7 @@ profiles_a = profiles_fig.add_subplot(111, ylim=(0,40000), xlim=(0,500))
 profiles_plot_canvas = FigureCanvasTkAgg(profiles_fig, master=profile_plot_canvas)
 profiles_plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+E+W, padx=(5,0), pady=(0,0))
 profiles_a.set_title ("Profiles", fontsize=12)
-profiles_a.set_ylabel("Pixel value", fontsize=12)
+profiles_a.set_ylabel("Dose (Gy)", fontsize=12)
 profiles_a.set_xlabel("Distance (mm)", fontsize=12)
 profiles_fig.tight_layout()
 
@@ -539,11 +539,27 @@ global profiles_choice_of_profile_line_type
 profiles_choice_of_profile_line_type = StringVar()
 profiles_choice_of_profile_line_type.set("h")
 
+global profiles_choice_of_penumbra
+profiles_choice_of_penumbra = BooleanVar()
+profiles_choice_of_penumbra.set(False)
+
+profiles_choose_penumbra_text = tk.Text(tab4_canvas, height=1, width=30)
+profiles_choose_penumbra_text.insert(INSERT, "Show penumbra in plot?")
+profiles_choose_penumbra_text.grid(row=15, column=0, sticky=N+W)
+profiles_choose_penumbra_text.config(bg='#ffffff', relief=FLAT, \
+highlightthickness=0, state=DISABLED, font=('calibri', '11'))
+Radiobutton(tab4_canvas, text="No", variable=profiles_choice_of_penumbra,\
+    value=False, bg='#ffffff', cursor='hand2').grid(row=16, column=0, sticky=N+W)
+Radiobutton(tab4_canvas, text="Yes", variable=profiles_choice_of_penumbra,\
+    value=True, bg='#ffffff', cursor='hand2').grid(row=16, column=0, sticky=N+W, padx=(60,0))
+
 profiles_choose_profile_type_text = tk.Text(profiles_choose_profile_canvas, height=1)
 profiles_choose_profile_type_text.insert(INSERT, "How to draw the profile:")
 profiles_choose_profile_type_text.pack(side=TOP)
 profiles_choose_profile_type_text.config(bg='#ffffff', relief=FLAT, \
 highlightthickness=0, state=DISABLED, font=('calibri', '11'))
+
+
 
 Radiobutton(profiles_choose_profile_canvas, text="Horizontal", variable=profiles_choice_of_profile_line_type, \
     value="h", bg='#ffffff', cursor='hand2').pack(side=LEFT)
@@ -630,6 +646,40 @@ global profiles_isocenter_or_reference_point
 global profiles_lateral
 global profiles_vertical
 global profiles_longitudinal
+
+global profiles_number_of_doseplans
+profiles_number_of_doseplans = 0
+global profiles_number_of_doseplans_row_count
+profiles_number_of_doseplans_row_count = 4
+global profiles_doseplans_grid_config_count
+profiles_doseplans_grid_config_count = 6
+global profiles_doseplans_filenames
+profiles_doseplans_filenames = []
+global profiles_doseplans_factor_text
+profiles_doseplans_factor_text = []
+global profiles_doseplans_factor_input
+profiles_doseplans_factor_input = []
+
+
+global profiles_doseplan_dataset_ROI_several
+profiles_doseplan_dataset_ROI_several = []
+global profiles_several_img
+profiles_several_img = []
+
+global profiles_film_factor
+
+global profiles_lines
+profiles_lines = []
+
+global end_point
+end_point = None
+
+global profiles_line_coords_film
+global profiles_line_coords_doseplan
+
+
+global profiles_dataset_film_variable_draw
+global profiles_dataset_doesplan_variable_draw
 
 ############################## DVH related ############################################
 """

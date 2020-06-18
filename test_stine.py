@@ -194,7 +194,7 @@ v2 = test_dosemap_v2.pixel_array
 
 print(np.max(v2)*test_dosemap_v2.DoseGridScaling)
 """
-
+"""
 
 def get_line(x1, y1, x2, y2):
     points = []
@@ -274,3 +274,16 @@ p = getCoordsInRandomLine(0,1,6,6)
 u = get_line(0,1,6,6)
 print(p)
 print(u)
+
+"""
+
+a = np.zeros(10)
+
+for i in range(10):
+    a[i] = i
+
+print(a)
+
+b = np.flip(a)
+
+print(max(1,10))
