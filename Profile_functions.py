@@ -2669,9 +2669,6 @@ def markROI(img, tab, canvas, ref_point_test):
 
 
 def UploadFilm():
-    #if(Globals.profiles_film_window_open):
-    #    Globals.profiles_film_window.destroy()
-    #    Globals.profiles_film_window_open = False
     if(Globals.profiles_film_orientation.get() == '-'):
         messagebox.showerror("Missing parameter", "Film orientation missing \n (Code: UploadFilm)")
         return
@@ -2683,16 +2680,6 @@ def UploadFilm():
         except:
             messagebox.showerror("Missing parameter", "Film factor invalid format. \n (Code: UploadFilm)")
             return
-                        
-    #if(Globals.profiles_depth.get("1.0",'end-1c') == " "):
-    #    messagebox.showerror("Missing parameter", "Film depth missing")
-    #    return
-    #try:
-    #    Globals.profiles_depth_float = float(Globals.profiles_depth.get("1.0", 'end-1c'))
-    #except:
-    #    messagebox.showerror("Error", "The depth must be a number")
-    #    return
-    #Globals.profiles_depth.config(state=DISABLED, fg='gray')
 
     file = filedialog.askopenfilename()
     ext = os.path.splitext(file)[-1].lower()
@@ -2703,7 +2690,6 @@ def UploadFilm():
         img = Image.open(file)
         img = img.transpose(Image.FLIP_LEFT_RIGHT)
         cv2Img = cv2.imread(basename(normpath(file)), cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
-        #cv2Img = cv2.flip(cv2Img, 0)
         cv2Img = cv2.medianBlur(cv2Img, 5)
         if(cv2Img is None):
             messagebox.showerror("Error", "Something has gone wrong. Check that the filename does not contain Æ,Ø,Å")
@@ -2735,9 +2721,6 @@ def UploadFilm():
         Globals.profiles_film_orientation_menu.configure(state=DISABLED)
         Globals.profiles_film_factor_input.config(state=DISABLED)
     
-        #scale_horizontal = 2
-        #scale_vertical = 2
-        
         h = 635 + 20
         w = 508 + 625
         new_window = tk.Toplevel(Globals.tab4)

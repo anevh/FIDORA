@@ -675,51 +675,66 @@ global max_dose_doseplan
 global profiles_slice_offset
 global profiles_offset
 ############################## DVH related ############################################
-"""
+
 global DVH_film_orientation
 DVH_film_orientation = StringVar()
 DVH_film_orientation.set('-')
-global doseplans_scroll_frame
 
-global profiles_number_of_doseplans
-profiles_number_of_doseplans = 0
-global profiles_number_of_doseplans_row_count
-profiles_number_of_doseplans_row_count = 4
-global profiles_doseplans_grid_config_count
-profiles_doseplans_grid_config_count = 6
-global profiles_doseplans_filenames
-profiles_doseplans_filenames = []
-global profiles_doseplans_factor_text
-profiles_doseplans_factor_text = []
-global profiles_doseplans_factor_input
-profiles_doseplans_factor_input = []
+global DVH_doseplans_scroll_frame
 
 
-global profiles_doseplan_dataset_ROI_several
-profiles_doseplan_dataset_ROI_several = []
-global profiles_several_img
-profiles_several_img = []
+global DVH_number_of_doseplans
+DVH_number_of_doseplans = 0
+global DVH_number_of_doseplans_row_count
+DVH_number_of_doseplans_row_count = 4
+global DVH_doseplans_grid_config_count
+DVH_doseplans_grid_config_count = 6
+global DVH_doseplans_filenames
+DVH_doseplans_filenames = []
+global DVH_doseplans_factor_text
+DVH_doseplans_factor_text = []
+global DVH_doseplans_factor_input
+DVH_doseplans_factor_input = []
+
+
+global DVH_doseplan_dataset_ROI_several
+DVH_doseplan_dataset_ROI_several = []
+
+global DVH_several_img
+DVH_several_img = []
 
 global profiles_film_factor
 
-global profiles_lines
-profiles_lines = []
+#global profiles_lines
+#profiles_lines = []
 
-global end_point
-end_point = None
+#global end_point
+#end_point = None
 
-global profiles_line_coords_film
-global profiles_line_coords_doseplan
+#global profiles_line_coords_film
+#global profiles_line_coords_doseplan
 
 global DVH_film_orientation_menu
+
+global DVH_film_factor_input
+global DVH_film_factor
 
 
 global DVH_film_dataset
 global DVH_film_dataset_red_channel
+
 global DVH_film_dataset_ROI
 global DVH_film_dataset_ROI_red_channel
 global DVH_doseplan_dataset_ROI
+
 global DVH_film_dataset_ROI_red_channel_dose
+
+global DVH_film_write_image
+global DVH_film_dose_write_image
+
+global DVH_max_dose_film
+global DVH_max_dose_doseplan
+
 
 global DVH_view_film_doseplan_ROI
 DVH_view_film_doseplan_ROI = tk.Canvas(tab5_canvas)
@@ -728,7 +743,7 @@ tab5_canvas.grid_columnconfigure(11, weight=0)
 tab5_canvas.grid_rowconfigure(11, weight=0)
 DVH_view_film_doseplan_ROI.config(bg='#E5f9ff', relief=FLAT, highlightthickness=0)
 
-
+"""
 global DVH_plot_canvas
 DVH_plot_canvas = tk.Canvas(tab4_canvas)
 DVH_plot_canvas.grid(row=3, column=0, rowspan=10, columnspan=2, sticky=N+E+W, pady=(0,5), padx=(5,10))
@@ -754,16 +769,18 @@ global DVH_depth_float
 #global DVH_mark_isocenter_button_image
 #global DVH_mark_ROI_button_image
 #global DVH_mark_point_button_image
-
+"""
 global DVH_iscoenter_coords
 DVH_iscoenter_coords = []
 
 #Given from top left corner [right, down]
 global DVH_film_isocenter
+
 global DVH_film_reference_point
 
 global DVH_distance_isocenter_ROI
 DVH_distance_isocenter_ROI = []
+
 global DVH_distance_reference_point_ROI
 DVH_distance_reference_point_ROI = []
 
@@ -771,8 +788,10 @@ global DVH_mark_isocenter_up_down_line
 DVH_mark_isocenter_up_down_line = []
 global DVH_mark_isocenter_right_left_line
 DVH_mark_isocenter_right_left_line = []
+
 global DVH_mark_isocenter_oval
-DVHs_mark_isocenter_oval = []
+DVH_mark_isocenter_oval = []
+
 global DVH_mark_ROI_rectangle
 DVH_mark_ROI_rectangle = []
 
@@ -782,18 +801,24 @@ DVH_mark_reference_point_oval = []
 global DVH_ROI_coords
 DVH_ROI_coords = []
 
+global DVH_film_variable_ROI_coords
+
 global DVH_done_button
 DVH_done_button = None
+
+
 global DVH_done_button_reference_point
 DVH_done_button_reference_point = None
 
 global DVH_isocenter_check
 DVH_isocenter_check=False
+
 global DVH_reference_point_check
 DVH_reference_point_check = False
 
 global DVH_ROI_check
 DVH_ROI_check = False
+
 global DVH_ROI_reference_point_check
 DVH_ROI_reference_point_check = False
 
@@ -805,7 +830,9 @@ global DVH_popt_red
 DVH_popt_red = np.zeros(3)
 
 global DVH_upload_button_doseplan
+
 global DVH_upload_button_film
+
 global DVH_upload_button_rtplan
 
 global DVH_dataset_doseplan
@@ -820,7 +847,7 @@ global DVH_isocenter_mm
 
 
 global DVH_dose_scaling_doseplan
-
+"""
 global DVH_max_dose_film
 
 
@@ -844,26 +871,27 @@ Radiobutton(DVH_choose_profile_canvas, text="Vertical", \
 Radiobutton(DVH_choose_profile_canvas, text="Draw", \
     variable=DVH_choice_of_profile_line_type, value="d", bg='#ffffff', cursor='hand2').pack(side=LEFT)
 ##################################################################################################3
-
+"""
 global DVH_film_panedwindow
 DVH_film_panedwindow = PanedWindow(DVH_view_film_doseplan_ROI, orient='vertical')
 DVH_film_panedwindow.pack()
 DVH_film_panedwindow.configure(sashrelief = RAISED, showhandle=True)
 
-
+"""
 global DVH_scanned_image_text_image
 global DVH_film_dose_map_text_image
 global DVH_doseplan_text_image
-
+"""
 global DVH_doseplan_write_image
 global DVH_doseplan_write_image_width
 global DVH_doseplan_write_image_height
+"""
 global DVH_doseplan_write_image_var_x 
 DVH_doseplan_write_image_var_x= 0
 
 
 global DVH_new_window_factor_textbox ###
-
+"""
 global DVH_doseplan_lateral_displacement
 global DVH_doseplan_vertical_displacement
 global DVH_doseplan_longitudianl_displacement
@@ -875,12 +903,15 @@ global DVH_input_lateral_displacement
 global DVH_input_longitudinal_displacement
 global DVH_input_vertical_displacement
 
+global DVH_slice_offset
+global DVH_offset
+
 global DVH_isocenter_or_reference_point
 
 global DVH_lateral
 global DVH_vertical
 global DVH_longitudinal
-"""
+
 ############################### Correction matrix ######################################
 
 global correction127_red
