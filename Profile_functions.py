@@ -136,7 +136,7 @@ def drawProfiles(even):
         #txt.insert(INSERT, " ")
         #txt.grid(row=1, column = 1, sticky=N+E+W+S, pady=(5,0), padx=(5,0))  
         #txt.config(bg='#ffffff', font=('calibri', '10'), state=DISABLED, relief=FLAT, bd= 0)
-        cols = (' ', 'Point match', 'Distance', 'Dose', 'Rel. to max', 'Rel to target')
+        cols = (' ', 'Point match', 'Distance', 'Dose', 'Rel. to max', 'Rel. to target')
         listBox = ttk.Treeview(Globals.profile_plot_canvas, columns=cols, show='headings')
         for col in cols:
             listBox.heading(col, text=col, anchor=W)
@@ -2030,7 +2030,7 @@ def processDoseplan_usingIsocenter(only_one):
     doseplan_ROI_coords.append([bottom_left_to_side, bottom_left_down])
     doseplan_ROI_coords.append([bottom_right_to_side, bottom_right_down])
 
-    dose_slice = cv2.flip(dose_slice, 1)
+    #dose_slice = cv2.flip(dose_slice, 1)
     if(only_one):
         Globals.profiles_doseplan_dataset_ROI = \
             dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
