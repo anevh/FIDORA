@@ -73,6 +73,26 @@ style.theme_create('MyStyle', parent= 'classic', settings={
             "background": [("selected", '#02B9A5')], # Color of active tab
             "expand": [("selected", [1, 1, 1, 0])] # [expanse of text]
         }
+    },
+    "Treeview":{
+        "configure":{
+            "font": ('calibri', '9'),
+            "highlightthickness": 0,
+            "relief": FLAT,
+            "borderwidth": 0
+  
+        }
+    },
+    "Treeview.Heading":{
+        "configure":{
+            "font": ('calibri', '9'),
+            "highlightthickness": 0,
+            "relief": FLAT,
+            "borderwidth": 0,
+            "anchor": W
+
+
+        }
     }
 })
 
@@ -903,7 +923,7 @@ Globals.profiles_adjust_button_return.pack(side=LEFT)
 Globals.profiles_adjust_button_return.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
 
 Globals.profiles_choice_of_profile_line_type.trace_add('write', Profile_functions.trace_profileLineType)
-Globals.profiles_choice_of_penumbra.trace_add('write', Profile_functions.trace_choiceOfPenumbra)
+
 
 Globals.tab4_canvas.pack(expand=True, fill=BOTH)
 
