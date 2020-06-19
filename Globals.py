@@ -541,19 +541,6 @@ global profiles_choice_of_profile_line_type
 profiles_choice_of_profile_line_type = StringVar()
 profiles_choice_of_profile_line_type.set("h")
 
-global profiles_choice_of_penumbra
-profiles_choice_of_penumbra = BooleanVar()
-profiles_choice_of_penumbra.set(False)
-
-profiles_choose_penumbra_text = tk.Text(tab4_canvas, height=1, width=30)
-profiles_choose_penumbra_text.insert(INSERT, "Show penumbra in plot?")
-profiles_choose_penumbra_text.grid(row=15, column=0, sticky=N+W)
-profiles_choose_penumbra_text.config(bg='#ffffff', relief=FLAT, \
-highlightthickness=0, state=DISABLED, font=('calibri', '11'))
-Radiobutton(tab4_canvas, text="No", variable=profiles_choice_of_penumbra,\
-    value=False, bg='#ffffff', cursor='hand2').grid(row=16, column=0, sticky=N+W)
-Radiobutton(tab4_canvas, text="Yes", variable=profiles_choice_of_penumbra,\
-    value=True, bg='#ffffff', cursor='hand2').grid(row=16, column=0, sticky=N+W, padx=(60,0))
 
 profiles_choose_profile_type_text = tk.Text(profiles_choose_profile_canvas, height=1)
 profiles_choose_profile_type_text.insert(INSERT, "How to draw the profile:")

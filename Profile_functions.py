@@ -2,7 +2,7 @@ import Globals
 import tkinter as tk
 from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog,\
     PhotoImage, BOTH, Canvas, N, S, W, E, ALL, Frame, SUNKEN, Radiobutton, GROOVE, ACTIVE, \
-    FLAT, END, Scrollbar, HORIZONTAL, VERTICAL, ttk, TOP, RIGHT, LEFT
+    FLAT, END, Scrollbar, HORIZONTAL, VERTICAL, ttk, TOP, RIGHT, LEFT, ttk
 import os
 from os.path import normpath, basename
 from PIL import Image, ImageTk
@@ -109,150 +109,6 @@ def getCoordsInRandomLine(x1,y1,x2,y2):
         points.reverse()
     return points
 
-def calculate_stats(dataset_film, dataset_doseplan):
-    sum_film=0;sum_doseplan=0;cent=0
-    for i in range(len(dataset_doseplan)):
-        if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
-            sum_doseplan+=dataset_doseplan[i]
-        elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
-            sum_doseplan+=dataset_doseplan[i]*2
-        else:
-            sum_doseplan+=dataset_doseplan[i]*3
-    for i in range(len(dataset_film)):
-        sum_film+=dataset_film[i]*0.2
-    
-    if(sum_film < sum_doseplan):
-        cent=(sum_film/sum_doseplan)*100
-    else:
-        cent=(sum_doseplan/sum_film)*100
-    
-    dataset_film_reversed = np.flip(dataset_film)
-    dataset_doseplan_reversed = np.flip(dataset_doseplan)
-
-    max_film=np.max(dataset_film);max_doseplan=np.max(dataset_doseplan)
-
-    not_finished = True;i=0
-    while not_finished:
-        if dataset_film[i] > 0.2*max_film:
-            film_penumbra_left_20_coord = i
-            not_finished = False
-        i+=1
-    not_finished = True;i=0
-    while not_finished:
-        if dataset_film[i] > 0.8*max_film:
-            film_penumbra_left_80_coord = i
-            not_finished = False
-        i+=1
-    not_finished = True;i=0
-    while not_finished:
-        if dataset_film_reversed[i] > 0.2*max_film:
-            film_penumbra_right_20_coord = i
-            not_finished = False
-        i+=1
-    not_finished = True;i=0
-    while not_finished:
-        if dataset_film_reversed[i] > 0.8*max_film:
-            film_penumbra_right_80_coord = i
-            not_finished = False
-        i+=1
-    if Globals.profiles_choice_of_profile_line_type.get() == 'h' or Globals.profiles_choice_of_profile_line_type.get() == 'v':
-        if film_penumbra_left_20_coord > film_penumbra_left_80_coord:
-            film_penumbra_left = "None"
-        else:
-            film_penumbra_left = str((film_penumbra_left_80_coord-film_penumbra_left_20_coord)*0.2)
-        if film_penumbra_right_20_coord > film_penumbra_right_80_coord:
-            film_penumbra_right = "None"
-        else:
-            film_penumbra_right=str((film_penumbra_right_80_coord-film_penumbra_right_20_coord)*0.2)
-    else:
-        if film_penumbra_left_20_coord > film_penumbra_left_80_coord:
-            film_penumbra_left = "None"
-        else:
-            start_c_x, start_c_y = Globals.profiles_line_coords_film[film_penumbra_left_20_coord]
-            end_c_x,end_c_y = Globals.profiles_line_coords_film[film_penumbra_left_80_coord]
-            film_penumbra_left = str(np.sqrt(((end_c_x-start_c_x)*0.2)**2 + ((end_c_y-start_c_y)*0.2)**2))
-        if film_penumbra_right_20_coord > film_penumbra_right_80_coord:
-            film_penumbra_right="None"
-        else:
-            start_c_x, start_c_y = Globals.profiles_line_coords_film[len(dataset_film)-film_penumbra_right_20_coord]
-            end_c_x,end_c_y = Globals.profiles_line_coords_film[len(dataset_film)-film_penumbra_right_80_coord]
-            film_penumbra_right = str(np.sqrt(((end_c_x-start_c_x)*0.2)**2 + ((end_c_y-start_c_y)*0.2)**2))
-    
-    not_finished=True;i=0
-    while not_finished:
-        if dataset_doseplan[i] > 0.2*max_doseplan:
-            doseplan_penumbra_left_20_coord = i
-            not_finished=False
-        i+=1
-    not_finished=True;i=0
-    while not_finished:
-        if dataset_doseplan[i] > 0.8*max_doseplan:
-            doseplan_penumbra_left_80_coord = i
-            not_finished=False
-        i+=1
-    not_finished=True;i=0
-    while not_finished:
-        if dataset_doseplan_reversed[i] > 0.2*max_doseplan:
-            doseplan_penumbra_right_20_coord = i
-            not_finished=False
-        i+=1
-    not_finished=True;i=0
-    while not_finished:
-        if dataset_doseplan_reversed[i] > 0.8*max_doseplan:
-            doseplan_penumbra_right_80_coord = i
-            not_finished=False
-        i+=1
-    if Globals.profiles_choice_of_profile_line_type.get() == 'h' or Globals.profiles_choice_of_profile_line_type.get() == 'v':
-        if doseplan_penumbra_left_20_coord > doseplan_penumbra_left_80_coord:
-            doseplan_penumbra_left = "None"
-        else:
-            if Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]:
-                doseplan_penumbra_left = str((doseplan_penumbra_left_80_coord-doseplan_penumbra_left_20_coord))
-            elif Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]:
-                doseplan_penumbra_left = str((doseplan_penumbra_left_80_coord-doseplan_penumbra_left_20_coord)*2)
-            else:
-                doseplan_penumbra_left=str((doseplan_penumbra_left_80_coord-doseplan_penumbra_left_80_coord)*3)
-        if doseplan_penumbra_right_20_coord > doseplan_penumbra_right_80_coord:
-            doseplan_penumbra_right = "None"
-        else:
-            if Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]:
-                doseplan_penumbra_right=str((doseplan_penumbra_right_80_coord-doseplan_penumbra_right_20_coord))
-            elif Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]:
-                doseplan_penumbra_right=str((doseplan_penumbra_right_80_coord-doseplan_penumbra_right_20_coord)*2)
-            else:
-                doseplan_penumbra_right=str((doseplan_penumbra_right_80_coord-doseplan_penumbra_right_20_coord)*3)    
-    else:
-        if doseplan_penumbra_left_20_coord > doseplan_penumbra_left_80_coord:
-            doseplan_penumbra_left = "None"
-        else:
-            start_c_x, start_c_y = Globals.profiles_line_coords_doseplan[doseplan_penumbra_left_20_coord]
-            end_c_x,end_c_y = Globals.profiles_line_coords_doseplan[doseplan_penumbra_left_80_coord]
-            if Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]:
-                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x))**2 + ((end_c_y-start_c_y))**2))
-            elif Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]:
-                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x)*2)**2 + ((end_c_y-start_c_y)*2)**2))
-            else:
-                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x)*3)**2 + ((end_c_y-start_c_y)*3)**2))
-        if doseplan_penumbra_right_20_coord > doseplan_penumbra_right_80_coord:
-            doseplan_penumbra_right="None"
-        else:
-            start_c_x, start_c_y = Globals.profiles_line_coords_doseplan[len(dataset_doseplan)-doseplan_penumbra_right_20_coord]
-            end_c_x,end_c_y = Globals.profiles_line_coords_doseplan[len(dataset_doseplan)-doseplan_penumbra_right_80_coord]
-            if Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]:
-                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x))**2 + ((end_c_y-start_c_y))**2))
-            elif Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]:
-                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x)*2)**2 + ((end_c_y-start_c_y)*2)**2))
-            else:
-                doseplan_penumbra_left = str(np.sqrt(((end_c_x-start_c_x)*3)**2 + ((end_c_y-start_c_y)*3)**2))
-    #HAR:
-    #cent - prosent match
-    #film_penumbra_left - lengden av left penumbra
-    #film_punumbra_right - lengden av right penumbra
-    #doseplan_penumbra_right - lenden av right penumbra
-    #doseplan_penumbra_left - lengden av left penumbra
-    return film_penumbra_left_20_coord, film_penumbra_left_80_coord, film_penumbra_right_20_coord, film_penumbra_right_80_coord,\
-        doseplan_penumbra_left_20_coord, doseplan_penumbra_left_80_coord, doseplan_penumbra_right_20_coord, doseplan_penumbra_right_80_coord,\
-            max(max_film, max_doseplan)
 
 def drawProfiles(even):
     if Globals.profiles_choice_of_profile_line_type.get() == 'h' or Globals.profiles_choice_of_profile_line_type.get() == 'v':
@@ -276,13 +132,25 @@ def drawProfiles(even):
         plot_canvas.get_tk_widget().grid(row=0,column=0,columnspan=4, sticky=N+E+W+S, padx=(5,0), pady=(0,0))
         #annotation = a.annotate("HEI", xy=(0,0), xytext=(0,20))
         #annotation.set_visible(False)
-        txt = tk.Text(Globals.profile_plot_canvas, width=50, height=6)
-        txt.insert(INSERT, " ")
-        txt.grid(row=1, column = 1, sticky=N+E+W+S, pady=(5,0), padx=(5,0))  
-        txt.config(bg='#ffffff', font=('calibri', '10'), state=DISABLED, relief=FLAT, bd= 0)
-        
+        #txt = tk.Text(Globals.profile_plot_canvas, width=50, height=6)
+        #txt.insert(INSERT, " ")
+        #txt.grid(row=1, column = 1, sticky=N+E+W+S, pady=(5,0), padx=(5,0))  
+        #txt.config(bg='#ffffff', font=('calibri', '10'), state=DISABLED, relief=FLAT, bd= 0)
+        cols = (' ', 'Point match', 'Distance', 'Dose', 'Rel. to max', 'Rel to target')
+        listBox = ttk.Treeview(Globals.profile_plot_canvas, columns=cols, show='headings')
+        for col in cols:
+            listBox.heading(col, text=col, anchor=W)
+            listBox.column(col ,width=84, stretch=False, anchor=W)    
+        listBox.grid(row=1, column=0, columnspan=4)
+        lst = [['Film: ', ' ', ' ', ' ', ' ', ' '],\
+            ['Doseplan: ', ' ', ' ', ' ', ' ', ' ']]
+        for i, (name, m, dis, d, rdROI, rdTarget) in enumerate(lst):
+            listBox.insert("", "end", values=(name, m, dis, d, rdROI, rdTarget))
         #a.text(0,0, "", fontsize=7, bbox=dict(facecolor='gray', alpha=0.1))
         #txt.set_visible(False)
+        v_line = a.axvline(x=0, ymin=0, ymax=50, c='gray')
+        
+        #v_line.set_visible(False)
 
         if line_orient == 'h':
             if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
@@ -349,16 +217,7 @@ def drawProfiles(even):
         a.set_title("Profiles", fontsize=12)
         a.set_ylabel("Dose (Gy)", fontsize=12)
         a.set_xlabel("Distance (mm)", fontsize=12)
-
-        #def update_annonation(x_val, y_val, notation):
-        #    annotation.xytext = (x_val-5, y_val)
-        #    annotation.xy = (x_val, y_val)
-        #    annotation.set_text = notation
-        #    print(notation)
-        #    annotation.set_visible(True)
-        #    print(x_val, y_val)
-
-
+        
         def mouseMove(event):
             if event.inaxes == a:
                 dist = event.xdata
@@ -399,38 +258,64 @@ def drawProfiles(even):
                     idx_doseplan = 0
                 if idx_doseplan >= len(plot_doseplan):
                     idx_doseplan = len(plot_doseplan) - 1
-                match = "Graph match: " + \
-                    str(np.round(min(plot_film[idx_film], plot_doseplan[idx_doseplan])/max(plot_film[idx_film], plot_doseplan[idx_doseplan])*100, 2)) + "\n"
-                distance = "Distance: " + str(np.round(dist,2)) + "\n"
-                film = "\t\tFILM: \t\t\t"
-                dose_film = "Dose: \t" + str(np.round(plot_film[idx_film],2)) + "\t\t\t"
-                rel_target_dose_film = "Relative to target dose: " + str(np.round(100*plot_film[idx_film]/Globals.max_dose_doseplan,2)) + "\t\t\t"
-                rel_mx_dose_ROI_film = "Relative to max dose in ROI: " + str(np.round(100*plot_film[idx_film]/np.max(plot_film),2)) + "\t\t\t"
-                doseplan = "DOSEPLAN: \n"
-                dose_doseplan = str(np.round(plot_doseplan[idx_doseplan],2)) + "\n"
-                rel_target_dose_doseplan =  str(np.round(100*plot_doseplan[idx_doseplan]/Globals.max_dose_doseplan,2)) + "\n"
-                rel_mx_dose_ROI_doseplan =  str(np.round(100*plot_doseplan[idx_doseplan]/np.max(plot_doseplan),2))
-                notation = match+distance+\
-                    film+doseplan+\
-                        dose_film+dose_doseplan+\
-                            rel_target_dose_film+rel_target_dose_doseplan+\
-                                rel_mx_dose_ROI_film+rel_mx_dose_ROI_doseplan
-
                 
-                #txt.set_text(notation)
-                #txt.x =dist
-                #txt.y =event.ydata
-                #txt.set_visible(True)
-                #update_annonation(event.xdata, event.ydata, notation)
-                #fig.canvas.draw_idle()
-                #txt.delete("1.0", END)
-                txt.config(state=NORMAL)
-                txt.delete("1.0", END)
-                txt.insert(INSERT, notation)
-                txt.config(state=DISABLED)
+                match_text = "\tGraph match: \t"
+                match = str(np.round(min(plot_film[idx_film], plot_doseplan[idx_doseplan])/max(plot_film[idx_film], plot_doseplan[idx_doseplan])*100, 2)) + "\n"
+                distance_text = "Distance:\t "
+                dose_text = "Dose: \t"
+                rel_target_dose_text = "Relative to target dose: \t "
+                rel_mx_dose_ROI_text = "Relative to max dose in ROI: \n"
+                distance = str(np.round(dist,2)) + "\n"
+                film = "FILM:   \t"
+                dose_film = str(np.round(plot_film[idx_film],2)) + "\t"
+                rel_target_dose_film = str(np.round(100*plot_film[idx_film]/Globals.max_dose_doseplan,2)) + "\t\t\t"
+                rel_mx_dose_ROI_film = str(np.round(100*plot_film[idx_film]/np.max(plot_film),2)) + "\n"
+                doseplan = "DOSEPLAN:  \t"
+                dose_doseplan = str(np.round(plot_doseplan[idx_doseplan],2)) + "\t"
+                rel_target_dose_doseplan =  str(np.round(100*plot_doseplan[idx_doseplan]/Globals.max_dose_doseplan,2)) + "\t\t\t"
+                rel_mx_dose_ROI_doseplan =  str(np.round(100*plot_doseplan[idx_doseplan]/np.max(plot_doseplan),2))
+                notation = match_text + distance_text + dose_text, rel_target_dose_text + rel_mx_dose_ROI_text +\
+                    film + dose_film + rel_target_dose_film + rel_mx_dose_ROI_film+\
+                        doseplan + dose_doseplan + rel_target_dose_doseplan + rel_mx_dose_ROI_doseplan
+
+                children = listBox.get_children()
+                for item in children:
+                    listBox.delete(item)
+                lst = [['Film: ', match, distance, dose_film, rel_mx_dose_ROI_film, rel_target_dose_film],\
+                    ['Doseplan: ', match, distance, dose_doseplan, rel_mx_dose_ROI_doseplan, rel_target_dose_doseplan]]
+                for i, (name, m, dis, d, rdROI, rdTarget) in enumerate(lst):
+                    listBox.insert("", "end", values=(name, m, dis, d, rdROI, rdTarget))
+                y_min = max(plot_film[idx_film], plot_doseplan[idx_doseplan])-0.3*max(np.max(plot_film), np.max(plot_doseplan))
+                if y_min < 0:
+                    y_min = 0
+                y_max = max(plot_film[idx_film], plot_doseplan[idx_doseplan])+0.3*max(np.max(plot_film), np.max(plot_doseplan))
+                if y_max > max(np.max(plot_film), np.max(plot_doseplan)):
+                    y_max =  max(np.max(plot_film), np.max(plot_doseplan))
+                v_line.set_xdata(dist)
+                #v_line.set_ylim(y_min,y_max)
+                #v_line.set_ymax = y
+                #v_line.set_ymax = y_max # = 
+                #v_line = a.axvline(x=dist, ymin=0, ymax=40, c='gray')
+                v_line.set_visible(True)
+                fig.canvas.draw_idle()
+
+                def freezeData(event):
+                    fig.canvas.mpl_disconnect(cid)
+                    v_line.set_visible(False)
+                    fig.canvas.draw_idle()
+                    def startData(event):
+                        fig.canvas.mpl_disconnect(cid2)
+                        fig.canvas.mpl_disconnect(cid3)
+                        draw(line_orient, dataset_film, dataset_doseplan)
+                        
+
+                    cid3 = fig.canvas.mpl_connect('button_press_event', startData)
+
+                cid2 = fig.canvas.mpl_connect('button_press_event', freezeData)
             else:
                 return
-
+        
+        cid3 = None
         cid = fig.canvas.mpl_connect('motion_notify_event', mouseMove)
         fig.tight_layout()        
 
@@ -973,8 +858,6 @@ def drawProfiles(even):
 def trace_profileLineType(var, indx, mode):
     test_drawProfiles()
 
-def trace_choiceOfPenumbra(car, indx, mode):
-    test_drawProfiles()
 
 def test_drawProfiles():
     if Globals.profiles_dataset_doseplan == None:
