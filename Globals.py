@@ -671,6 +671,9 @@ global profiles_dataset_film_variable_draw
 global profiles_dataset_doesplan_variable_draw
 
 global max_dose_doseplan
+
+global profiles_slice_offset
+global profiles_offset
 ############################## DVH related ############################################
 """
 global DVH_film_orientation

@@ -1912,7 +1912,18 @@ def processDoseplan_usingIsocenter(only_one):
     ####################### Match film and doseplan ###############################
 
     #Pick the slice where the reference point is (this is the slice-position of the film)
-    dose_slice = dataset_swapped[int(reference_point[0]), :, :]
+    
+    if Globals.profiles_dataset_doseplan.PixelSpacing == [1, 1]:
+        offset = int(np.round(Globals.profiles_offset))
+        dose_slice = dataset_swapped[int(reference_point[0]) + offset]
+    elif Globals.profiles_dataset_doseplan.PixelSpacing == [2, 2]:
+        offset = int(np.round(Globals.profiles_offset/2))
+        dose_slice = dataset_swapped[int(reference_point[0] + offset)]
+    else:
+        offset = int(np.round(Globals.profiles_offset/3))
+        dose_slice = dataset_swapped[int(reference_point[0]) + offset]
+
+        
     
     #calculate the coordinates of the Region of Interest in doseplan (marked on the film) 
     #and checks if it actualy exists in dosematrix
@@ -2365,7 +2376,7 @@ def UploadDoseplan(only_one):
         messagebox.showerror("Error", "The Image Orientation (Patient) must be parallel to one of the main axis and perpendicular to the two others.")
         return
     
-    if not only_one and not Globals.profiles_number_of_doseplans==1:
+    if not only_one and Globals.profiles_number_of_doseplans > 1:
         if(not (Globals.profiles_dataset_doseplan.PixelSpacing==dataset.PixelSpacing)):
             messagebox.showerror("Error", "Resolution of the doseplans must be equal. \n(Code: UploadDoseplan)")
             return
@@ -2786,7 +2797,7 @@ adjustments \nto the placement of either the reference point or isocenter.")
 
 
         image_canvas = tk.Canvas(new_window_isocenter_tab)
-        image_canvas.grid(row=0,column=0, rowspan=10, columnspan=3, sticky=N+S+E+W, padx=(0,0), pady=(0,0))
+        image_canvas.grid(row=0,column=0, rowspan=12, columnspan=3, sticky=N+S+E+W, padx=(0,0), pady=(0,0))
         new_window_isocenter_tab.grid_rowconfigure(1, weight=0)
         new_window_isocenter_tab.grid_columnconfigure(1, weight=0)
         image_canvas.create_image(0,0,image=img_scaled,anchor="nw")
@@ -2805,7 +2816,7 @@ adjustments \nto the placement of either the reference point or isocenter.")
             height=img_scaled.height(), width=img_scaled.width())
         image_canvas_reference_tab.grid_propagate(0)
 
-        film_window_mark_isocenter_text = tk.Text(new_window_isocenter_tab, width=55, height=5)
+        film_window_mark_isocenter_text = tk.Text(new_window_isocenter_tab, width=55, height=7)
         film_window_mark_isocenter_text.insert(INSERT, \
 "When clicking the button \"Mark isocenter\" a window showing \n\
 the image will appear and you are to click on the markers \n\
@@ -2845,7 +2856,7 @@ again and repeat.")
         mark_isocenter_button.image=Globals.profiles_mark_isocenter_button_image
 
         mark_point_button_frame = tk.Frame(new_window_reference_point_tab)
-        mark_point_button_frame.grid(row=2, column=3, padx=(10,10), pady=(30,0))
+        mark_point_button_frame.grid(row=3, column=3, padx=(10,10), pady=(30,0))
         mark_point_button_frame.configure(bg='#ffffff')
         new_window_reference_point_tab.grid_columnconfigure(3, weight=0)
         new_window_reference_point_tab.grid_rowconfigure(3, weight=0)
@@ -2909,7 +2920,7 @@ displacemnet here (in mm). Defaults to zero ")
         new_window_reference_point_tab.grid_rowconfigure(9, weight=0)
         new_window_reference_point_tab.grid_columnconfigure(9, weight=0)     
 
-        film_window_mark_ROI_text = tk.Text(new_window_isocenter_tab, width=55, height=5)
+        film_window_mark_ROI_text = tk.Text(new_window_isocenter_tab, width=55, height=7)
         film_window_mark_ROI_text.insert(INSERT, \
 "When clicking the button \"Mark ROI\" a window showing the\n\
 image will appear and you are to drag a rectangle marking \n\
@@ -2918,7 +2929,7 @@ scanned in either portrait or landscape orientation. When\n\
 the ROI has been marked it will appear on the image. If you\n\
 are not happy with the placement click the button again.")
         film_window_mark_ROI_text.config(bg='#ffffff', relief=FLAT, bd=0, state=DISABLED, font=('calibri', '11'))
-        film_window_mark_ROI_text.grid(row=4, column=3, rowspan=3, sticky=N+S+E+W, padx=(10,10), pady=(10,0))
+        film_window_mark_ROI_text.grid(row=5, column=3, rowspan=4, sticky=N+S+E+W, padx=(10,10), pady=(0,0))
         new_window_isocenter_tab.grid_columnconfigure(4, weight=0)
         new_window_isocenter_tab.grid_rowconfigure(4, weight=0)
         
@@ -2936,7 +2947,7 @@ are not happy with the placement click the button again.")
         new_window_reference_point_tab.grid_rowconfigure(4, weight=0)
         
         mark_ROI_button_frame = tk.Frame(new_window_isocenter_tab)
-        mark_ROI_button_frame.grid(row=7, column=3, padx=(10,10), pady=(0,5))
+        mark_ROI_button_frame.grid(row=8, column=3, padx=(10,0), pady=(0,5))
         mark_ROI_button_frame.configure(bg='#ffffff')
         new_window_isocenter_tab.grid_columnconfigure(5, weight=0)
         new_window_isocenter_tab.grid_rowconfigure(5, weight=0)
@@ -2946,6 +2957,20 @@ are not happy with the placement click the button again.")
         mark_ROI_button.pack(expand=True, fill=BOTH)
         mark_ROI_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
         mark_ROI_button.image=Globals.profiles_mark_ROI_button_image
+
+        slice_offset_text = tk.Text(new_window_isocenter_tab, width=25, height=1)
+        slice_offset_text.insert(INSERT, "Slice offset, mm (default 0):")
+        slice_offset_text.config(state=DISABLED, font=('calibri', '10'), bd = 0, relief=FLAT)   
+        slice_offset_text.grid(row=9, column=3, padx=(5,110), pady=(0,0))
+        new_window_isocenter_tab.grid_columnconfigure(6, weight=0)
+        new_window_isocenter_tab.grid_rowconfigure(6, weight=0)
+
+        Globals.profiles_slice_offset = tk.Text(new_window_isocenter_tab, width=8, height=1)
+        Globals.profiles_slice_offset.grid(row=9, column=3, padx=(110,10), pady=(0,0))
+        Globals.profiles_slice_offset.insert(INSERT, " ")
+        Globals.profiles_slice_offset.config(state=NORMAL, font=('calibri', '10'), bd = 2, bg='#ffffff')
+        new_window_isocenter_tab.grid_columnconfigure(7, weight=0)
+        new_window_isocenter_tab.grid_rowconfigure(7, weight=0)
 
         mark_ROI_button_reference_point_frame = tk.Frame(new_window_reference_point_tab)
         mark_ROI_button_reference_point_frame.grid(row=8, column=3, padx=(10,10), pady=(0,5))
@@ -2960,6 +2985,7 @@ are not happy with the placement click the button again.")
         mark_ROI_reference_point_button.image=Globals.profiles_mark_ROI_button_image
 
         def finishFilmMarkers(ref_test):
+            Globals.profiles_slice_offset.config(state=DISABLED)
             if(ref_test):
                 if(not(Globals.profiles_input_lateral_displacement.get("1.0",'end-1c')==" ")):
                     try:
@@ -2991,7 +3017,16 @@ are not happy with the placement click the button again.")
                 Globals.profiles_input_vertical_displacement.config(state=DISABLED)
                 Globals.profiles_input_longitudinal_displacement.config(state=DISABLED)
                 Globals.profiles_input_lateral_displacement.config(state=DISABLED)
-
+            else:
+                if not Globals.profiles_slice_offset.get("1.0",'end-1c')==" ":
+                    try:
+                        offset = float(Globals.profiles_slice_offset.get("1.0",'end-1c'))
+                        Globals.profiles_offset = offset
+                    except:
+                        messagebox.showerror("Error", "Slice offset must be a number \n(Code: finishFilmMarkers(false)")
+                        return
+                else:
+                    Globals.profiles_offset = 0
             if(ref_test):
                 choose_batch_window = tk.Toplevel(new_window_reference_point_tab)
             else:
@@ -3196,7 +3231,7 @@ are not happy with the placement click the button again.")
 
             
         done_button_frame = tk.Frame(new_window_isocenter_tab)
-        done_button_frame.grid(row=8, column=3, padx=(10,10), pady=(5,5), sticky=N+S+W+E)
+        done_button_frame.grid(row=10, column=3, padx=(10,10), pady=(5,5), sticky=N+S+W+E)
         done_button_frame.configure(bg='#ffffff')
         new_window_isocenter_tab.grid_columnconfigure(5, weight=0)
         new_window_isocenter_tab.grid_rowconfigure(5, weight=0)
