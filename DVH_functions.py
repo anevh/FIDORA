@@ -1,8 +1,8 @@
 import Globals
 import tkinter as tk
-from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL, simpledialog,\
+from tkinter import filedialog, INSERT, DISABLED, messagebox, NORMAL,simpledialog,\
     PhotoImage, BOTH, Canvas, N, S, W, E, ALL, Frame, SUNKEN, Radiobutton, GROOVE, ACTIVE, \
-    FLAT, END, Scrollbar, HORIZONTAL, VERTICAL, ttk, TOP, RIGHT, LEFT
+    FLAT, END, Scrollbar, HORIZONTAL, VERTICAL, ttk, TOP, RIGHT, LEFT, ttk
 import os
 from os.path import normpath, basename
 from PIL import Image, ImageTk
@@ -10,165 +10,45 @@ import cv2
 from cv2 import imread, IMREAD_ANYCOLOR, IMREAD_ANYDEPTH, imwrite
 import pydicom
 from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib as mpl
 from matplotlib import cm
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg,  NavigationToolbar2Tk
 import numpy as np
 
-
-#Bresenham's line algorithm
-
-def clearAll():
-    Globals.DVH_film_orientation.set('-')
-    Globals.DVH_film_orientation_menu.config(state=ACTIVE, bg = '#ffffff', width=15, relief=FLAT)
-    
-    #Globals.DVH_depth.config(state=NORMAL, fg='black')
-    #Globals.DVH_depth.delete('1.0', END)
-    #Globals.DVH_depth.insert(INSERT, " ")
-
-    Globals.DVH_iscoenter_coords = []
-    Globals.DVH_film_isocenter = None
-    Globals.DVH_film_reference_point = None
-    Globals.DVH_mark_isocenter_up_down_line = []
-    Globals.DVH_mark_isocenter_right_left_line = []
-    Globals.DVH_mark_isocenter_oval = []
-    Globals.DVH_mark_reference_point_oval = []
-    Globals.DVH_mark_ROI_rectangle = []
-    Globals.DVH_ROI_coords = []
-
-
-    #if(Globals.DVH_isocenter_check and Globals.DVH_ROI_check):
-    #    Globals.DVH_done_button.config(state=DISABLED)
-    Globals.DVH_isocenter_check = False
-    Globals.DVH_ROI_check = False
-    Globals.DVH_reference_point_check = False
-    Globals.DVH_ROI_reference_point_check = False
-    
-    #if(Globals.DVH_film_window_open):
-    #    Globals.DVH_film_window.destroy()
-    #    Globals.DVH_film_window_open = False
-
-    Globals.DVH_upload_button_film.config(state=ACTIVE)
-    Globals.DVH_upload_button_doseplan.config(state=DISABLED)
-    Globals.DVH_upload_button_rtplan.config(state=DISABLED)
-
-    Globals.DVH_distance_isocenter_ROI = []
-
-    Globals.DVH_film_dataset = None
-    Globals.DVH_film_dataset_red_channel = None
-    Globals.DVH_film_dataset_ROI = None
-    Globals.DVH_film_dataset_ROI_red_channel = None
-
-    Globals.DVH_film_match_isocenter_dataset = np.zeros((7,7))
-
-    Globals.DVH_dataset_doseplan = None
-    Globals.DVH_dataset_rtplan = None
-    Globals.DVH_isocenter_mm = None
-    Globals.DVH_test_if_added_rtplan = False
-    Globals.DVH_test_if_added_doseplan = False
-
-
+def drawProfiles(even):
+    #LAG DVH PLOT
     return
 
-
-def drawProfiles():
-    if(Globals.DVH_choice_of_profile_line_type.get() == 'h'): #Funker kun på [1,1,1]
-        dataset_film = np.zeros(\
-            (Globals.DVH_doseplan_dataset_ROI.shape[0], Globals.DVH_film_dataset_ROI_red_channel_dose.shape[1]))
-        i = 0;el=0
-        while(el<dataset_film.shape[0]):     #Average 5 rows together to match doseplan resolution, keeps second dimension of film.
-            j = Globals.DVH_film_dataset_ROI_red_channel_dose.shape[0] - i
-            if(j > 5):
-                dataset_film[el,:] = (Globals.DVH_film_dataset_ROI_red_channel_dose[i, :] + \
-                Globals.DVH_film_dataset_ROI_red_channel_dose[i+1,:]+Globals.DVH_film_dataset_ROI_red_channel_dose[i+2,:]+\
-                Globals.DVH_film_dataset_ROI_red_channel_dose[i+3,:]+Globals.DVH_film_dataset_ROI_red_channel_dose[i+4,:])/5.0
-                i+=5;el+=1
-            else:
-                temp = np.zeros((1,Globals.DVH_film_dataset_ROI_red_channel_dose.shape[1]))
-                for k in range(i, dataset_film.shape[0]):
-                    temp[k,:] += Globals.DVH_film_dataset_ROI_red_channel_dose[k,:]
-                dataset_film[el,:] = temp/j
-                el+=1
-       
-
-        Globals.DVH_doseplan_write_image.create_line(0,Globals.DVH_doseplan_write_image_var_x,\
-            Globals.DVH_doseplan_write_image_width,Globals.DVH_doseplan_write_image_var_x, fill='red')
-        
-        def up_button_pressed(event):
-            temp_x = Globals.DVH_doseplan_write_image_var_x - 1
-            if(temp_x < 0):
-                drawProfiles()
-                return
-            Globals.DVH_doseplan_write_image_var_x = temp_x
-            drawProfiles()
-            return
-
-        def down_button_pressed(event):
-            temp_x = Globals.DVH_doseplan_write_image_var_x + 1
-            if(temp_x >= Globals.DVH_doseplan_write_image_height):
-                drawProfiles()
-                return
-            Globals.DVH_doseplan_write_image_var_x = temp_x
-            drawProfiles()
-            return
-
-        Globals.DVH_doseplan_write_image.bind("<Up>", up_button_pressed)
-        Globals.DVH_doseplan_write_image.bind("<Down>", down_button_pressed)
-
-
-    elif(Globals.DVH_choice_of_profile_line_type.get() == 'v'):
-        print("Ikke laget for vertikal profile enda")
-        return
-    else:
-        print("Ikke laget for draw enda")
-        return
-
-
-def pixel_to_dose(P,a,b,c):
-    ret = c + b/(P-a)
-    return ret
-
-def processDoseplan_usingReferencePoint():
-
+def processDoseplan_usingReferencePoint(only_one):
     ################  RT Plan ######################
 
     #Find each coordinate in mm to isocenter relative to first element in doseplan
     iso_1 = abs(Globals.DVH_dataset_doseplan.ImagePositionPatient[0] - Globals.DVH_isocenter_mm[0])
     iso_2 = abs(Globals.DVH_dataset_doseplan.ImagePositionPatient[1] - Globals.DVH_isocenter_mm[1])
     iso_3 = abs(Globals.DVH_dataset_doseplan.ImagePositionPatient[2] - Globals.DVH_isocenter_mm[2])
-    print(Globals.DVH_isocenter_mm)
     #Given as [x,y,z] in patient coordinates
     Globals.DVH_isocenter_mm = [iso_1, iso_2, iso_3]
     
-    #Reads input displacement from phantom on reference point in film
-    #lateral = Globals.DVH_input_lateral_displacement.get("1.0",'end-1c')
-    #vertical = Globals.DVH_input_vertical_displacement.get("1.0", 'end-1c')
-    #longit = Globals.DVH_input_longitudinal_displacement.get("1.0", 'end-1c')
-    #if(lateral==" "):lateral=0
-    #if(vertical==" "):vertical=0
-    #if(longit==" "):longit=0
     try:
         Globals.DVH_vertical = int(Globals.DVH_vertical)
-        print(Globals.DVH_vertical)
     except:
         messagebox.showerror("Error", "Could not read the vertical displacements\n (Code: displacements to integer)")
         return
     try:
         Globals.DVH_lateral = int(Globals.DVH_lateral)
-        print(Globals.DVH_lateral)
     except:
         messagebox.showerror("Error", "Could not read the lateral displacements\n (Code: displacements to integer)")
         return
     try:
         Globals.DVH_longitudinal = int(Globals.DVH_longitudinal)
-        print(Globals.DVH_longitudinal)
     except:
         messagebox.showerror("Error", "Could not read the longitudinal displacements\n (Code: displacements to integer)")
         return
 
     lateral = Globals.DVH_lateral
-    longit = Globals.DVH_longitudinal
+    longit = Globals.DVHlongitudinal
     vertical = Globals.DVH_vertical
     isocenter_px = np.zeros(3)
     distance_in_doseplan_ROI_reference_point_px = []
@@ -297,34 +177,15 @@ def processDoseplan_usingReferencePoint():
         reference_point[1] = temp_ref_point_doseplan[1]
         reference_point[2] = temp_ref_point_doseplan[0]
         if(Globals.DVH_film_orientation.get()=='Coronal'):
-            #number of frames -> rows
-            #rows -> number of frames
-            #columns -> columns
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,1)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[1]
-            #isocenter_px[1] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[1]
             reference_point[1] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Sagittal'):
-            #column -> number of frames
-            #number of frames -> rows
-            #rows -> columns
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,2)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[2]
             reference_point[2] = temp_ref
-            #dataset_swapped = np.swapaxes(dataset_swapped, 0,1)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[1]
-            #isocenter_px[1] = temp_iso
-            #temp_ref = reference_point[0]
-            #reference_point[0] = reference_point[1]
-            #reference_point[1] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Axial'):
             dataset_swapped = Globals.DVH_dataset_doseplan.pixel_array
         else:
@@ -337,7 +198,7 @@ def processDoseplan_usingReferencePoint():
         reference_point[2] = temp_ref_point_doseplan[0]
         if(Globals.DVH_film_orientation.get()=='Coronal'):
             dataset_swapped = Globals.DVH_dataset_doseplan.pixel_array
-        elif(Globals.DVH_film_orientation.get()=='Sagittal'):
+        elif(Globals.DCH_film_orientation.get()=='Sagittal'):
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,2)
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[2]
@@ -455,7 +316,7 @@ def processDoseplan_usingReferencePoint():
             reference_point[1] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Sagittal'):
             dataset_swapped = Globals.DVH_dataset_doseplan.pixel_array
-        elif(Globals.DVH_film_orientation.get()=='Axial'):
+        elif(Globals.DCH_film_orientation.get()=='Axial'):
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,2)
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[2]
@@ -591,54 +452,68 @@ def processDoseplan_usingReferencePoint():
     doseplan_ROI_coords.append([bottom_left_to_side, bottom_left_down])
     doseplan_ROI_coords.append([bottom_right_to_side, bottom_right_down])
 
-    Globals.DVH_doseplan_dataset_ROI = dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+    if only_one:
+        Globals.DVH_doseplan_dataset_ROI = \
+            dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
    
-    img=Globals.DVH_doseplan_dataset_ROI
-    if(Globals.DVH_dataset_doseplan.PixelSpacing==[1, 1]):
-        img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
-    elif(Globals.DVH_dataset_doseplan.PixelSpacing==[2, 2]):
-        img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+        img=Globals.DVH_doseplan_dataset_ROI
+        if(Globals.DVH_dataset_doseplan.PixelSpacing==[1, 1]):
+            img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
+        elif(Globals.DVH_dataset_doseplan.PixelSpacing==[2, 2]):
+            img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+        else:
+            img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+
+        mx=np.max(img)
+        Globals.DVH_max_dose_doseplan = mx*Globals.DVH_dose_scaling_doseplan
+        img = img/mx
+        PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
+
+        wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
+        doseplan_canvas = tk.Canvas(Globals.DVH_film_panedwindow)
+        doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
+        Globals.DVH_film_panedwindow.add(doseplan_canvas, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+        doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+
+
+        Globals.DVH_doseplan_write_image = tk.Canvas(doseplan_canvas)
+        Globals.DVH_doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+        Globals.DVH_doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+
+        doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
+        doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
+        doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            width=Globals.profiles_doseplan_text_image.width(), height=Globals.profiles_doseplan_text_image.height())
+
+        scaled_image_visual = PIL_img_doseplan_ROI
+        scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
+        Globals.DVH_doseplan_write_image_width = scaled_image_visual.width()
+        Globals.DVH_doseplan_write_image_height = scaled_image_visual.height()
+        Globals.DVH_doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
+        Globals.DVH_doseplan_write_image.image = scaled_image_visual
+        doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
+        doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
+
+        drawProfiles(False)
+    
     else:
-        img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+        img=dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+        Globals.DVH_doseplan_dataset_ROI_several.append(img)
+        Globals.DVH_number_of_doseplans+=1
 
-    mx=np.max(img)
-    max_dose = mx*Globals.DVH_dose_scaling_doseplan
-    img = img/mx
-    PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
-
-    wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
-    doseplan_canvas = tk.Canvas(Globals.DVH_film_panedwindow)
-    doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
-    Globals.DVH_film_panedwindow.add(doseplan_canvas, \
-        height=max(heig, Globals.DVH_doseplan_text_image.height()), \
-            width=wid + Globals.DVH_doseplan_text_image.width())
-    doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-        height=max(heig, Globals.DVH_doseplan_text_image.height()), \
-            width=wid + Globals.DVH_doseplan_text_image.width())
+        if(Globals.DVH_dataset_doseplan.PixelSpacing==[1, 1]):
+            Globals.DVH_several_img.append(cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5)))
+        elif(Globals.DVH_dataset_doseplan.PixelSpacing==[2, 2]):
+            Globals.DVH_several_img.append(cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10)))
+        else:
+            Globals.DVH_several_img.append(cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15)))
 
 
-    Globals.DVH_doseplan_write_image = tk.Canvas(doseplan_canvas)
-    Globals.DVH_doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
-    Globals.DVH_doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
-
-    doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
-    doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
-    doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-        width=Globals.DVH_doseplan_text_image.width(), height=Globals.DVH_doseplan_text_image.height())
-
-    scaled_image_visual = PIL_img_doseplan_ROI
-    scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
-    Globals.DVH_doseplan_write_image_width = scaled_image_visual.width()
-    Globals.DVH_doseplan_write_image_height = scaled_image_visual.height()
-    Globals.DVH_doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
-    Globals.DVH_doseplan_write_image.image = scaled_image_visual
-    doseplan_text_image_canvas.create_image(0,0,image=Globals.DVH_doseplan_text_image, anchor="nw")
-    doseplan_text_image_canvas.image=Globals.DVH_doseplan_text_image
-
-    drawProfiles()
-
-def processDoseplan_usingIsocenter():
-
+def processDoseplan_usingIsocenter(only_one):
     ################  RT Plan ######################
 
     #Find each coordinate in mm to isocenter relative to first element in doseplan
@@ -653,9 +528,9 @@ def processDoseplan_usingIsocenter():
     isocenter_px = np.zeros(3)
     distance_in_doseplan_ROI_reference_point_px = []
     if(Globals.DVH_dataset_doseplan.PixelSpacing==[1, 1]):
-        isocenter_px[0] = np.round(Globals.DVH_isocenter_mm[0])
-        isocenter_px[1] = np.round(Globals.DVH_isocenter_mm[1])
-        isocenter_px[2] = np.round(Globals.DVH_isocenter_mm[2])
+        isocenter_px[0] = np.round(iso_1)#np.round(Globals.profiles_isocenter_mm[0])
+        isocenter_px[1] = np.round(iso_2)#np.round(Globals.profiles_isocenter_mm[1])
+        isocenter_px[2] = np.round(iso_3)#np.round(Globals.profiles_isocenter_mm[2])
         
         #Change distance in film to pixel in doseplan
         distance_in_doseplan_ROI_reference_point_px.append([np.round(Globals.DVH_distance_isocenter_ROI[0][0]),\
@@ -668,9 +543,9 @@ def processDoseplan_usingIsocenter():
             np.round(Globals.DVH_distance_isocenter_ROI[3][1])])
     
     elif(Globals.DVH_dataset_doseplan.PixelSpacing==[2, 2]):
-        isocenter_px[0] = np.round(Globals.DVH_isocenter_mm[0]/2)
-        isocenter_px[1] = np.round(Globals.DVH_isocenter_mm[1]/2)
-        isocenter_px[2] = np.round(Globals.DVH_isocenter_mm[2]/2)
+        isocenter_px[0] = np.round(iso_1/2)#np.round(Globals.profiles_isocenter_mm[0]/2)
+        isocenter_px[1] = np.round(iso_2/2)#np.round(Globals.profiles_isocenter_mm[1]/2)
+        isocenter_px[2] = np.round(iso_3/2)#np.round(Globals.profiles_isocenter_mm[2]/2)
        
         
         #Change distance in film to pixel in doseplan
@@ -684,9 +559,9 @@ def processDoseplan_usingIsocenter():
             np.round((Globals.DVH_distance_isocenter_ROI[3][1])/2)])
 
     else:
-        isocenter_px[0] = np.round(Globals.DVH_isocenter_mm[0]/3)
-        isocenter_px[1] = np.round(Globals.DVH_isocenter_mm[1]/3)
-        isocenter_px[2] = np.round(Globals.DVH_isocenter_mm[2]/3)
+        isocenter_px[0] = np.round(iso_1/3)#np.round(Globals.profiles_isocenter_mm[0]/3)
+        isocenter_px[1] = np.round(iso_2/3)#np.round(Globals.profiles_isocenter_mm[1]/3)
+        isocenter_px[2] = np.round(iso_3/3)#np.round(Globals.profiles_isocenter_mm[2]/3)
         
         #Change distance in film to pixel in doseplan
         distance_in_doseplan_ROI_reference_point_px.append([np.round((Globals.DVH_distance_isocenter_ROI[0][0])/3),\
@@ -704,41 +579,20 @@ def processDoseplan_usingIsocenter():
     #dataset_swapped is now the dataset entered the same way as expected with film (slice, rows, columns)
     #isocenter_px and reference_point is not turned according to the doseplan and film orientation.
     if(Globals.DVH_dataset_doseplan.ImageOrientationPatient==[1, 0, 0, 0, 1, 0]):
-        #reference_point[1] = isocenter_px[0]
-        #reference_point[2] = isocenter_px[1]
-        #reference_point[0] = isocenter_px[2]
+    
         reference_point[0] = isocenter_px[2]
         reference_point[1] = isocenter_px[1]
         reference_point[2] = isocenter_px[0]
         if(Globals.DVH_film_orientation.get()=='Coronal'):
-            #number of frames -> rows
-            #rows -> number of frames
-            #columns -> columns
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,1)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[1]
-            #isocenter_px[1] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[1]
             reference_point[1] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Sagittal'):
-            #column -> number of frames
-            #number of frames -> rows
-            #rows -> columns
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,2)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[2]
             reference_point[2] = temp_ref
-            #dataset_swapped = np.swapaxes(dataset_swapped, 0,1)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[1]
-            #isocenter_px[1] = temp_iso
-            #temp_ref = reference_point[0]
-            #reference_point[0] = reference_point[1]
-            #reference_point[1] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Axial'):
             dataset_swapped = Globals.DVH_dataset_doseplan.pixel_array
         else:
@@ -746,22 +600,13 @@ def processDoseplan_usingIsocenter():
             clearAll()
             return
     elif(Globals.DVH_dataset_doseplan.ImageOrientationPatient==[1, 0, 0, 0, 0, 1]):
-        #reference_point[1] = isocenter_px[0]
-        #reference_point[2] = isocenter_px[1]
-        #reference_point[0] = isocenter_px[2]
         reference_point[0] = isocenter_px[1]
         reference_point[1] = isocenter_px[2]
         reference_point[2] = isocenter_px[0]
         if(Globals.DVH_film_orientation.get()=='Coronal'):
             dataset_swapped = Globals.DVH_dataset_doseplan.pixel_array
         elif(Globals.DVH_film_orientation.get()=='Sagittal'):
-            #columns -> number of frames
-            #number of frames -> columns
-            #rows -> rows
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,2)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[2]
             reference_point[2] = temp_ref
@@ -770,13 +615,7 @@ def processDoseplan_usingIsocenter():
             reference_point[1] = reference_point[2]
             reference_point[2] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Axial'):
-            #rows -> number of frames
-            #number of frames -> rows
-            #columns -> columns
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,1)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[1]
-            #isocenter_px[1] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[1]
             reference_point[1] = temp_ref
@@ -785,38 +624,20 @@ def processDoseplan_usingIsocenter():
             clearAll()
             return
     elif(Globals.DVH_dataset_doseplan.ImageOrientationPatient==[0, 1, 0, 1, 0, 0]):
-        #reference_point[1] = isocenter_px[0]
-        #reference_point[2] = isocenter_px[1]
-        #reference_point[0] = isocenter_px[2]
         reference_point[0] = isocenter_px[2]
         reference_point[1] = isocenter_px[0]
         reference_point[2] = isocenter_px[1]
         if(Globals.DVH_film_orientation.get()=='Coronal'):
-            #rows -> columns
-            #columns -> number of frames
-            #number of frames -> rows
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,2)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[2]
             reference_point[2] = temp_ref
             dataset_swapped = np.swapaxes(dataset_swapped, 1,2)
-            #temp_iso = isocenter_px[1]
-            #isocenter_px[1] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[1]
             reference_point[1] = reference_point[2]
             reference_point[2] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Sagittal'):
-            #number -> rows
-            #colums -> colums
-            #rows -> number of frames
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,1)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[1]
-            #isocenter_px[1] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[1]
             reference_point[1] = temp_ref
@@ -825,13 +646,7 @@ def processDoseplan_usingIsocenter():
             reference_point[1] = reference_point[2]
             reference_point[2] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Axial'):
-            #column -> rows
-            #rows -> column
-            #number of frames -> number of frames
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 1,2)
-            #temp_iso = isocenter_px[1]
-            #isocenter_px[1] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[1]
             reference_point[1] = reference_point[2]
             reference_point[2] = temp_ref
@@ -840,20 +655,11 @@ def processDoseplan_usingIsocenter():
             clearAll()
             return
     elif(Globals.DVH_dataset_doseplan.ImageOrientationPatient==[0, 1, 0, 0, 0, 1]):
-        #reference_point[1] = isocenter_px[0]
-        #reference_point[2] = isocenter_px[1]
-        #reference_point[0] = isocenter_px[2]
         reference_point[0] = isocenter_px[0]
         reference_point[1] = isocenter_px[2]
         reference_point[2] = isocenter_px[1]
         if(Globals.DVH_film_orientation.get()=='Coronal'):
-            #rows -> rows
-            #columns -> number of frames
-            #number of frames ->columns
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,2)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[2]
             reference_point[2] = temp_ref
@@ -863,20 +669,11 @@ def processDoseplan_usingIsocenter():
             reference_point[1] = reference_point[2]
             reference_point[2] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Axial'):
-            #number of frames -> columns
-            #columns -> rows
-            #rows -> number of frames
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,1)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[1]
-            #isocenter_px[1] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[1]
             reference_point[1] = temp_ref
             dataset_swapped = np.swapaxes(dataset_swapped, 1,2)
-            #temp_iso = isocenter_px[1]
-            #isocenter_px[1] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[1]
             reference_point[1] = reference_point[2]
             reference_point[2] = temp_ref
@@ -885,56 +682,25 @@ def processDoseplan_usingIsocenter():
             clearAll()
             return
     elif(Globals.DVH_dataset_doseplan.ImageOrientationPatient==[0, 0, 1, 1, 0, 0]):
-        #reference_point[1] = isocenter_px[0]
-        #reference_point[2] = isocenter_px[1]
-        #reference_point[0] = isocenter_px[2]
         reference_point[0] = isocenter_px[1]
         reference_point[1] = isocenter_px[0]
         reference_point[2] = isocenter_px[2]
         if(Globals.DVH_film_orientation.get()=='Coronal'):
-            #rows -> columns
-            #columns -> rows
-            #number of frames -> number of frames
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 1,2)
-            #temp_iso = isocenter_px[1]
-            #isocenter_px[1] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[1]
             reference_point[1] = reference_point[2]
             reference_point[2] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Sagittal'):
-            #rows -> number of frames
-            #columns -> rows
-            #number of frames -> columns
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,1)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[1]
-            #isocenter_px[1] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[1]
             reference_point[1] = temp_ref
-            #dataset_swapped = np.swapaxes(dataset_swapped, 1,2)
-            #temp_iso = isocenter_px[1]
-            #isocenter_px[1] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
-            #temp_ref = reference_point[1]
-            #reference_point[1] = reference_point[2]
-            #reference_point[2] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Axial'):
-            #rows -> columns
-            #colums -> number of frames
-            #number of frames -> rows
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,1)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[1]
-            #isocenter_px[1] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[1]
             reference_point[1] = temp_ref
             dataset_swapped = np.swapaxes(dataset_swapped, 0,2)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[2]
             reference_point[2] = temp_ref
@@ -943,34 +709,19 @@ def processDoseplan_usingIsocenter():
             clearAll()
             return
     elif(Globals.DVH_dataset_doseplan.ImageOrientationPatient==[0, 0, 1, 0, 1, 0]):
-        #reference_point[1] = isocenter_px[0]
-        #reference_point[2] = isocenter_px[1]
-        #reference_point[0] = isocenter_px[2]
         reference_point[0] = isocenter_px[0]
         reference_point[1] = isocenter_px[1]
         reference_point[2] = isocenter_px[2]
         if(Globals.DVH_film_orientation.get()=='Coronal'):
-            #rows -> number of frames
-            #columns ->rows
-            #number of frames -> columns
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,2)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[2]
-            #isocenter_px[2] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[2]
             reference_point[2] = temp_ref
             dataset_swapped = np.swapaxes(dataset_swapped, 0,1)
-            #temp_iso = isocenter_px[0]
-            #isocenter_px[0] = isocenter_px[1]
-            #isocenter_px[1] = temp_iso
             temp_ref = reference_point[0]
             reference_point[0] = reference_point[1]
             reference_point[1] = temp_ref
         elif(Globals.DVH_film_orientation.get()=='Sagittal'):
-            #rows -> columns
-            #columns -> rows
-            #number of frames -> number of frames
             dataset_swapped = Globals.DVH_dataset_doseplan.pixel_array
         elif(Globals.DVH_film_orientation.get()=='Axial'):
             dataset_swapped = np.swapaxes(Globals.DVH_dataset_doseplan.pixel_array, 0,2)
@@ -991,7 +742,18 @@ def processDoseplan_usingIsocenter():
     ####################### Match film and doseplan ###############################
 
     #Pick the slice where the reference point is (this is the slice-position of the film)
-    dose_slice = dataset_swapped[int(reference_point[0]), :, :]
+    
+    if Globals.DVH_dataset_doseplan.PixelSpacing == [1, 1]:
+        offset = int(np.round(Globals.DVH_offset))
+        dose_slice = dataset_swapped[int(reference_point[0]) + offset]
+    elif Globals.DVH_dataset_doseplan.PixelSpacing == [2, 2]:
+        offset = int(np.round(Globals.DVH_offset/2))
+        dose_slice = dataset_swapped[int(reference_point[0] + offset)]
+    else:
+        offset = int(np.round(Globals.DVH_offset/3))
+        dose_slice = dataset_swapped[int(reference_point[0]) + offset]
+
+        
     
     #calculate the coordinates of the Region of Interest in doseplan (marked on the film) 
     #and checks if it actualy exists in dosematrix
@@ -1098,55 +860,306 @@ def processDoseplan_usingIsocenter():
     doseplan_ROI_coords.append([bottom_left_to_side, bottom_left_down])
     doseplan_ROI_coords.append([bottom_right_to_side, bottom_right_down])
 
-    Globals.DVH_doseplan_dataset_ROI = dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+    #dose_slice = cv2.flip(dose_slice, 1)
+    if(only_one):
+        Globals.DVH_doseplan_dataset_ROI = \
+            dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
     
     
-    img=Globals.DVH_doseplan_dataset_ROI
-    if(Globals.DVH_dataset_doseplan.PixelSpacing==[1, 1]):
-        img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
-    elif(Globals.DVH_dataset_doseplan.PixelSpacing==[2, 2]):
-        img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+        img=Globals.DVH_doseplan_dataset_ROI
+        if(Globals.DVH_dataset_doseplan.PixelSpacing==[1, 1]):
+            img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
+        elif(Globals.DVH_dataset_doseplan.PixelSpacing==[2, 2]):
+            img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
+        else:
+            img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+
+        mx=np.max(img)
+        Globals.DVH_max_dose_doseplan = mx*Globals.DVH_dose_scaling_doseplan
+        max_dose = mx*Globals.DVH_dose_scaling_doseplan
+        img = img/mx
+        PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
+
+        wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
+        doseplan_canvas = tk.Canvas(Globals.DVH_film_panedwindow)
+        doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
+        Globals.DVH_film_panedwindow.add(doseplan_canvas, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+        doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+
+
+        Globals.DVH_doseplan_write_image = tk.Canvas(doseplan_canvas)
+        Globals.DVH_doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+        Globals.DVH_doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+
+        doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
+        doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
+        doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            width=Globals.profiles_doseplan_text_image.width(), height=Globals.profiles_doseplan_text_image.height())
+
+        scaled_image_visual = PIL_img_doseplan_ROI
+        scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
+        Globals.DVH_doseplan_write_image_width = scaled_image_visual.width()
+        Globals.DVH_doseplan_write_image_height = scaled_image_visual.height()
+        Globals.DVH_doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
+        Globals.DVH_doseplan_write_image.image = scaled_image_visual
+        doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
+        doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
+
+        drawProfiles(False)
+
     else:
-        img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
+        img=dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+        Globals.DVH_doseplan_dataset_ROI_several.append(img)
+        Globals.DVH_number_of_doseplans+=1
 
-    mx=np.max(img)
-    max_dose = mx*Globals.DVH_dose_scaling_doseplan
-    img = img/mx
-    PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
-
-    wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
-    doseplan_canvas = tk.Canvas(Globals.DVH_film_panedwindow)
-    doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
-    Globals.DVH_film_panedwindow.add(doseplan_canvas, \
-        height=max(heig, Globals.DVH_doseplan_text_image.height()), \
-            width=wid + Globals.DVH_doseplan_text_image.width())
-    doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-        height=max(heig, Globals.DVH_doseplan_text_image.height()), \
-            width=wid + Globals.DVH_doseplan_text_image.width())
+        if(Globals.DVH_dataset_doseplan.PixelSpacing==[1, 1]):
+            Globals.DVH_several_img.append(cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5)))
+        elif(Globals.DVH_dataset_doseplan.PixelSpacing==[2, 2]):
+            Globals.DVH_several_img.append(cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10)))
+        else:
+            Globals.DVH_several_img.append(cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15)))
 
 
-    Globals.DVH_doseplan_write_image = tk.Canvas(doseplan_canvas)
-    Globals.DVH_doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
-    Globals.DVH_doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+def UploadDoseplan(only_one):
+    file = filedialog.askopenfilename()
+    ext = os.path.splitext(file)[-1].lower()
+    if(not(ext == '.dcm')):
+        if(ext == ""):
+            return
+        else:
+            messagebox.showerror("Error", "The file must be a *.dcm file")
+            return
+    
+    current_folder = os.getcwd()
+    parent = os.path.dirname(file)
+    os.chdir(parent)
+    dataset = pydicom.dcmread(file)
+    try:
+        dose_summation_type = dataset.DoseSummationType
+    except:
+        messagebox.showerror("Error", "Could not upload the doseplan correctly. Try again or another file.\n (Code: dose summation)")
+        return
+    
+    if(not(dose_summation_type == "PLAN")):
+        ok = messagebox.askokcancel("Dose summation", "You did not upload the full doseplan. Do you want to continue?")
+        if not ok:
+            return
+    os.chdir(current_folder)
+    doseplan_dataset = dataset.pixel_array
+    #Check that the resolution is either 1x1x1, 2x2x2 or 3x3x3
+    if(not((dataset.PixelSpacing==[1, 1] and dataset.SliceThickness==1) \
+        or (dataset.PixelSpacing==[2, 2] and dataset.SliceThickness==2) \
+        or (dataset.PixelSpacing==[3, 3] and dataset.SliceThickness==3))):
+        messagebox.showerror("Error", "The resolution in doseplan must be 1x1x1, 2x2x2 or 3x3x3")
+        return
+    #Check that the datamatrix is in right angles to the coordinate system
+    if(not(dataset.ImageOrientationPatient==[1, 0, 0, 0, 1, 0] or \
+        dataset.ImageOrientationPatient==[1, 0, 0, 0, 0, 1] or \
+        dataset.ImageOrientationPatient==[0, 1, 0, 1, 0, 0] or \
+        dataset.ImageOrientationPatient==[0, 1, 0, 0, 0, 1] or \
+        dataset.ImageOrientationPatient==[0, 0, 1, 1, 0, 0] or \
+        dataset.ImageOrientationPatient==[0, 0, 1, 0, 1, 0])):
+        messagebox.showerror("Error", "The Image Orientation (Patient) must be parallel to one of the main axis and perpendicular to the two others.")
+        return
+    
+    if not only_one and Globals.DVH_number_of_doseplans > 1:
+        if(not (Globals.DVH_dataset_doseplan.PixelSpacing==dataset.PixelSpacing)):
+            messagebox.showerror("Error", "Resolution of the doseplans must be equal. \n(Code: UploadDoseplan)")
+            return
+        if(not (Globals.DVH_dataset_doseplan.DoseGridScaling == dataset.DoseGridScaling)):
+            messagebox.showerror("Error", "Dose grid scaling of the doseplans must be equal. \n(Code: UploadDoseplan)")
+            return
+    Globals.DVH_dataset_doseplan = dataset
+    Globals.DVH_dose_scaling_doseplan = dataset.DoseGridScaling
+    Globals.DVH_test_if_added_doseplan = True
+    if(Globals.DVH_test_if_added_rtplan):
+        if(Globals.DVH_isocenter_or_reference_point == "Isocenter"):
+            processDoseplan_usingIsocenter(only_one)
+        elif(Globals.DVH_isocenter_or_reference_point == "Ref_point"):
+            processDoseplan_usingReferencePoint(only_one)
+        else:
+            messagebox.showerror("Error", "Something went wrong. Try again.\n (Code: processDoseplan)")
+            return
 
-    doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
-    doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
-    doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-        width=Globals.DVH_doseplan_text_image.width(), height=Globals.DVH_doseplan_text_image.height())
+    if only_one:
+        Globals.DVH_upload_button_doseplan.config(state=DISABLED)
 
-    scaled_image_visual = PIL_img_doseplan_ROI
-    scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
-    Globals.DVH_doseplan_write_image_width = scaled_image_visual.width()
-    Globals.DVH_doseplan_write_image_height = scaled_image_visual.height()
-    Globals.DVH_doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
-    Globals.DVH_doseplan_write_image.image = scaled_image_visual
-    doseplan_text_image_canvas.create_image(0,0,image=Globals.DVH_doseplan_text_image, anchor="nw")
-    doseplan_text_image_canvas.image=Globals.DVH_doseplan_text_image
+    if not only_one:
+        filename = basename(normpath(file))
+        textbox_filename = tk.Text(Globals.DVH_doseplans_scroll_frame, width = 30, height = 1)
+        textbox_filename.insert(INSERT, filename)
+        textbox_filename.config(bg='#ffffff', font=('calibri', '12'), state=DISABLED, relief=FLAT)
+        textbox_filename.grid(row = Globals.DVH_number_of_doseplans_row_count, column = 0, sticky=N+S+W+E, pady=(10,10), padx=(10,10))
+        Globals.DVH_doseplans_scroll_frame.grid_columnconfigure(Globals.DVH_doseplans_grid_config_count, weight=0)
+        Globals.DVH_doseplans_scroll_frame.grid_rowconfigure(Globals.DVH_doseplans_grid_config_count, weight=0)
+        Globals.DVH_doseplans_filenames.append(textbox_filename)
 
-    drawProfiles()
+        Globals.DVH_doseplans_grid_config_count+=1;
+
+        textbox_factor = tk.Text(Globals.DVH_doseplans_scroll_frame, width = 6, height = 1)
+        textbox_factor.insert(INSERT, "Factor: ")
+        textbox_factor.config(bg='#ffffff', font=('calibri', '12'), state=DISABLED, relief=FLAT)
+        textbox_factor.grid(row = Globals.profiles_number_of_doseplans_row_count, column = 1, sticky=N+S+W+E, pady=(10,10), padx=(10,10))
+        Globals.DVH_doseplans_scroll_frame.grid_columnconfigure(Globals.DVH_doseplans_grid_config_count, weight=0)
+        Globals.DVH_doseplans_scroll_frame.grid_rowconfigure(Globals.DVH_doseplans_grid_config_count, weight=0)
+        Globals.DVH_doseplans_factor_text.append(textbox_factor)
+
+        Globals.DVH_doseplans_grid_config_count+=1;
+
+        textbox_factor_input = tk.Text(Globals.DVH_doseplans_scroll_frame)
+        textbox_factor_input.insert(INSERT, " ")
+        textbox_factor_input.config(bg='#E5f9ff', font=('calibri', '12'), state=NORMAL, bd = 2)
+        textbox_factor_input.grid(row = Globals.DVH_number_of_doseplans_row_count, column = 1, sticky=N+S+W+E, pady=(10,10), padx=(30,10))
+        Globals.DVH_doseplans_scroll_frame.grid_columnconfigure(Globals.DVH_doseplans_grid_config_count, weight=0)
+        Globals.DVH_doseplans_scroll_frame.grid_rowconfigure(Globals.DVH_doseplans_grid_config_count, weight=0)
+        Globals.DVH_doseplans_factor_input.append(textbox_factor_input)
+
+        Globals.DVH_number_of_doseplans_row_count+=1
+        Globals.DVH_doseplans_grid_config_count+=1;
+
+def UploadDoseplan_button_function():
+    yes = messagebox.askyesno("Question", "Are you going to upload several doseplans and/or use a factor on a plan?")
+    if not yes:
+        UploadDoseplan(True)
+        return
+    
+    several_doseplans_window = tk.Toplevel(Globals.tab5_canvas)
+    several_doseplans_window.geometry("600x500+10+10")
+    several_doseplans_window.grab_set()
+    
+    doseplans_over_all_frame = tk.Frame(several_doseplans_window, bd=0, relief=FLAT)
+    doseplans_over_all_canvas = Canvas(doseplans_over_all_frame)
+
+    doseplans_xscrollbar = Scrollbar(doseplans_over_all_frame, orient=HORIZONTAL, command=doseplans_over_all_canvas.xview)
+    doseplans_yscrollbar = Scrollbar(doseplans_over_all_frame, command=doseplans_over_all_canvas.yview)
+
+    Globals.DVH_doseplans_scroll_frame = ttk.Frame(doseplans_over_all_canvas)
+    Globals.DVH_doseplans_scroll_frame.bind("<Configure>", lambda e: doseplans_over_all_canvas.configure(scrollregion=doseplans_over_all_canvas.bbox('all')))
+
+    doseplans_over_all_canvas.create_window((0,0), window=Globals.DVH_doseplans_scroll_frame, anchor='nw')
+    doseplans_over_all_canvas.configure(xscrollcommand=doseplans_xscrollbar.set, yscrollcommand=doseplans_yscrollbar.set)
+
+    doseplans_over_all_frame.config(highlightthickness=0, bg='#ffffff')
+    doseplans_over_all_canvas.config(highlightthickness=0, bg='#ffffff')
+    doseplans_over_all_frame.pack(expand=True, fill=BOTH)
+    doseplans_over_all_canvas.grid(row=0, column=0, sticky=N+S+E+W)
+    doseplans_over_all_frame.grid_columnconfigure(0, weight=1)
+    doseplans_over_all_frame.grid_rowconfigure(0, weight=1)
+    doseplans_xscrollbar.grid(row=1, column=0, sticky=E+W)
+    doseplans_over_all_frame.grid_columnconfigure(1, weight=0)
+    doseplans_over_all_frame.grid_rowconfigure(1, weight=0)
+    doseplans_yscrollbar.grid(row=0, column=1, sticky=N+S)
+    doseplans_over_all_frame.grid_columnconfigure(2, weight=0)
+    doseplans_over_all_frame.grid_rowconfigure(2, weight=0)
+
+    upload_doseplan_frame = tk.Frame(Globals.DVH_doseplans_scroll_frame)
+    upload_doseplan_frame.grid(row=0, column = 0, padx = (30,30), pady=(30,0), sticky=N+S+E+W)
+    Globals.DVH_doseplans_scroll_frame.grid_columnconfigure(0, weight=0)
+    Globals.DVH_doseplans_scroll_frame.grid_rowconfigure(0, weight=0)
+    upload_doseplan_frame.config(bg = '#ffffff')
+
+    upload_button_doseplan = tk.Button(upload_doseplan_frame, text='Browse', image=Globals.profiles_add_doseplans_button_image,\
+        cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: UploadDoseplan(False))
+    upload_button_doseplan.pack(expand=True, fill=BOTH)
+    upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+    upload_button_doseplan.image = Globals.profiles_add_doseplans_button_image
+
+    def closeUploadDoseplans():
+        if(len(Globals.DVH_doseplan_dataset_ROI_several) == 0):
+            messagebox.showinfo("INFO", "No doseplan has been uploaded")
+            return
+        for i in range(len(Globals.DVH_doseplan_dataset_ROI_several)):
+            if Globals.DVH_doseplans_factor_input[i].get("1.0", 'end-1c') == " ":
+                factor = 1
+            else:
+                try:
+                    factor = float(Globals.DVH_doseplans_factor_input[i].get("1.0", 'end-1c'))
+                except:
+                    messagebox.showerror("Error", "Invalid factor. Must be number.\n (Code: closeUploadDoseplans)")
+                    return
+            if i == 0:
+                doseplan_ROI = Globals.DVH_doseplan_dataset_ROI_several[i]
+                doseplan_ROI= doseplan_ROI*factor
+
+                img_ROI = Globals.DVH_several_img[i]
+                img_ROI = img_ROI*factor
+            else:
+                doseplan_ROI+= factor*Globals.DVH_doseplan_dataset_ROI_several[i]
+                img_ROI+= factor*Globals.DVH_several_img[i]
+
+        
+
+        mx=np.max(img_ROI)
+        #max_dose = mx*Globals.DVH_dose_scaling_doseplan
+        img_ROI = img_ROI/mx
+        PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img_ROI)*255))
+
+        wid = PIL_img_doseplan_ROI.width;heig = PIL_img_doseplan_ROI.height
+        doseplan_canvas = tk.Canvas(Globals.DVH_film_panedwindow)
+        doseplan_canvas.grid(row=2, column=0, sticky=N+S+W+E)
+        Globals.DVH_film_panedwindow.add(doseplan_canvas, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
+        doseplan_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            height=max(heig, Globals.profiles_doseplan_text_image.height()), \
+                width=wid + Globals.profiles_doseplan_text_image.width())
 
 
+        Globals.DVH_doseplan_write_image = tk.Canvas(doseplan_canvas)
+        Globals.DVH_doseplan_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+        Globals.DVH_doseplan_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
 
+        doseplan_text_image_canvas = tk.Canvas(doseplan_canvas)
+        doseplan_text_image_canvas.grid(row=0,column=0,sticky=N+S+W+E)
+        doseplan_text_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
+            width=Globals.profiles_doseplan_text_image.width(), height=Globals.profiles_doseplan_text_image.height())
+
+        scaled_image_visual = PIL_img_doseplan_ROI
+        scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
+        Globals.DVH_doseplan_write_image_width = scaled_image_visual.width()
+        Globals.DVH_doseplan_write_image_height = scaled_image_visual.height()
+        Globals.DVH_doseplan_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
+        Globals.DVH_doseplan_write_image.image = scaled_image_visual
+        doseplan_text_image_canvas.create_image(0,0,image=Globals.profiles_doseplan_text_image, anchor="nw")
+        doseplan_text_image_canvas.image=Globals.profiles_doseplan_text_image
+
+        Globals.DVH_doseplan_dataset_ROI = doseplan_ROI
+
+        Globals.DVH_upload_button_doseplan.config(state=DISABLED)
+
+        several_doseplans_window.after(500, lambda: several_doseplans_window.destroy())
+        drawProfiles(False)
+
+    doseplans_done_button_frame = tk.Frame(Globals.DVH_doseplans_scroll_frame)
+    doseplans_done_button_frame.grid(row=0, column = 1, padx=(0,40), pady=(30,0), sticky=N+S+W+E)
+    doseplans_done_button_frame.config(bg='#ffffff')
+    Globals.DVH_doseplans_scroll_frame.grid_rowconfigure(3, weight=0)
+    Globals.DVH_doseplans_scroll_frame.grid_columnconfigure(3, weight=0)
+
+    doseplans_done_button = tk.Button(doseplans_done_button_frame, text='Done', image=Globals.done_button_image,\
+        cursor='hand2', font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=closeUploadDoseplans)
+    doseplans_done_button.pack(expand=True, fill=BOTH)
+    doseplans_done_button.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
+    doseplans_done_button.image = Globals.done_button_image
+    
+
+    filename_title = tk.Text(Globals.DVH_doseplans_scroll_frame, width = 15, height= 1)
+    filename_title.insert(INSERT, "Filename")
+    filename_title.grid(row=2, column=0, sticky=N+S+E+W, pady=(40,0), padx=(45,15))
+    filename_title.config(bg='#ffffff', relief=FLAT, state=DISABLED, font=('calibri', '15', 'bold'))
+    Globals.DVH_doseplans_scroll_frame.grid_rowconfigure(1, weight=0)
+    Globals.DVH_doseplans_scroll_frame.grid_columnconfigure(1, weight=0)
+
+    factor_title = tk.Text(Globals.DVH_doseplans_scroll_frame, width=30, height=2)
+    factor_title.insert(INSERT, "Here you can write a factor to use \non the doseplan. Defaults to 1.")
+    factor_title.grid(row=2, column=1, sticky=N+W+S+E, pady=(37,10), padx=(15,25))
+    factor_title.config(bg='#ffffff', relief=FLAT, state=DISABLED, font=('calibri', '15', 'bold'))
+    Globals.DVH_doseplans_scroll_frame.grid_columnconfigure(2,weight=0)
+    Globals.DVH_doseplans_scroll_frame.grid_rowconfigure(2, weight=0)
 
 def UploadRTplan():
     file = filedialog.askopenfilename()
@@ -1207,126 +1220,13 @@ def UploadRTplan():
         return
     
     Globals.DVH_test_if_added_rtplan = True
-    if(Globals.DVH_test_if_added_doseplan):
-        if(Globals.DVH_isocenter_or_reference_point == "Isocenter"):
-            processDoseplan_usingIsocenter()
-        elif(Globals.DVH_isocenter_or_reference_point == "Ref_point"):
-            processDoseplan_usingReferencePoint()
-        else:
-            messagebox.showerror("Error", "Something went wrong. Try again.\n\
-                (Code: processDoseplan)")
-            return
-
+    Globals.DVH_upload_button_doseplan.config(state=ACTIVE)
     Globals.DVH_upload_button_rtplan.config(state=DISABLED)
 
-def UploadDoseplan_button_function():
-    yes = messagebox.askyesno("Question", "Are you going to upload several doseplans and/or use a factor on a plan?")
-    if not yes:
-        UploadDoseplan()
-        return
-    
-    several_doseplans_window = tk.Toplevel(Globals.tab4_canvas)
-    several_doseplans_window.geometry("700x700+10+10")
-    several_doseplans_window.grab_set()
-    
-    doseplans_over_all_frame = tk.Frame(several_doseplans_window, bd=0, relief=FLAT)
-    doseplans_over_all_canvas = Canvas(doseplans_over_all_frame)
+def pixel_to_dose(P,a,b,c):
+    ret = c + b/(P-a)
+    return ret
 
-    doseplans_xscrollbar = Scrollbar(doseplans_over_all_frame, orient=HORIZONTAL, command=doseplans_over_all_canvas.xview)
-    doseplans_yscrollbar = Scrollbar(doseplans_over_all_frame, command=doseplans_over_all_canvas.yview)
-
-    doseplans_scroll_frame = ttk.Frame(doseplans_over_all_canvas)
-    doseplans_scroll_frame.bind("<Configure>", lambda e: doseplans_over_all_canvas.configure(scrollregion=doseplans_over_all_canvas.bbox('all')))
-
-    doseplans_over_all_canvas.create_window((0,0), window=doseplans_scroll_frame, anchor='nw')
-    doseplans_over_all_canvas.configure(xscrollcommand=doseplans_xscrollbar.set, yscrollcommand=doseplans_yscrollbar.set)
-
-    doseplans_over_all_frame.config(highlightthickness=0, bg='#ffffff')
-    doseplans_over_all_canvas.config(highlightthickness=0, bg='#ffffff')
-    doseplans_over_all_frame.pack(expand=True, fill=BOTH)
-    doseplans_over_all_canvas.grid(row=0, column=0, sticky=N+S+E+W)
-    doseplans_over_all_frame.grid_columnconfigure(0, weight=1)
-    doseplans_over_all_frame.grid_rowconfigure(0, weight=1)
-    doseplans_xscrollbar.grid(row=1, column=0, sticky=E+W)
-    doseplans_over_all_frame.grid_columnconfigure(1, weight=0)
-    doseplans_over_all_frame.grid_rowconfigure(1, weight=0)
-    doseplans_yscrollbar.grid(row=0, column=1, sticky=N+S)
-    doseplans_over_all_frame.grid_columnconfigure(2, weight=0)
-    doseplans_over_all_frame.grid_rowconfigure(2, weight=0)
-
-    upload_doseplan_frame = tk.Frame(doseplans_scroll_frame)
-    upload_doseplan_frame.grid(row=2, column = 0, padx = (0,40), pady=(10,0), sticky=N)
-    doseplans_scroll_frame.grid_columnconfigure(0, weight=0)
-    doseplans_scroll_frame.grid_rowconfigure(0, weight=0)
-    upload_film_frame.config(bg = '#ffffff')
-
-    upload_button_doseplan = tk.Button(upload_doseplan_frame, text='Browse', image=DVH_add_doseplan_button_image,\
-        cursor='hand2', font=('calibri', '14'), relief=FLAT, state=DISABLED, command=UploadDoseplan)
-    Globals.DVH_upload_button_doseplan.pack(expand=True, fill=BOTH)
-    Globals.DVH_upload_button_doseplan.configure(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-    Globals.DVH_upload_button_doseplan.image = DVH_add_doseplan_button_image
-
-
-
-
-def UploadDoseplan():
-    file = filedialog.askopenfilename()
-    ext = os.path.splitext(file)[-1].lower()
-    if(not(ext == '.dcm')):
-        if(ext == ""):
-            return
-        else:
-            messagebox.showerror("Error", "The file must be a *.dcm file")
-            return
-    
-    current_folder = os.getcwd()
-    parent = os.path.dirname(file)
-    os.chdir(parent)
-    dataset = pydicom.dcmread(file)
-    try:
-        dose_summation_type = dataset.DoseSummationType
-    except:
-        messagebox.showerror("Error", "Could not upload the doseplan correctly. Try again or another file.\n (Code: dose summation)")
-        return
-    
-    if(not(dose_summation_type == "PLAN")):
-        ok = messagebox.askokcancel("Dose summation", "You did not upload the full doseplan. Do you want to continue?")
-        if not ok:
-            return
-    os.chdir(current_folder)
-    doseplan_dataset = dataset.pixel_array
-    #Check that the resolution is either 1x1x1, 2x2x2 or 3x3x3
-    if(not((dataset.PixelSpacing==[1, 1] and dataset.SliceThickness==1) \
-        or (dataset.PixelSpacing==[2, 2] and dataset.SliceThickness==2) \
-        or (dataset.PixelSpacing==[3, 3] and dataset.SliceThickness==3))):
-        messagebox.showerror("Error", "The resolution in doseplan must be 1x1x1, 2x2x2 or 3x3x3")
-        return
-    #Check that the datamatrix is in right angles to the coordinate system
-    if(not(dataset.ImageOrientationPatient==[1, 0, 0, 0, 1, 0] or \
-        dataset.ImageOrientationPatient==[1, 0, 0, 0, 0, 1] or \
-        dataset.ImageOrientationPatient==[0, 1, 0, 1, 0, 0] or \
-        dataset.ImageOrientationPatient==[0, 1, 0, 0, 0, 1] or \
-        dataset.ImageOrientationPatient==[0, 0, 1, 1, 0, 0] or \
-        dataset.ImageOrientationPatient==[0, 0, 1, 0, 1, 0])):
-        messagebox.showerror("Error", "The Image Orientation (Patient) must be parallel to one of the main axis and perpendicular to the two others.")
-        return
-
-    Globals.DVH_dataset_doseplan = dataset
-    Globals.DVH_dose_scaling_doseplan = dataset.DoseGridScaling
-    Globals.DVH_test_if_added_doseplan = True
-    if(Globals.DVH_test_if_added_rtplan):
-        if(Globals.DVH_isocenter_or_reference_point == "Isocenter"):
-            processDoseplan_usingIsocenter()
-        elif(Globals.DVH_isocenter_or_reference_point == "Ref_point"):
-            processDoseplan_usingReferencePoint()
-        else:
-            messagebox.showerror("Error", "Something went wrong. Try again.\n (Code: processDoseplan)")
-            return
-
-    Globals.DVH_upload_button_doseplan.config(state=DISABLED)
-
-
-######################################################## F I L M ########################################################
 def markIsocenter(img, new_window_isocenter_tab, image_canvas, cv2Img):
     if(len(Globals.DVH_mark_isocenter_oval)>0):
         image_canvas.delete(Globals.DVH_mark_isocenter_up_down_line[0])
@@ -1375,7 +1275,7 @@ def markIsocenter(img, new_window_isocenter_tab, image_canvas, cv2Img):
 
     mark_isocenter_image_canvas.create_image(0,0,image=img_mark_isocenter,anchor="nw")
     mark_isocenter_image_canvas.image = img_mark_isocenter
-    mark_isocenter_image_canvas.config(cursor='top_side', bg='#ffffff', relief=FLAT, bd=0, \
+    mark_isocenter_image_canvas.config(cursor='hand2', bg='#ffffff', relief=FLAT, bd=0, \
         scrollregion=mark_isocenter_image_canvas.bbox(ALL), height=img_mark_isocenter.height(), width=img_mark_isocenter.width())
     mark_isocenter_image_canvas.grid_propagate(0)
 
@@ -1383,7 +1283,7 @@ def markIsocenter(img, new_window_isocenter_tab, image_canvas, cv2Img):
         mark_isocenter_image_canvas.create_oval(event.x-2, event.y-2, event.x+2, event.y+2, fill='red')
         if(Globals.DVH_iscoenter_coords==[]):
             Globals.DVH_iscoenter_coords.append([event.x, event.y])
-            mark_isocenter_image_canvas.config(cursor='right_side')
+            mark_isocenter_image_canvas.config(cursor='hand2')
 
         elif(len(Globals.DVH_iscoenter_coords)==1):
             Globals.DVH_iscoenter_coords.append([event.x, event.y])
@@ -1409,9 +1309,7 @@ def markIsocenter(img, new_window_isocenter_tab, image_canvas, cv2Img):
             
     mark_isocenter_image_canvas.bind("<Button 1>",findCoords)
 
-    
 def markReferencePoint(img, new_window_reference_point_tab, image_canvas_reference_tab, cv2Img):
-
     if(len(Globals.DVH_mark_reference_point_oval)>0):
         image_canvas_reference_tab.delete(Globals.DVH_mark_reference_point_oval[0])
         Globals.DVH_mark_reference_point_oval=[]
@@ -1561,23 +1459,18 @@ def markROI(img, tab, canvas, ref_point_test):
     mark_ROI_image_canvas.bind("<Button-1>", buttonPushed)
     mark_ROI_image_canvas.bind("<ButtonRelease-1>", buttonReleased)
 
-
 def UploadFilm():
-    #if(Globals.DVH_film_window_open):
-    #    Globals.DVH_film_window.destroy()
-    #    Globals.DVH_film_window_open = False
     if(Globals.DVH_film_orientation.get() == '-'):
-        messagebox.showerror("Missing parameter", "Film orientation missing")
+        messagebox.showerror("Missing parameter", "Film orientation missing \n (Code: UploadFilm)")
         return
-    #if(Globals.DVH_depth.get("1.0",'end-1c') == " "):
-    #    messagebox.showerror("Missing parameter", "Film depth missing")
-    #    return
-    #try:
-    #    Globals.DVH_depth_float = float(Globals.DVH_depth.get("1.0", 'end-1c'))
-    #except:
-    #    messagebox.showerror("Error", "The depth must be a number")
-    #    return
-    #Globals.DVH_depth.config(state=DISABLED, fg='gray')
+    if Globals.DVH_film_factor_input.get("1.0", 'end-1c') == " ":
+        Globals.DVH_film_factor = 1
+    else:
+        try:
+            Globals.DVH_film_factor = float(Globals.DVH_film_factor_input.get("1.0", 'end-1c'))
+        except:
+            messagebox.showerror("Missing parameter", "Film factor invalid format. \n (Code: UploadFilm)")
+            return
 
     file = filedialog.askopenfilename()
     ext = os.path.splitext(file)[-1].lower()
@@ -1588,7 +1481,6 @@ def UploadFilm():
         img = Image.open(file)
         img = img.transpose(Image.FLIP_LEFT_RIGHT)
         cv2Img = cv2.imread(basename(normpath(file)), cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
-        #cv2Img = cv2.flip(cv2Img, 0)
         cv2Img = cv2.medianBlur(cv2Img, 5)
         if(cv2Img is None):
             messagebox.showerror("Error", "Something has gone wrong. Check that the filename does not contain Æ,Ø,Å")
@@ -1611,20 +1503,18 @@ def UploadFilm():
             messagebox.showerror("Error","The uploaded image need to be in RGB-format")
             return
 
-        os.chdir(current_folder)  
-       
+        os.chdir(current_folder)
+
         if(not (img.width == 1016)):
             messagebox.showerror("Error", "Dpi in image has to be 127")
             return
 
         Globals.DVH_film_orientation_menu.configure(state=DISABLED)
-    
-        #scale_horizontal = 2
-        #scale_vertical = 2
-        
+        Globals.DVH_film_factor_input.config(state=DISABLED)
+
         h = 635 + 20
         w = 508 + 625
-        new_window = tk.Toplevel(Globals.tab4)
+        new_window = tk.Toplevel(Globals.tab5)
         new_window.geometry("%dx%d+0+0" % (w, h))
         new_window.grab_set()
 
@@ -1679,9 +1569,8 @@ adjustments \nto the placement of either the reference point or isocenter.")
         new_window_manually_tab = ttk.Frame(new_window_notebook)
         new_window_notebook.add(new_window_manually_tab, text='Manually')
 
-
         image_canvas = tk.Canvas(new_window_isocenter_tab)
-        image_canvas.grid(row=0,column=0, rowspan=10, columnspan=3, sticky=N+S+E+W, padx=(0,0), pady=(0,0))
+        image_canvas.grid(row=0,column=0, rowspan=12, columnspan=3, sticky=N+S+E+W, padx=(0,0), pady=(0,0))
         new_window_isocenter_tab.grid_rowconfigure(1, weight=0)
         new_window_isocenter_tab.grid_columnconfigure(1, weight=0)
         image_canvas.create_image(0,0,image=img_scaled,anchor="nw")
@@ -1700,7 +1589,7 @@ adjustments \nto the placement of either the reference point or isocenter.")
             height=img_scaled.height(), width=img_scaled.width())
         image_canvas_reference_tab.grid_propagate(0)
 
-        film_window_mark_isocenter_text = tk.Text(new_window_isocenter_tab, width=55, height=5)
+        film_window_mark_isocenter_text = tk.Text(new_window_isocenter_tab, width=55, height=7)
         film_window_mark_isocenter_text.insert(INSERT, \
 "When clicking the button \"Mark isocenter\" a window showing \n\
 the image will appear and you are to click on the markers \n\
@@ -1733,31 +1622,31 @@ again and repeat.")
         new_window_isocenter_tab.grid_columnconfigure(3, weight=0)
         new_window_isocenter_tab.grid_rowconfigure(3, weight=0)
 
-        mark_isocenter_button = tk.Button(mark_isocenter_button_frame, text='Browse', image=Globals.DVH_mark_isocenter_button_image,\
+        mark_isocenter_button = tk.Button(mark_isocenter_button_frame, text='Browse', image=Globals.profiles_mark_isocenter_button_image,\
             cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: markIsocenter(img, new_window_isocenter_tab, image_canvas, cv2Img))
         mark_isocenter_button.pack(expand=True, fill=BOTH)
         mark_isocenter_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-        mark_isocenter_button.image=Globals.DVH_mark_isocenter_button_image
+        mark_isocenter_button.image=Globals.profiles_mark_isocenter_button_image
 
         mark_point_button_frame = tk.Frame(new_window_reference_point_tab)
-        mark_point_button_frame.grid(row=2, column=3, padx=(10,10), pady=(30,0))
+        mark_point_button_frame.grid(row=3, column=3, padx=(10,10), pady=(30,0))
         mark_point_button_frame.configure(bg='#ffffff')
         new_window_reference_point_tab.grid_columnconfigure(3, weight=0)
         new_window_reference_point_tab.grid_rowconfigure(3, weight=0)
 
-        mark_point_button = tk.Button(mark_point_button_frame, text='Browse', image=Globals.DVH_mark_point_button_image,\
+        mark_point_button = tk.Button(mark_point_button_frame, text='Browse', image=Globals.profiles_mark_point_button_image,\
             cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: \
                 markReferencePoint(img, new_window_reference_point_tab, image_canvas_reference_tab, cv2Img))
         mark_point_button.pack(expand=True, fill=BOTH)
         mark_point_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-        mark_point_button.image=Globals.DVH_mark_point_button_image
+        mark_point_button.image=Globals.profiles_mark_point_button_image
 
         write_displacement_relative_to_reference_point = tk.Text(new_window_reference_point_tab, width = 55, height=3)
         write_displacement_relative_to_reference_point.insert(INSERT, "\
 If the marked reference points in the film does not match\n\
 the reference point in the phantom you can write the\n\
 displacemnet here (in mm). Defaults to zero ")
-        write_displacement_relative_to_reference_point.grid(row=3, column=3, rowspan=2, sticky=N+S+E+W, padx=(10,10), pady=(0,10))
+        write_displacement_relative_to_reference_point.grid(row=4, column=3, rowspan=2, sticky=N+S+E+W, padx=(10,10), pady=(0,10))
         write_displacement_relative_to_reference_point.config(bg='#ffffff', relief=FLAT, bd=0, state=DISABLED, font=('calibri', '11'))
         new_window_reference_point_tab.grid_rowconfigure(6, weight=0)
         new_window_reference_point_tab.grid_columnconfigure(6, weight=0)
@@ -1765,46 +1654,46 @@ displacemnet here (in mm). Defaults to zero ")
         input_lateral_text = tk.Text(new_window_reference_point_tab, width=12, height=1)
         input_lateral_text.insert(INSERT, "Lateral:")
         input_lateral_text.config(bg='#ffffff', relief=FLAT, bd=0, state=DISABLED, font=('calibri', '10'))
-        input_lateral_text.grid(row=4, column=3, sticky=N+S, padx=(0,250), pady=(25,0))
+        input_lateral_text.grid(row=5, column=3, sticky=N+S, padx=(0,250), pady=(25,0))
         new_window_reference_point_tab.grid_rowconfigure(10, weight=0)
         new_window_reference_point_tab.grid_rowconfigure(10, weight=0)
 
         Globals.DVH_input_lateral_displacement = tk.Text(new_window_reference_point_tab, width=5, height=1)
         Globals.DVH_input_lateral_displacement.insert(INSERT, " ")
         Globals.DVH_input_lateral_displacement.config(bg='#E5f9ff', relief=GROOVE, bd=2, state=NORMAL, font=('calibri', '11'))
-        Globals.DVH_input_lateral_displacement.grid(row=4, column=3, padx=(0,285), pady=(35,0))
+        Globals.DVH_input_lateral_displacement.grid(row=5, column=3, padx=(0,285), pady=(35,0))
         new_window_reference_point_tab.grid_rowconfigure(7, weight=0)
         new_window_reference_point_tab.grid_columnconfigure(7, weight=0)
 
         input_vertical_text = tk.Text(new_window_reference_point_tab, width=12, height=1)
         input_vertical_text.insert(INSERT, "Vertical:")
         input_vertical_text.config(bg='#ffffff', relief=FLAT, bd=0, state=DISABLED, font=('calibri', '10'))
-        input_vertical_text.grid(row=4, column=3, sticky=N+S, padx=(0,0), pady=(25,0))
+        input_vertical_text.grid(row=5, column=3, sticky=N+S, padx=(0,0), pady=(25,0))
         new_window_reference_point_tab.grid_rowconfigure(11, weight=0)
         new_window_reference_point_tab.grid_rowconfigure(11, weight=0)
 
         Globals.DVH_input_vertical_displacement = tk.Text(new_window_reference_point_tab, width=4, height=1)
         Globals.DVH_input_vertical_displacement.insert(INSERT, " ")
         Globals.DVH_input_vertical_displacement.config(bg='#E5f9ff', relief=GROOVE, bd=2, state=NORMAL, font=('calibri', '11'))
-        Globals.DVH_input_vertical_displacement.grid(row=4, column=3, padx=(0,25), pady=(35,0))
+        Globals.DVH_input_vertical_displacement.grid(row=5, column=3, padx=(0,25), pady=(35,0))
         new_window_reference_point_tab.grid_rowconfigure(8, weight=0)
         new_window_reference_point_tab.grid_columnconfigure(8, weight=0)   
 
         input_long_text = tk.Text(new_window_reference_point_tab, width=12, height=1)
         input_long_text.insert(INSERT, "Longitudinal:")
         input_long_text.config(bg='#ffffff', relief=FLAT, bd=0, state=DISABLED, font=('calibri', '10'))
-        input_long_text.grid(row=4, column=3, sticky=N+S, padx=(250,0), pady=(25,0))
+        input_long_text.grid(row=5, column=3, sticky=N+S, padx=(250,0), pady=(25,0))
         new_window_reference_point_tab.grid_rowconfigure(12, weight=0)
         new_window_reference_point_tab.grid_rowconfigure(12, weight=0)
 
         Globals.DVH_input_longitudinal_displacement = tk.Text(new_window_reference_point_tab, width=5, height=1)
         Globals.DVH_input_longitudinal_displacement.insert(INSERT, " ")
         Globals.DVH_input_longitudinal_displacement.config(bg='#E5f9ff', relief=GROOVE, bd=2, state=NORMAL, font=('calibri', '11'))
-        Globals.DVH_input_longitudinal_displacement.grid(row=4, column=3, padx=(240,0), pady=(35,0))
+        Globals.DVH_input_longitudinal_displacement.grid(row=5, column=3, padx=(240,0), pady=(35,0))
         new_window_reference_point_tab.grid_rowconfigure(9, weight=0)
         new_window_reference_point_tab.grid_columnconfigure(9, weight=0)     
 
-        film_window_mark_ROI_text = tk.Text(new_window_isocenter_tab, width=55, height=5)
+        film_window_mark_ROI_text = tk.Text(new_window_isocenter_tab, width=55, height=7)
         film_window_mark_ROI_text.insert(INSERT, \
 "When clicking the button \"Mark ROI\" a window showing the\n\
 image will appear and you are to drag a rectangle marking \n\
@@ -1813,7 +1702,7 @@ scanned in either portrait or landscape orientation. When\n\
 the ROI has been marked it will appear on the image. If you\n\
 are not happy with the placement click the button again.")
         film_window_mark_ROI_text.config(bg='#ffffff', relief=FLAT, bd=0, state=DISABLED, font=('calibri', '11'))
-        film_window_mark_ROI_text.grid(row=4, column=3, rowspan=3, sticky=N+S+E+W, padx=(10,10), pady=(10,0))
+        film_window_mark_ROI_text.grid(row=5, column=3, rowspan=4, sticky=N+S+E+W, padx=(10,10), pady=(0,0))
         new_window_isocenter_tab.grid_columnconfigure(4, weight=0)
         new_window_isocenter_tab.grid_rowconfigure(4, weight=0)
         
@@ -1826,35 +1715,50 @@ scanned in either portrait or landscape orientation. When\n\
 the ROI has been marked it will appear on the image. If you\n\
 are not happy with the placement click the button again.")
         film_window_mark_ROI_reference_point_text.config(bg='#ffffff', relief=FLAT, bd=0, state=DISABLED, font=('calibri', '11'))
-        film_window_mark_ROI_reference_point_text.grid(row=5, column=3, rowspan=3, sticky=N+E+W, padx=(10,10), pady=(10,0))
+        film_window_mark_ROI_reference_point_text.grid(row=6, column=3, rowspan=3, sticky=N+E+W, padx=(10,10), pady=(10,0))
         new_window_reference_point_tab.grid_columnconfigure(4, weight=0)
         new_window_reference_point_tab.grid_rowconfigure(4, weight=0)
         
         mark_ROI_button_frame = tk.Frame(new_window_isocenter_tab)
-        mark_ROI_button_frame.grid(row=7, column=3, padx=(10,10), pady=(0,5))
+        mark_ROI_button_frame.grid(row=8, column=3, padx=(10,0), pady=(0,5))
         mark_ROI_button_frame.configure(bg='#ffffff')
         new_window_isocenter_tab.grid_columnconfigure(5, weight=0)
         new_window_isocenter_tab.grid_rowconfigure(5, weight=0)
 
-        mark_ROI_button = tk.Button(mark_ROI_button_frame, text='Browse', image=Globals.DVH_mark_ROI_button_image,\
+        mark_ROI_button = tk.Button(mark_ROI_button_frame, text='Browse', image=Globals.profiles_mark_ROI_button_image,\
             cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: markROI(img, new_window_isocenter_tab, image_canvas, False))
         mark_ROI_button.pack(expand=True, fill=BOTH)
         mark_ROI_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-        mark_ROI_button.image=Globals.DVH_mark_ROI_button_image
+        mark_ROI_button.image=Globals.profiles_mark_ROI_button_image
+
+        slice_offset_text = tk.Text(new_window_isocenter_tab, width=25, height=1)
+        slice_offset_text.insert(INSERT, "Slice offset, mm (default 0):")
+        slice_offset_text.config(state=DISABLED, font=('calibri', '10'), bd = 0, relief=FLAT)   
+        slice_offset_text.grid(row=9, column=3, padx=(5,110), pady=(0,0))
+        new_window_isocenter_tab.grid_columnconfigure(6, weight=0)
+        new_window_isocenter_tab.grid_rowconfigure(6, weight=0)
+
+        Globals.DVH_slice_offset = tk.Text(new_window_isocenter_tab, width=8, height=1)
+        Globals.DVH_slice_offset.grid(row=9, column=3, padx=(110,10), pady=(0,0))
+        Globals.DVH_slice_offset.insert(INSERT, " ")
+        Globals.DVH_slice_offset.config(state=NORMAL, font=('calibri', '10'), bd = 2, bg='#ffffff')
+        new_window_isocenter_tab.grid_columnconfigure(7, weight=0)
+        new_window_isocenter_tab.grid_rowconfigure(7, weight=0)
 
         mark_ROI_button_reference_point_frame = tk.Frame(new_window_reference_point_tab)
-        mark_ROI_button_reference_point_frame.grid(row=8, column=3, padx=(10,10), pady=(0,5))
+        mark_ROI_button_reference_point_frame.grid(row=9, column=3, padx=(10,10), pady=(0,5))
         mark_ROI_button_reference_point_frame.configure(bg='#ffffff')
         new_window_reference_point_tab.grid_columnconfigure(5, weight=0)
         new_window_reference_point_tab.grid_rowconfigure(5, weight=0)
 
-        mark_ROI_reference_point_button = tk.Button(mark_ROI_button_reference_point_frame, text='Browse', image=Globals.DVH_mark_ROI_button_image,\
+        mark_ROI_reference_point_button = tk.Button(mark_ROI_button_reference_point_frame, text='Browse', image=Globals.profiles_mark_ROI_button_image,\
             cursor='hand2',font=('calibri', '14'), relief=FLAT, state=ACTIVE, command=lambda: markROI(img, new_window_reference_point_tab, image_canvas_reference_tab, True))
         mark_ROI_reference_point_button.pack(expand=True, fill=BOTH)
         mark_ROI_reference_point_button.config(bg='#ffffff', activebackground='#ffffff', activeforeground='#ffffff', highlightthickness=0)
-        mark_ROI_reference_point_button.image=Globals.DVH_mark_ROI_button_image
+        mark_ROI_reference_point_button.image=Globals.profiles_mark_ROI_button_image
 
         def finishFilmMarkers(ref_test):
+            Globals.DVH_slice_offset.config(state=DISABLED)
             if(ref_test):
                 if(not(Globals.DVH_input_lateral_displacement.get("1.0",'end-1c')==" ")):
                     try:
@@ -1886,7 +1790,16 @@ are not happy with the placement click the button again.")
                 Globals.DVH_input_vertical_displacement.config(state=DISABLED)
                 Globals.DVH_input_longitudinal_displacement.config(state=DISABLED)
                 Globals.DVH_input_lateral_displacement.config(state=DISABLED)
-
+            else:
+                if not Globals.DVH_slice_offset.get("1.0",'end-1c')==" ":
+                    try:
+                        offset = float(Globals.DVH_slice_offset.get("1.0",'end-1c'))
+                        Globals.DVH_offset = offset
+                    except:
+                        messagebox.showerror("Error", "Slice offset must be a number \n(Code: finishFilmMarkers(false)")
+                        return
+                else:
+                    Globals.DVH_offset = 0
             if(ref_test):
                 choose_batch_window = tk.Toplevel(new_window_reference_point_tab)
             else:
@@ -1952,18 +1865,26 @@ are not happy with the placement click the button again.")
                 Globals.DVH_popt_red[0] = float(words[3])
                 Globals.DVH_popt_red[1] = float(words[4])
                 Globals.DVH_popt_red[2] = float(words[5])
-                print("popt:")
-                print(Globals.DVH_popt_red)
                 f.close()
 
                 Globals.DVH_film_dataset_ROI_red_channel_dose = np.zeros((Globals.DVH_film_dataset_ROI_red_channel.shape[0],\
                     Globals.DVH_film_dataset_ROI_red_channel.shape[1]))
                 for i in range(Globals.DVH_film_dataset_ROI_red_channel_dose.shape[0]):
                     for j in range(Globals.DVH_film_dataset_ROI_red_channel_dose.shape[1]):
-                        Globals.DVH_film_dataset_ROI_red_channel_dose[i,j] = pixel_to_dose(Globals.DVH_film_dataset_ROI_red_channel[i,j], \
+                        Globals.DVH_film_dataset_ROI_red_channel_dose[i,j] = Globals.DVH_film_factor*\
+                            pixel_to_dose(Globals.DVH_film_dataset_ROI_red_channel[i,j], \
                             Globals.DVH_popt_red[0], Globals.DVH_popt_red[1], Globals.DVH_popt_red[2])
-                film_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
-                film_write_image.image = scaled_image_visual
+
+                Globals.DVH_film_dataset_red_channel_dose = np.zeros((Globals.DVH_film_dataset_red_channel.shape[0],\
+                    Globals.DVH_film_dataset_red_channel.shape[1]))
+                for i in range(Globals.DVH_film_dataset_red_channel_dose.shape[0]):
+                    for j in range(Globals.DVH_film_dataset_red_channel_dose.shape[1]):
+                        Globals.DVH_film_dataset_red_channel_dose[i,j] = Globals.DVH_film_factor*\
+                            pixel_to_dose(Globals.DVH_film_dataset_red_channel[i,j], \
+                            Globals.DVH_popt_red[0], Globals.DVH_popt_red[1], Globals.DVH_popt_red[2])
+
+                Globals.DVH_film_write_image.create_image(0,0,image=scaled_image_visual, anchor="nw")
+                Globals.DVH_film_write_image.image = scaled_image_visual
 
                 mx_film=np.max(Globals.DVH_film_dataset_ROI_red_channel_dose)
                 Globals.DVH_max_dose_film = mx_film
@@ -1972,13 +1893,13 @@ are not happy with the placement click the button again.")
                 PIL_img_film = Image.fromarray(np.uint8(cm.viridis(img_film)*255))
 
                 scaled_image_visual_film = ImageTk.PhotoImage(image=PIL_img_film)
-                film_dose_write_image.create_image(0,0,image=scaled_image_visual_film, anchor="nw")
-                film_dose_write_image.image = scaled_image_visual_film
+                Globals.DVH_film_dose_write_image.create_image(0,0,image=scaled_image_visual_film, anchor="nw")
+                Globals.DVH_film_dose_write_image.image = scaled_image_visual_film
 
-                film_scanned_image_text_canvas.create_image(0,0,image=Globals.DVH_scanned_image_text_image, anchor="nw")
-                film_scanned_image_text_canvas.image = Globals.DVH_scanned_image_text_image
-                film_dose_map_image_text_canvas.create_image(0,0, image=Globals.DVH_film_dose_map_text_image, anchor="nw")
-                film_dose_map_image_text_canvas.image=Globals.DVH_film_dose_map_text_image
+                film_scanned_image_text_canvas.create_image(0,0,image=Globals.profiles_scanned_image_text_image, anchor="nw")
+                film_scanned_image_text_canvas.image = Globals.profiles_scanned_image_text_image
+                film_dose_map_image_text_canvas.create_image(0,0, image=Globals.profiles_film_dose_map_text_image, anchor="nw")
+                film_dose_map_image_text_canvas.image=Globals.profiles_film_dose_map_text_image
 
                 new_window.destroy()
 
@@ -1993,9 +1914,12 @@ are not happy with the placement click the button again.")
             set_batch_button.pack(expand=True, fill=BOTH)
             set_batch_button.image=Globals.done_button_image
             
+
             img_ROI = Globals.DVH_film_dataset[Globals.DVH_ROI_coords[0][1]:Globals.DVH_ROI_coords[2][1],\
                 Globals.DVH_ROI_coords[0][0]:Globals.DVH_ROI_coords[1][0], :]
             img_ROI_red_channel = img_ROI[:,:,2]
+            Globals.DVH_film_variable_ROI_coords = [Globals.DVH_ROI_coords[0][1], Globals.DVH_ROI_coords[2][1],\
+                Globals.DVH_ROI_coords[0][0], Globals.DVH_ROI_coords[1][0]]
             Globals.DVH_film_dataset_ROI = img_ROI
             Globals.DVH_film_dataset_ROI_red_channel = img_ROI_red_channel
             R = img_ROI[:,:,2];B = img_ROI[:,:,0]; G = img_ROI[:,:,1]
@@ -2010,46 +1934,43 @@ are not happy with the placement click the button again.")
             film_image_canvas = tk.Canvas(Globals.DVH_film_panedwindow)
             film_image_canvas.grid(row=0,column=0, sticky=N+S+W+E)
             Globals.DVH_film_panedwindow.add(film_image_canvas, \
-                height=max(heig,Globals.DVH_scanned_image_text_image.height()), \
-                    width=wid + Globals.DVH_scanned_image_text_image.width())
+                height=max(heig,Globals.profiles_scanned_image_text_image.height()), \
+                    width=wid + Globals.profiles_scanned_image_text_image.width())
             film_image_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-                height=max(heig,Globals.DVH_scanned_image_text_image.height()), \
-                    width=wid + Globals.DVH_scanned_image_text_image.width())
+                height=max(heig,Globals.profiles_scanned_image_text_image.height()), \
+                    width=wid + Globals.profiles_scanned_image_text_image.width())
 
             film_dose_canvas = tk.Canvas(Globals.DVH_film_panedwindow)
             film_dose_canvas.grid(row=1,column=0, sticky=N+S+W+E)
             Globals.DVH_film_panedwindow.add(film_dose_canvas, \
-                height=max(heig,Globals.DVH_film_dose_map_text_image.height()), \
-                    width=wid + Globals.DVH_film_dose_map_text_image.width())
+                height=max(heig,Globals.profiles_film_dose_map_text_image.height()), \
+                    width=wid + Globals.profiles_film_dose_map_text_image.width())
             film_dose_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-                height=max(heig,Globals.DVH_film_dose_map_text_image.height()), \
-                    width=wid + Globals.DVH_film_dose_map_text_image.width())
+                height=max(heig,Globals.profiles_film_dose_map_text_image.height()), \
+                    width=wid + Globals.profiles_film_dose_map_text_image.width())
 
-            film_write_image = tk.Canvas(film_image_canvas)
-            film_write_image.grid(row=0,column=1,sticky=N+S+W+E)
-            film_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
+            Globals.DVH_film_write_image = tk.Canvas(film_image_canvas)
+            Globals.DVH_film_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+            Globals.DVH_film_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)
             
-            film_dose_write_image = tk.Canvas(film_dose_canvas)
-            film_dose_write_image.grid(row=0,column=1,sticky=N+S+W+E)
-            film_dose_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)           
+            Globals.DVH_film_dose_write_image = tk.Canvas(film_dose_canvas)
+            Globals.DVH_film_dose_write_image.grid(row=0,column=1,sticky=N+S+W+E)
+            Globals.DVH_film_dose_write_image.config(bg='#ffffff', relief=FLAT, highlightthickness=0, width=wid, height=heig)           
 
             film_scanned_image_text_canvas=tk.Canvas(film_image_canvas)
             film_scanned_image_text_canvas.grid(row=0,column=0,sticky=N+S+W+E)
             film_scanned_image_text_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-                height=Globals.DVH_scanned_image_text_image.height(), width=Globals.DVH_scanned_image_text_image.width())
+                height=Globals.profiles_scanned_image_text_image.height(), width=Globals.profiles_scanned_image_text_image.width())
 
             film_dose_map_image_text_canvas=tk.Canvas(film_dose_canvas)
             film_dose_map_image_text_canvas.grid(row=0,column=0,sticky=N+S+W+E)
             film_dose_map_image_text_canvas.config(bg='#ffffff', relief=FLAT, highlightthickness=0, \
-                height=Globals.DVH_film_dose_map_text_image.height(), width=Globals.DVH_film_dose_map_text_image.width())
+                height=Globals.profiles_film_dose_map_text_image.height(), width=Globals.profiles_film_dose_map_text_image.width())
 
             scaled_image_visual = PIL_img_ROI
             scaled_image_visual = ImageTk.PhotoImage(image=scaled_image_visual)
-            
-            #film_window_write_image.create_image(0,0,image=scaled_image_visual,anchor="nw")
-            #film_window_write_image.image = scaled_image_visual
 
-            Globals.DVH_upload_button_doseplan.config(state=ACTIVE)
+            Globals.DVH_upload_button_doseplan.config(state=DISABLED)
             Globals.DVH_upload_button_rtplan.config(state=ACTIVE)
             Globals.DVH_upload_button_film.config(state=DISABLED)
 
@@ -2080,7 +2001,7 @@ are not happy with the placement click the button again.")
 
             
         done_button_frame = tk.Frame(new_window_isocenter_tab)
-        done_button_frame.grid(row=8, column=3, padx=(10,10), pady=(5,5), sticky=N+S+W+E)
+        done_button_frame.grid(row=10, column=3, padx=(10,10), pady=(5,5), sticky=N+S+W+E)
         done_button_frame.configure(bg='#ffffff')
         new_window_isocenter_tab.grid_columnconfigure(5, weight=0)
         new_window_isocenter_tab.grid_rowconfigure(5, weight=0)
@@ -2092,7 +2013,7 @@ are not happy with the placement click the button again.")
         Globals.DVH_done_button.image=Globals.done_button_image
 
         done_button_reference_point_frame = tk.Frame(new_window_reference_point_tab)
-        done_button_reference_point_frame.grid(row=9, column=3, padx=(10,10), pady=(5,5), sticky=N+S+W+E)
+        done_button_reference_point_frame.grid(row=10, column=3, padx=(10,10), pady=(5,5), sticky=N+S+W+E)
         done_button_reference_point_frame.configure(bg='#ffffff')
         new_window_reference_point_tab.grid_columnconfigure(5, weight=0)
         new_window_reference_point_tab.grid_rowconfigure(5, weight=0)
@@ -2109,33 +2030,15 @@ are not happy with the placement click the button again.")
     else:
         messagebox.showerror("Error", "The file must be a *.tif file")
 
-def plot_DVH():
-    #print(Globals.DVH_film_orientation.get())
-    return
-
 
 def help_showPlanes():
-    new_window = tk.Toplevel(Globals.tab4)
-    w = Globals.DVH_showPlanes_image.width()
-    h = Globals.DVH_showPlanes_image.height()
+    new_window = tk.Toplevel(Globals.tab5)
+    w = Globals.profiles_showPlanes_image.width()
+    h = Globals.profiles_showPlanes_image.height()
     new_window.geometry("%dx%d+0+0" % (w, h))
     new_window.grab_set()
 
     canvas = tk.Canvas(new_window)
     canvas.config(relief=FLAT, bg='#ffffff', highlightthickness=0)
-    canvas.create_image(0, 0, image=Globals.DVH_showPlanes_image, anchor='nw')
-    canvas.pack(expand=True, fill=BOTH)
-    
-
-
-def help_showDepth():
-    new_window = tk.Toplevel(Globals.tab4)
-    w = Globals.DVH_showDirections_image.width()
-    h = Globals.DVH_showDirections_image.height()
-    new_window.geometry("%dx%d+0+0" % (w, h))
-    new_window.grab_set()
-
-    canvas = tk.Canvas(new_window)
-    canvas.config(relief=FLAT, bg='#ffffff', highlightthickness=0)
-    canvas.create_image(0,0, image=Globals.DVH_showDirections_image, anchor='nw')
+    canvas.create_image(0, 0, image=Globals.profiles_showPlanes_image, anchor='nw')
     canvas.pack(expand=True, fill=BOTH)

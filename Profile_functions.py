@@ -737,13 +737,16 @@ def drawProfiles(even):
                 Globals.profiles_dataset_film_variable_draw = np.zeros(len(Globals.profiles_line_coords_film))
                 Globals.profiles_dataset_doesplan_variable_draw=np.zeros(len(Globals.profiles_line_coords_doseplan))
                 
+                print(Globals.profiles_dataset_film_variable_draw.shape)
                 for i in range(len(Globals.profiles_dataset_film_variable_draw)):
                     coord = Globals.profiles_line_coords_film[i]
-                    #print(coord[1], ", ", coord[0])
-                    Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
-                
+                    print(i, ": ",coord[1], ", ", coord[0])
+                    Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0]-1, coord[1]-1]
+                print(Globals.profiles_dataset_doesplan_variable_draw.shape)
                 for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
-                    Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+                    coord = Globals.profiles_line_coords_doseplan[i]
+                    print(i, ": ", coord[1], ", ", coord[0])
+                    Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[coord[0]-1, coord[1]-1]
 
                 draw('d', Globals.profiles_dataset_film_variable_draw, Globals.profiles_dataset_doesplan_variable_draw)
 
@@ -1021,9 +1024,9 @@ def processDoseplan_usingReferencePoint(only_one):
     ################  RT Plan ######################
 
     #Find each coordinate in mm to isocenter relative to first element in doseplan
-    iso_1 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[0] - Globals.profiles_isocenter_mm[0])
-    iso_2 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[1] - Globals.profiles_isocenter_mm[1])
-    iso_3 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[2] - Globals.profiles_isocenter_mm[2])
+    iso_1 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[0] - Globals.profiles_dataset_rtplan.BeamSequence[0].ControlPointSequence[0].IsocenterPosition[0])
+    iso_2 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[1] - Globals.profiles_dataset_rtplan.BeamSequence[0].ControlPointSequence[0].IsocenterPosition[1])
+    iso_3 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[2] - Globals.profiles_dataset_rtplan.BeamSequence[0].ControlPointSequence[0].IsocenterPosition[2])
     #Given as [x,y,z] in patient coordinates
     Globals.profiles_isocenter_mm = [iso_1, iso_2, iso_3]
     
@@ -1524,29 +1527,7 @@ def processDoseplan_usingReferencePoint(only_one):
     
     else:
         img=dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
-        """
-        if(Globals.profiles_number_of_doseplans == 1):
-            Globals.profiles_doseplan_dataset_ROI_several = img
-            Globals.profiles_number_of_doseplans+=1
-
-            if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
-                Globals.profiles_several_img = cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
-            elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
-                Globals.profiles_several_img = cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
-            else:
-                Globals.profiles_several_img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
-
-        else:
-            Globals.profiles_doseplan_dataset_ROI_several += img
-            Globals.profiles_number_of_doseplans+=1
-            
-            if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
-                Globals.profiles_several_img += cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5))
-            elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
-                Globals.profiles_several_img += cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10))
-            else:
-                Globals.profiles_several_img += cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
-        """
+        
         Globals.profiles_doseplan_dataset_ROI_several.append(img)
         Globals.profiles_number_of_doseplans+=1
 
@@ -1563,9 +1544,9 @@ def processDoseplan_usingIsocenter(only_one):
     ################  RT Plan ######################
 
     #Find each coordinate in mm to isocenter relative to first element in doseplan
-    iso_1 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[0] - Globals.profiles_isocenter_mm[0])
-    iso_2 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[1] - Globals.profiles_isocenter_mm[1])
-    iso_3 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[2] - Globals.profiles_isocenter_mm[2])
+    iso_1 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[0] - Globals.profiles_dataset_rtplan.BeamSequence[0].ControlPointSequence[0].IsocenterPosition[0])
+    iso_2 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[1] - Globals.profiles_dataset_rtplan.BeamSequence[0].ControlPointSequence[0].IsocenterPosition[1])
+    iso_3 = abs(Globals.profiles_dataset_doseplan.ImagePositionPatient[2] - Globals.profiles_dataset_rtplan.BeamSequence[0].ControlPointSequence[0].IsocenterPosition[2])
     #Given as [x,y,z] in patient coordinates
     Globals.profiles_isocenter_mm = [iso_1, iso_2, iso_3]
 
@@ -1915,13 +1896,13 @@ def processDoseplan_usingIsocenter(only_one):
     
     if Globals.profiles_dataset_doseplan.PixelSpacing == [1, 1]:
         offset = int(np.round(Globals.profiles_offset))
-        dose_slice = dataset_swapped[int(reference_point[0]) + offset]
+        dose_slice = dataset_swapped[int(reference_point[0] + offset)]
     elif Globals.profiles_dataset_doseplan.PixelSpacing == [2, 2]:
         offset = int(np.round(Globals.profiles_offset/2))
         dose_slice = dataset_swapped[int(reference_point[0] + offset)]
     else:
         offset = int(np.round(Globals.profiles_offset/3))
-        dose_slice = dataset_swapped[int(reference_point[0]) + offset]
+        dose_slice = dataset_swapped[int(reference_point[0]+ offset)]
 
         
     
@@ -2265,7 +2246,7 @@ def UploadDoseplan_button_function():
         
 
         mx=np.max(img_ROI)
-        #max_dose = mx*Globals.profiles_dose_scaling_doseplan
+        Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan
         img_ROI = img_ROI/mx
         PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img_ROI)*255))
 
@@ -2420,10 +2401,10 @@ def UploadDoseplan(only_one):
 
         Globals.profiles_doseplans_grid_config_count+=1;
 
-        textbox_factor_input = tk.Text(Globals.doseplans_scroll_frame)
+        textbox_factor_input = tk.Text(Globals.doseplans_scroll_frame, width=3, height=1)
         textbox_factor_input.insert(INSERT, " ")
         textbox_factor_input.config(bg='#E5f9ff', font=('calibri', '12'), state=NORMAL, bd = 2)
-        textbox_factor_input.grid(row = Globals.profiles_number_of_doseplans_row_count, column = 1, sticky=N+S+W+E, pady=(10,10), padx=(30,10))
+        textbox_factor_input.grid(row = Globals.profiles_number_of_doseplans_row_count, column = 1, sticky=N+S, pady=(10,10), padx=(40,10))
         Globals.doseplans_scroll_frame.grid_columnconfigure(Globals.profiles_doseplans_grid_config_count, weight=0)
         Globals.doseplans_scroll_frame.grid_rowconfigure(Globals.profiles_doseplans_grid_config_count, weight=0)
         Globals.profiles_doseplans_factor_input.append(textbox_factor_input)
@@ -2669,9 +2650,6 @@ def markROI(img, tab, canvas, ref_point_test):
 
 
 def UploadFilm():
-    #if(Globals.profiles_film_window_open):
-    #    Globals.profiles_film_window.destroy()
-    #    Globals.profiles_film_window_open = False
     if(Globals.profiles_film_orientation.get() == '-'):
         messagebox.showerror("Missing parameter", "Film orientation missing \n (Code: UploadFilm)")
         return
@@ -2683,16 +2661,6 @@ def UploadFilm():
         except:
             messagebox.showerror("Missing parameter", "Film factor invalid format. \n (Code: UploadFilm)")
             return
-                        
-    #if(Globals.profiles_depth.get("1.0",'end-1c') == " "):
-    #    messagebox.showerror("Missing parameter", "Film depth missing")
-    #    return
-    #try:
-    #    Globals.profiles_depth_float = float(Globals.profiles_depth.get("1.0", 'end-1c'))
-    #except:
-    #    messagebox.showerror("Error", "The depth must be a number")
-    #    return
-    #Globals.profiles_depth.config(state=DISABLED, fg='gray')
 
     file = filedialog.askopenfilename()
     ext = os.path.splitext(file)[-1].lower()
@@ -2703,7 +2671,6 @@ def UploadFilm():
         img = Image.open(file)
         img = img.transpose(Image.FLIP_LEFT_RIGHT)
         cv2Img = cv2.imread(basename(normpath(file)), cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
-        #cv2Img = cv2.flip(cv2Img, 0)
         cv2Img = cv2.medianBlur(cv2Img, 5)
         if(cv2Img is None):
             messagebox.showerror("Error", "Something has gone wrong. Check that the filename does not contain Æ,Ø,Å")
@@ -2735,9 +2702,6 @@ def UploadFilm():
         Globals.profiles_film_orientation_menu.configure(state=DISABLED)
         Globals.profiles_film_factor_input.config(state=DISABLED)
     
-        #scale_horizontal = 2
-        #scale_vertical = 2
-        
         h = 635 + 20
         w = 508 + 625
         new_window = tk.Toplevel(Globals.tab4)
