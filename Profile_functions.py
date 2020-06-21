@@ -849,7 +849,8 @@ def drawProfiles(even):
                 
                 for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
                     Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), \
-                        int(Globals.profiles_line_coords_doseplan[i][1])]*Globals.profiles_dataset_doseplan.DoseGridScaling
+                        int(Globals.profiles_line_coords_doseplan[i][1])]
+                        
 
                 draw('d', Globals.profiles_dataset_film_variable_draw, Globals.profiles_dataset_doesplan_variable_draw)
 
