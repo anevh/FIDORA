@@ -2244,7 +2244,7 @@ def UploadDoseplan_button_function():
                 img_ROI+= factor*Globals.profiles_several_img[i]
 
         
-
+        Globals.profiles_doseplan_dataset_ROI = doseplan_ROI
         mx=np.max(img_ROI)
         Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan
         img_ROI = img_ROI/mx
