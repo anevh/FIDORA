@@ -11,5 +11,5 @@ for i in range(3):
 print(a)
 print(b)
 
-a += b
+a += 3*b
 print(a)
