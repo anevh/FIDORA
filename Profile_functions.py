@@ -1532,11 +1532,11 @@ def processDoseplan_usingReferencePoint(only_one):
         Globals.profiles_number_of_doseplans+=1
 
         if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
-            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5)))
+            Globals.profiles_several_img.append(img)#cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5)))
         elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
-            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10)))
+            Globals.profiles_several_img.append(img)#cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10)))
         else:
-            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15)))
+            Globals.profiles_several_img.append(img)#cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15)))
 
 
 def processDoseplan_usingIsocenter(only_one):
@@ -2091,11 +2091,11 @@ def processDoseplan_usingIsocenter(only_one):
         Globals.profiles_number_of_doseplans+=1
 
         if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
-            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5)))
+            Globals.profiles_several_img.append(img)#cv2.resize(img, dsize=(img.shape[1]*5,img.shape[0]*5)))
         elif(Globals.profiles_dataset_doseplan.PixelSpacing==[2, 2]):
-            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10)))
+            Globals.profiles_several_img.append(img)#cv2.resize(img, dsize=(img.shape[1]*10,img.shape[0]*10)))
         else:
-            Globals.profiles_several_img.append(cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15)))
+            Globals.profiles_several_img.append(img)#cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15)))
 
         
         
@@ -2242,8 +2242,9 @@ def UploadDoseplan_button_function():
             else:
                 doseplan_ROI+= factor*Globals.profiles_doseplan_dataset_ROI_several[i]
                 img_ROI+= factor*Globals.profiles_several_img[i]
+                
 
-        
+        img_ROI = cv2.resize(img_ROI, dsize=(img.shape[1]*5,img.shape[0]*5))
         Globals.profiles_doseplan_dataset_ROI = doseplan_ROI
         mx=np.max(img_ROI)
         Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan
