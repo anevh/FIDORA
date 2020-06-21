@@ -213,7 +213,7 @@ def drawProfiles(even):
             return
 
        
-        a.legend(('Film', 'Doseplan'))
+        a.legend()
         a.set_title("Profiles", fontsize=12)
         a.set_ylabel("Dose (Gy)", fontsize=12)
         a.set_xlabel("Distance (mm)", fontsize=12)
@@ -2245,7 +2245,7 @@ def UploadDoseplan_button_function():
                 img_ROI+= factor*Globals.profiles_several_img[i]
                 
 
-        img_ROI = cv2.resize(img_ROI, dsize=(img.shape[1]*5,img.shape[0]*5))
+        img_ROI = cv2.resize(img_ROI, dsize=(img_ROI.shape[1]*5,img_ROI.shape[0]*5))
         Globals.profiles_doseplan_dataset_ROI = doseplan_ROI
         mx=np.max(img_ROI)
         Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan
