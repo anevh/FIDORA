@@ -163,9 +163,9 @@ def drawProfiles(even):
             x = np.linspace(-dx,dx, dataset_film.shape[1])
             y = np.linspace(-dy,dy, Globals.profiles_doseplan_dataset_ROI.shape[1])
             plot_film = dataset_film[Globals.profiles_coordinate_in_dataset,:]/100
-            plot_doseplan = dataset_doseplan[Globals.profiles_coordinate_in_dataset, :]*Globals.profiles_dataset_doseplan.DoseGridScaling
-            a.plot(x,plot_film, 'r')
-            a.plot(y,plot_doseplan, 'b')
+            plot_doseplan = dataset_doseplan[Globals.profiles_coordinate_in_dataset, :]
+            film = a.plot(x,plot_film, color='r', label='Film')
+            dose = a.plot(y,plot_doseplan, color='b', label='Doseplan')
         elif line_orient == 'v':
             if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
                 dy = Globals.profiles_doseplan_dataset_ROI.shape[0]/2
@@ -177,9 +177,9 @@ def drawProfiles(even):
             x = np.linspace(-dx,dx, dataset_film.shape[0])
             y = np.linspace(-dy,dy, Globals.profiles_doseplan_dataset_ROI.shape[0])
             plot_film = dataset_film[:,Globals.profiles_coordinate_in_dataset]/100
-            plot_doseplan = dataset_doseplan[:, Globals.profiles_coordinate_in_dataset]*Globals.profiles_dataset_doseplan.DoseGridScaling  #Globals.profiles_doseplan_dataset_ROI
-            a.plot(x,plot_film, 'r')
-            a.plot(y,plot_doseplan, 'b')
+            plot_doseplan = dataset_doseplan[:, Globals.profiles_coordinate_in_dataset]  #Globals.profiles_doseplan_dataset_ROI
+            film=a.plot(x,plot_film, color='r', label='Film')
+            dose=a.plot(y,plot_doseplan, color='b', label='Doseplan')
         elif line_orient == 'd':
             start_f_x, start_f_y = Globals.profiles_line_coords_film[0]
             end_f_x, end_f_y = Globals.end_point
@@ -204,9 +204,9 @@ def drawProfiles(even):
             x = np.linspace(-dx,dx,len(dataset_film))
             y = np.linspace(-dy,dy,len(dataset_doseplan))
             plot_film=dataset_film/100
-            plot_doseplan=dataset_doseplan*Globals.profiles_dataset_doseplan.DoseGridScaling
-            a.plot(x,plot_film, 'r')
-            a.plot(y,plot_doseplan, 'b')
+            plot_doseplan=dataset_doseplan
+            film = a.plot(x,plot_film, color='r', label='Film')
+            dose= a.plot(y,plot_doseplan, 'b', label='Doseplan')
 
         else:
             messagebox.showerror("Error", "Fatal error. Something has gone wrong, try again \n(Code: draw")
@@ -848,7 +848,8 @@ def drawProfiles(even):
                     Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
                 
                 for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
-                    Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+                    Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), \
+                        int(Globals.profiles_line_coords_doseplan[i][1])]*Globals.profiles_dataset_doseplan.DoseGridScaling
 
                 draw('d', Globals.profiles_dataset_film_variable_draw, Globals.profiles_dataset_doesplan_variable_draw)
 
@@ -1479,7 +1480,7 @@ def processDoseplan_usingReferencePoint(only_one):
 
     if only_one:
         Globals.profiles_doseplan_dataset_ROI = \
-            dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+            dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]*Globals.profiles_dataset_doseplan.DoseGridScaling
    
         img=Globals.profiles_doseplan_dataset_ROI
         if(Globals.profiles_dataset_doseplan.PixelSpacing==[1, 1]):
@@ -2014,7 +2015,7 @@ def processDoseplan_usingIsocenter(only_one):
     #dose_slice = cv2.flip(dose_slice, 1)
     if(only_one):
         Globals.profiles_doseplan_dataset_ROI = \
-            dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]
+            dose_slice[int(top_left_down):int(bottom_left_down), int(top_left_to_side):int(top_right_to_side)]*Globals.profiles_dataset_doseplan.DoseGridScaling
     
     
         img=Globals.profiles_doseplan_dataset_ROI
@@ -2234,13 +2235,13 @@ def UploadDoseplan_button_function():
                     messagebox.showerror("Error", "Invalid factor. Must be number.\n (Code: closeUploadDoseplans)")
                     return
             if i == 0:
-                doseplan_ROI = Globals.profiles_doseplan_dataset_ROI_several[i]
+                doseplan_ROI = Globals.profiles_doseplan_dataset_ROI_several[i]*Globals.profiles_dataset_doseplan.DoseGridScaling
                 doseplan_ROI= doseplan_ROI*factor
 
                 img_ROI = Globals.profiles_several_img[i]
                 img_ROI = img_ROI*factor
             else:
-                doseplan_ROI+= factor*Globals.profiles_doseplan_dataset_ROI_several[i]
+                doseplan_ROI+= factor*Globals.profiles_doseplan_dataset_ROI_several[i]*Globals.profiles_dataset_doseplan.DoseGridScaling
                 img_ROI+= factor*Globals.profiles_several_img[i]
                 
 
