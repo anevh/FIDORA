@@ -737,15 +737,16 @@ def drawProfiles(even):
                 Globals.profiles_dataset_film_variable_draw = np.zeros(len(Globals.profiles_line_coords_film))
                 Globals.profiles_dataset_doesplan_variable_draw=np.zeros(len(Globals.profiles_line_coords_doseplan))
                 
-                print(Globals.profiles_dataset_film_variable_draw.shape)
+                
                 for i in range(len(Globals.profiles_dataset_film_variable_draw)):
                     coord = Globals.profiles_line_coords_film[i]
-                    print(i, ": ",coord[1], ", ", coord[0])
                     Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0]-1, coord[1]-1]
-                print(Globals.profiles_dataset_doesplan_variable_draw.shape)
+                print(len(Globals.profiles_dataset_film_variable_draw))
+                print(Globals.profiles_film_dataset_ROI_red_channel_dose.shape)
+                print(coord)
                 for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
                     coord = Globals.profiles_line_coords_doseplan[i]
-                    print(i, ": ", coord[1], ", ", coord[0])
+
                     Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[coord[0]-1, coord[1]-1]
 
                 draw('d', Globals.profiles_dataset_film_variable_draw, Globals.profiles_dataset_doesplan_variable_draw)
@@ -794,11 +795,11 @@ def drawProfiles(even):
                 
                 for i in range(len(Globals.profiles_dataset_film_variable_draw)):
                     coord = Globals.profiles_line_coords_film[i]
-                    #print(coord[1], ", ", coord[0])
-                    Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+
+                    Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0]-1, coord[1]-1]
                 
                 for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
-                    Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+                    Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0])-1, int(Globals.profiles_line_coords_doseplan[i][1])-1]
 
                 draw('d', Globals.profiles_dataset_film_variable_draw, Globals.profiles_dataset_doesplan_variable_draw)
 
@@ -844,12 +845,12 @@ def drawProfiles(even):
                 
                 for i in range(len(Globals.profiles_dataset_film_variable_draw)):
                     coord = Globals.profiles_line_coords_film[i]
-                    #print(coord[1], ", ", coord[0])
-                    Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+
+                    Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0]-1, coord[1]-1]
                 
                 for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
-                    Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), \
-                        int(Globals.profiles_line_coords_doseplan[i][1])]
+                    Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0])-1, \
+                        int(Globals.profiles_line_coords_doseplan[i][1])-1]
                         
 
                 draw('d', Globals.profiles_dataset_film_variable_draw, Globals.profiles_dataset_doesplan_variable_draw)
@@ -898,11 +899,11 @@ def adjustROILeft(line_orient):
     if line_orient == 'd':
         for i in range(len(Globals.profiles_dataset_film_variable_draw)):
             coord = Globals.profiles_line_coords_film[i]
-            #print(coord[1], ", ", coord[0])
-            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+
+            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0]-1, coord[1]-1]
                 
         for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
-            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0])-1, int(Globals.profiles_line_coords_doseplan[i][1])-1]
         drawProfiles(True)
     else:
         drawProfiles(False)
@@ -926,11 +927,11 @@ def adjustROIRight(line_orient):
     if line_orient == 'd':
         for i in range(len(Globals.profiles_dataset_film_variable_draw)):
             coord = Globals.profiles_line_coords_film[i]
-            #print(coord[1], ", ", coord[0])
-            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+
+            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0]-1, coord[1]-1]
                 
         for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
-            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0])-1, int(Globals.profiles_line_coords_doseplan[i][1])-1]
         drawProfiles(True)
     else:
         drawProfiles(False)
@@ -954,11 +955,11 @@ def adjustROIUp(line_orient):
     if line_orient == 'd':
         for i in range(len(Globals.profiles_dataset_film_variable_draw)):
             coord = Globals.profiles_line_coords_film[i]
-            #print(coord[1], ", ", coord[0])
-            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+
+            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0]-1, coord[1]-1]
                 
         for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
-            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0])-1, int(Globals.profiles_line_coords_doseplan[i][1])-1]
         drawProfiles(True)
     else:
         drawProfiles(False)
@@ -982,11 +983,11 @@ def adjustROIDown(line_orient):
     if line_orient == 'd':
         for i in range(len(Globals.profiles_dataset_film_variable_draw)):
             coord = Globals.profiles_line_coords_film[i]
-            #print(coord[1], ", ", coord[0])
-            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+
+            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0]-1, coord[1]-1]
                 
         for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
-            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0])-1, int(Globals.profiles_line_coords_doseplan[i][1])-1]
         drawProfiles(True)
     else:
         drawProfiles(False)
@@ -1008,11 +1009,11 @@ def returnToOriginalROICoordinates(line_orient):
     if line_orient == 'd':
         for i in range(len(Globals.profiles_dataset_film_variable_draw)):
             coord = Globals.profiles_line_coords_film[i]
-            #print(coord[1], ", ", coord[0])
-            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0], coord[1]]
+
+            Globals.profiles_dataset_film_variable_draw[i] = Globals.profiles_film_dataset_ROI_red_channel_dose[coord[0]-1, coord[1]-1]
                 
         for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
-            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0]), int(Globals.profiles_line_coords_doseplan[i][1])]
+            Globals.profiles_dataset_doesplan_variable_draw[i] = Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0])-1, int(Globals.profiles_line_coords_doseplan[i][1])-1]
         drawProfiles(True)
     else:
         drawProfiles(False)
@@ -1492,7 +1493,7 @@ def processDoseplan_usingReferencePoint(only_one):
             img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
 
         mx=np.max(img)
-        Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan
+        Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan[0]
         img = img/mx
         PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
 
@@ -2028,8 +2029,8 @@ def processDoseplan_usingIsocenter(only_one):
             img = cv2.resize(img, dsize=(img.shape[1]*15,img.shape[0]*15))
 
         mx=np.max(img)
-        Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan
-        max_dose = mx*Globals.profiles_dose_scaling_doseplan
+        Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan[0]
+        max_dose = mx*Globals.profiles_dose_scaling_doseplan[0]
         img = img/mx
         PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img)*255))
 
@@ -2242,14 +2243,14 @@ def UploadDoseplan_button_function():
                 img_ROI = Globals.profiles_several_img[i]
                 img_ROI = img_ROI*factor
             else:
-                doseplan_ROI+= factor*Globals.profiles_doseplan_dataset_ROI_several[i]*Globals.profiles_dataset_doseplan.DoseGridScaling
+                doseplan_ROI+= factor*Globals.profiles_doseplan_dataset_ROI_several[i]*Globals.profiles_dose_scaling_doseplan[i]
                 img_ROI+= factor*Globals.profiles_several_img[i]
                 
 
         img_ROI = cv2.resize(img_ROI, dsize=(img_ROI.shape[1]*5,img_ROI.shape[0]*5))
         Globals.profiles_doseplan_dataset_ROI = doseplan_ROI
         mx=np.max(img_ROI)
-        Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan
+        Globals.max_dose_doseplan = mx*Globals.profiles_dose_scaling_doseplan[0]
         img_ROI = img_ROI/mx
         PIL_img_doseplan_ROI = Image.fromarray(np.uint8(cm.viridis(img_ROI)*255))
 
@@ -2368,7 +2369,7 @@ def UploadDoseplan(only_one):
             messagebox.showerror("Error", "Dose grid scaling of the doseplans must be equal. \n(Code: UploadDoseplan)")
             return
     Globals.profiles_dataset_doseplan = dataset
-    Globals.profiles_dose_scaling_doseplan = dataset.DoseGridScaling
+    Globals.profiles_dose_scaling_doseplan.append(dataset.DoseGridScaling)
     Globals.profiles_test_if_added_doseplan = True
     if(Globals.profiles_test_if_added_rtplan):
         if(Globals.profiles_isocenter_or_reference_point == "Isocenter"):
@@ -3228,7 +3229,7 @@ are not happy with the placement click the button again.")
         messagebox.showerror("Error", "The file must be a *.tif file")
 
 def plot_profiles():
-    #print(Globals.profiles_film_orientation.get())
+
     return
 
 

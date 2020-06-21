@@ -422,6 +422,7 @@ global profiles_film_dataset_ROI_red_channel
 global profiles_doseplan_dataset_ROI
 global profiles_film_dataset_ROI_red_channel_dose
 
+
 global profiles_view_film_doseplan_ROI
 profiles_view_film_doseplan_ROI = tk.Canvas(tab4_canvas)
 profiles_view_film_doseplan_ROI.grid(row=2, column=3, rowspan=25, sticky=E+W+N, pady=(0,5), padx=(5,10))
@@ -530,6 +531,7 @@ global profiles_isocenter_mm
 
 
 global profiles_dose_scaling_doseplan
+profiles_dose_scaling_doseplan = []
 
 global profiles_max_dose_film
 
