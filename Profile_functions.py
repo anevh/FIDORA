@@ -202,6 +202,7 @@ def drawProfiles(even):
                 dy=np.sqrt(((end_d_x-start_d_x)*3)**2 + ((end_d_y-start_d_y)*3)**2)/2
             
                 
+            print(dx, dy)
             x = np.linspace(-dx,dx,len(dataset_film))
             y = np.linspace(-dy,dy,len(dataset_doseplan))
             plot_film=dataset_film/100
@@ -703,35 +704,35 @@ def drawProfiles(even):
     elif(Globals.profiles_choice_of_profile_line_type.get() == 'd' and Globals.profiles_dataset_doseplan.PixelSpacing == [1, 1]):
         start_point = [0,0]
         def mousePushed(event):
-            start_point = [event.x, event.y]
+            start_point = [event.y, event.x]
             if not len(Globals.profiles_lines)==0:
                 Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
                 Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
                 Globals.film_write_image.delete(Globals.profiles_lines[2])
                 Globals.profiles_lines = []
 
-            line_doseplan = Globals.doseplan_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
-            line_film_dosemap = Globals.film_dose_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
-            line_film = Globals.film_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
+            line_doseplan = Globals.doseplan_write_image.create_line(start_point[1], start_point[0],start_point[1],start_point[0], fill='red')
+            line_film_dosemap = Globals.film_dose_write_image.create_line(start_point[1], start_point[0],start_point[1],start_point[0], fill='red')
+            line_film = Globals.film_write_image.create_line(start_point[1], start_point[0],start_point[1],start_point[0], fill='red')
 
             Globals.profiles_lines.append(line_doseplan)
             Globals.profiles_lines.append(line_film_dosemap)
             Globals.profiles_lines.append(line_film)
 
             def mouseMoving(event):
-                Globals.doseplan_write_image.coords(line_doseplan, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_write_image.coords(line_film, start_point[0], start_point[1], event.x, event.y)
+                Globals.doseplan_write_image.coords(line_doseplan, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_write_image.coords(line_film, start_point[1], start_point[0], event.x, event.y)
 
                 
 
             Globals.film_dose_write_image.bind("<B1-Motion>", mouseMoving)
 
             def mouseReleased(event):
-                Globals.end_point = [event.x, event.y]
-                Globals.doseplan_write_image.coords(line_doseplan, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_write_image.coords(line_film, start_point[0], start_point[1], event.x, event.y)
+                Globals.end_point = [event.y, event.x]
+                Globals.doseplan_write_image.coords(line_doseplan, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_write_image.coords(line_film, start_point[1], start_point[0], event.x, event.y)
                 Globals.profiles_line_coords_film = getCoordsInRandomLine(start_point[1], start_point[0], Globals.end_point[1], Globals.end_point[0])
                 Globals.profiles_line_coords_doseplan = getCoordsInRandomLine(int(start_point[1]/5), int(start_point[0]/5), \
                     int(Globals.end_point[1]/5), int(Globals.end_point[0]/5))
@@ -760,35 +761,35 @@ def drawProfiles(even):
     elif(Globals.profiles_choice_of_profile_line_type.get() == 'd' and Globals.profiles_dataset_doseplan.PixelSpacing == [2, 2]):
         start_point = [0,0]
         def mousePushed(event):
-            start_point = [event.x, event.y]
+            start_point = [event.y, event.x]
             if not len(Globals.profiles_lines)==0:
                 Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
                 Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
                 Globals.film_write_image.delete(Globals.profiles_lines[2])
                 Globals.profiles_lines = []
 
-            line_doseplan = Globals.doseplan_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
-            line_film_dosemap = Globals.film_dose_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
-            line_film = Globals.film_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
+            line_doseplan = Globals.doseplan_write_image.create_line(start_point[1], start_point[0],start_point[1],start_point[0], fill='red')
+            line_film_dosemap = Globals.film_dose_write_image.create_line(start_point[1], start_point[0],start_point[1],start_point[0], fill='red')
+            line_film = Globals.film_write_image.create_line(start_point[1], start_point[0],start_point[1],start_point[0], fill='red')
 
             Globals.profiles_lines.append(line_doseplan)
             Globals.profiles_lines.append(line_film_dosemap)
             Globals.profiles_lines.append(line_film)
 
             def mouseMoving(event):
-                Globals.doseplan_write_image.coords(line_doseplan, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_write_image.coords(line_film, start_point[0], start_point[1], event.x, event.y)
+                Globals.doseplan_write_image.coords(line_doseplan, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_write_image.coords(line_film, start_point[1], start_point[0], event.x, event.y)
 
                 
 
             Globals.film_dose_write_image.bind("<B1-Motion>", mouseMoving)
 
             def mouseReleased(event):
-                Globals.end_point = [event.x, event.y]
-                Globals.doseplan_write_image.coords(line_doseplan, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_write_image.coords(line_film, start_point[0], start_point[1], event.x, event.y)
+                Globals.end_point = [event.y, event.x]
+                Globals.doseplan_write_image.coords(line_doseplan, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_write_image.coords(line_film, start_point[1], start_point[0], event.x, event.y)
                 Globals.profiles_line_coords_film = getCoordsInRandomLine(start_point[1], start_point[0], Globals.end_point[1], Globals.end_point[0])
                 Globals.profiles_line_coords_doseplan = getCoordsInRandomLine(int(start_point[1]/10), int(start_point[0]/10), \
                     int(Globals.end_point[1]/10), int(Globals.end_point[0]/10))
@@ -806,7 +807,7 @@ def drawProfiles(even):
                 for i in range(len(Globals.profiles_dataset_doesplan_variable_draw)):
                     try:
                         Globals.profiles_dataset_doesplan_variable_draw[i] = \
-                            Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][0])-1, int(Globals.profiles_line_coords_doseplan[i][1])-1]
+                            Globals.profiles_doseplan_dataset_ROI[int(Globals.profiles_line_coords_doseplan[i][1])-1, int(Globals.profiles_line_coords_doseplan[i][0])-1]
                     except:
                         return
                 draw('d', Globals.profiles_dataset_film_variable_draw, Globals.profiles_dataset_doesplan_variable_draw)
@@ -816,35 +817,35 @@ def drawProfiles(even):
     elif(Globals.profiles_choice_of_profile_line_type.get() == 'd' and Globals.profiles_dataset_doseplan.PixelSpacing == [3, 3]):
         start_point = [0,0]
         def mousePushed(event):
-            start_point = [event.x, event.y]
+            start_point = [event.y, event.x]
             if not len(Globals.profiles_lines)==0:
                 Globals.doseplan_write_image.delete(Globals.profiles_lines[0])
                 Globals.film_dose_write_image.delete(Globals.profiles_lines[1])
                 Globals.film_write_image.delete(Globals.profiles_lines[2])
                 Globals.profiles_lines = []
 
-            line_doseplan = Globals.doseplan_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
-            line_film_dosemap = Globals.film_dose_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
-            line_film = Globals.film_write_image.create_line(start_point[0], start_point[1],start_point[0],start_point[1], fill='red')
+            line_doseplan = Globals.doseplan_write_image.create_line(start_point[1], start_point[0],start_point[1],start_point[0], fill='red')
+            line_film_dosemap = Globals.film_dose_write_image.create_line(start_point[1], start_point[0],start_point[1],start_point[0], fill='red')
+            line_film = Globals.film_write_image.create_line(start_point[1], start_point[0],start_point[1],start_point[0], fill='red')
 
             Globals.profiles_lines.append(line_doseplan)
             Globals.profiles_lines.append(line_film_dosemap)
             Globals.profiles_lines.append(line_film)
 
             def mouseMoving(event):
-                Globals.doseplan_write_image.coords(line_doseplan, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_write_image.coords(line_film, start_point[0], start_point[1], event.x, event.y)
+                Globals.doseplan_write_image.coords(line_doseplan, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_write_image.coords(line_film, start_point[1], start_point[0], event.x, event.y)
 
                 
 
             Globals.film_dose_write_image.bind("<B1-Motion>", mouseMoving)
 
             def mouseReleased(event):
-                Globals.end_point = [event.x, event.y]
-                Globals.doseplan_write_image.coords(line_doseplan, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[0], start_point[1], event.x, event.y)
-                Globals.film_write_image.coords(line_film, start_point[0], start_point[1], event.x, event.y)
+                Globals.end_point = [event.y, event.x]
+                Globals.doseplan_write_image.coords(line_doseplan, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_dose_write_image.coords(line_film_dosemap, start_point[1], start_point[0], event.x, event.y)
+                Globals.film_write_image.coords(line_film, start_point[1], start_point[0], event.x, event.y)
                 Globals.profiles_line_coords_film = getCoordsInRandomLine(start_point[1], start_point[0], Globals.end_point[1], Globals.end_point[0])
                 Globals.profiles_line_coords_doseplan = getCoordsInRandomLine(int(start_point[1]/15), int(start_point[0]/15), \
                     int(Globals.end_point[1]/15), int(Globals.end_point[0]/15))
